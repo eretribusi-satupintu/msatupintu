@@ -17,7 +17,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
-  int selectedPage = 1;
+  int selectedPage = 0;
   late AnimationController _controller;
   bool auth = false;
 
@@ -314,7 +314,6 @@ class CustomClipPath extends CustomClipper<Path> {
   Path getClip(Size size) {
     double w = size.width;
     double h = size.height;
-    print(move);
     Path path_0 = Path();
     path_0.moveTo(w * -0.0016667, h * -0.0014286);
     path_0.lineTo(0, h * 0.6095429);

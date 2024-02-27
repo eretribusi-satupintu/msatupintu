@@ -12,6 +12,7 @@ Color orangeColor = const Color(0xffF29D38);
 Color redColor = const Color(0xffEB4E4E);
 Color lightGreenColor = const Color(0xff85EB4E);
 Color greyColor = const Color(0xff808080);
+Color lightGreyColor = const Color(0xffD9D9D9);
 
 // readexPro
 TextStyle blackRdTextStyle = GoogleFonts.readexPro(color: blackColor);
@@ -23,6 +24,7 @@ TextStyle mainRdTextStyle = GoogleFonts.readexPro(color: mainColor);
 TextStyle blueRdTextStyle = GoogleFonts.readexPro(color: blueColor);
 TextStyle redRdTextStyle = GoogleFonts.readexPro(color: redColor);
 TextStyle orangeRdTextStyle = GoogleFonts.readexPro(color: orangeColor);
+TextStyle lightGreyRdTextStyle = GoogleFonts.readexPro(color: lightGreyColor);
 
 // inter
 TextStyle blackInTextStyle = GoogleFonts.inter(color: blackColor);

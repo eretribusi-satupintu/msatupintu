@@ -33,8 +33,10 @@ class CustomFilledButton extends StatelessWidget {
 class CustomOutlinedButton extends StatelessWidget {
   final String title;
   final Color? color;
+  final VoidCallback onPressed;
 
-  const CustomOutlinedButton({super.key, required this.title, this.color});
+  const CustomOutlinedButton(
+      {super.key, required this.title, this.color, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +51,7 @@ class CustomOutlinedButton extends StatelessWidget {
           side: BorderSide(width: 2, color: color ?? mainColor),
         ),
         child: Text(
-          "Get Started",
+          title,
           style: TextStyle(fontSize: 16, color: color),
         ),
       ),

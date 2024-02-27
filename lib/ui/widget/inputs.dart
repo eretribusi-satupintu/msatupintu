@@ -3,16 +3,19 @@ import 'package:satupintu_app/shared/theme.dart';
 
 class CustomInput extends StatelessWidget {
   final String hintText;
+  final TextEditingController? controller;
   final bool obscure;
   final String? errorText;
   final bool error;
 
-  const CustomInput(
-      {super.key,
-      required this.hintText,
-      this.obscure = false,
-      this.error = false,
-      this.errorText});
+  const CustomInput({
+    super.key,
+    required this.hintText,
+    this.obscure = false,
+    this.error = false,
+    this.errorText,
+    this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,7 @@ class CustomInput extends StatelessWidget {
         SizedBox(
           height: 48,
           child: TextFormField(
+            controller: controller,
             obscureText: obscure,
             decoration: InputDecoration(
               filled: true,

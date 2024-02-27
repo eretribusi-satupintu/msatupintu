@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
+import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -70,18 +75,57 @@ class HomePage extends StatelessWidget {
         const SizedBox(
           height: 20,
         ),
-        Column(
-          children: [
-            tagihanTerbaru(),
-            tagihanTerbaru(),
-            tagihanTerbaru(),
-          ],
+        BlocProvider(
+          create: (context) => TagihanBloc()..add(TagihanGet()),
+          child: BlocBuilder<TagihanBloc, TagihanState>(
+            builder: (context, state) {
+              if (state is TagihanSuccess) {
+                return Column(
+                  children: state.data
+                      .map((tagihan) => GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TagihanDetailPage(tagihan: tagihan),
+                                ),
+                              );
+                            },
+                            child: tagihanTerbaru(
+                              tagihan.nama.toString(),
+                              int.parse(
+                                tagihan.totalHarga.toString(),
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                );
+              }
+
+              if (state is TagihanFailed) {
+                return const Column(
+                  children: [
+                    Text("Tidak dapat mengakses server"),
+                  ],
+                );
+              }
+
+              return Center(
+                child:
+                    LoadingAnimationWidget.inkDrop(color: mainColor, size: 24),
+              );
+            },
+          ),
         )
       ],
     );
   }
 
-  Widget tagihanTerbaru() {
+  Widget tagihanTerbaru(
+    String title,
+    int totalHarga,
+  ) {
     return Container(
       width: double.infinity,
       // height: 86,
@@ -110,7 +154,7 @@ class HomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Retribusi Pasar',
+                    title.toString(),
                     style: darRdBrownTextStyle.copyWith(
                         fontSize: 12, fontWeight: semiBold),
                   ),
@@ -153,7 +197,7 @@ class HomePage extends StatelessWidget {
           Align(
               alignment: Alignment.topRight,
               child: Text(
-                'Rp. 5000',
+                'Rp. $totalHarga',
                 style: mainRdTextStyle.copyWith(fontWeight: bold, fontSize: 16),
               )
               // Container(
