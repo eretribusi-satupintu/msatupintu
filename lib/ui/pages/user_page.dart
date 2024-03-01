@@ -49,7 +49,7 @@ class UserPage extends StatelessWidget {
                       children: [
                         Text(
                           'Rizki Okto S',
-                          style: darRdBrownTextStyle.copyWith(
+                          style: darkRdBrownTextStyle.copyWith(
                             fontSize: 18,
                             fontWeight: bold,
                           ),
@@ -59,7 +59,7 @@ class UserPage extends StatelessWidget {
                         ),
                         Text(
                           'NIK : 1912100210001',
-                          style: darRdBrownTextStyle.copyWith(
+                          style: darkRdBrownTextStyle.copyWith(
                               fontWeight: bold, fontSize: 12),
                         ),
                         SizedBox(
@@ -143,7 +143,7 @@ class UserPage extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: darRdBrownTextStyle.copyWith(fontWeight: semiBold),
+                style: darkRdBrownTextStyle.copyWith(fontWeight: semiBold),
               ),
               Text(
                 description,

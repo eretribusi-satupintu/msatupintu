@@ -19,7 +19,7 @@ TextStyle blackRdTextStyle = GoogleFonts.readexPro(color: blackColor);
 TextStyle whiteRdTextStyle = GoogleFonts.readexPro(color: whiteColor);
 TextStyle greyRdTextStyle = GoogleFonts.readexPro(color: greyColor);
 TextStyle greenRdTextStyle = GoogleFonts.readexPro(color: greenColor);
-TextStyle darRdBrownTextStyle = GoogleFonts.readexPro(color: darkBrownColor);
+TextStyle darkRdBrownTextStyle = GoogleFonts.readexPro(color: darkBrownColor);
 TextStyle mainRdTextStyle = GoogleFonts.readexPro(color: mainColor);
 TextStyle blueRdTextStyle = GoogleFonts.readexPro(color: blueColor);
 TextStyle redRdTextStyle = GoogleFonts.readexPro(color: redColor);
@@ -29,6 +29,7 @@ TextStyle lightGreyRdTextStyle = GoogleFonts.readexPro(color: lightGreyColor);
 // inter
 TextStyle blackInTextStyle = GoogleFonts.inter(color: blackColor);
 TextStyle whiteInTextStyle = GoogleFonts.inter(color: whiteColor);
+TextStyle darkInBrownTextStyle = GoogleFonts.inter(color: darkBrownColor);
 
 FontWeight light = FontWeight.w300;
 FontWeight regular = FontWeight.w400;

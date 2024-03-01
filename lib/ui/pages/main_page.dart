@@ -5,7 +5,7 @@ import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/home_page.dart';
 import 'package:satupintu_app/ui/pages/kontrak_page.dart';
 import 'package:satupintu_app/ui/pages/qr_code_page.dart';
-import 'package:satupintu_app/ui/pages/tagihan_page.dart';
+import 'package:satupintu_app/ui/pages/retribusi_page.dart';
 import 'package:satupintu_app/ui/pages/user_page.dart';
 
 class MainPage extends StatefulWidget {

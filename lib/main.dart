@@ -1,11 +1,10 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:satupintu_app/blocs/auth/auth_bloc.dart";
-import "package:satupintu_app/ui/pages/home_page.dart";
 import "package:satupintu_app/ui/pages/login_page.dart";
 import "package:satupintu_app/ui/pages/main_page.dart";
+import "package:satupintu_app/ui/pages/retribusi_detail_page.dart";
 import "package:satupintu_app/ui/pages/splash_page.dart";
-import "package:satupintu_app/ui/pages/tagihan_detail_page.dart";
 
 void main() => runApp(const MainApp());
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
-import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
 
@@ -37,12 +36,16 @@ class HomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Bayar Retribusi\ndaerah kini makin',
-                      style: whiteRdTextStyle.copyWith(fontSize: 18),
+                      style: whiteRdTextStyle.copyWith(
+                        fontSize: 18,
+                      ),
                     ),
                     Text(
                       'Mudah',
                       style: orangeRdTextStyle.copyWith(
-                          fontSize: 18, fontWeight: bold),
+                        fontSize: 18,
+                        fontWeight: bold,
+                      ),
                     )
                   ],
                 ),
@@ -61,17 +64,27 @@ class HomePage extends StatelessWidget {
           height: 39,
         ),
         Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 18,
-          ),
-          child: Text(
-            'Tagihan Terbaru',
-            style: darRdBrownTextStyle.copyWith(
-              fontSize: 16,
-              fontWeight: bold,
+            margin: const EdgeInsets.symmetric(
+              horizontal: 18,
             ),
-          ),
-        ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.receipt_long_outlined,
+                  color: greenColor,
+                ),
+                const SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  'Tagihan Terbaru',
+                  style: darkRdBrownTextStyle.copyWith(
+                    fontSize: 16,
+                    fontWeight: bold,
+                  ),
+                ),
+              ],
+            )),
         const SizedBox(
           height: 20,
         ),
@@ -80,9 +93,11 @@ class HomePage extends StatelessWidget {
           child: BlocBuilder<TagihanBloc, TagihanState>(
             builder: (context, state) {
               if (state is TagihanSuccess) {
-                return Column(
-                  children: state.data
-                      .map((tagihan) => GestureDetector(
+                if (state.data.isNotEmpty) {
+                  return Column(
+                    children: state.data
+                        .map(
+                          (tagihan) => GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -98,9 +113,21 @@ class HomePage extends StatelessWidget {
                                 tagihan.totalHarga.toString(),
                               ),
                             ),
-                          ))
-                      .toList(),
-                );
+                          ),
+                        )
+                        .toList(),
+                  );
+                } else {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Text(
+                      'Anda tidak memiliki tagihan',
+                      style:
+                          blueRdTextStyle.copyWith(fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
               }
 
               if (state is TagihanFailed) {
@@ -155,67 +182,26 @@ class HomePage extends StatelessWidget {
                 children: [
                   Text(
                     title.toString(),
-                    style: darRdBrownTextStyle.copyWith(
+                    style: darkRdBrownTextStyle.copyWith(
                         fontSize: 12, fontWeight: semiBold),
                   ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  const SizedBox(height: 5),
                   Text(
                     'Bulanan',
                     style: greyRdTextStyle.copyWith(fontSize: 10),
                   )
-                  // Row(
-                  //   children: [
-                  //     Icon(
-                  //       Icons.receipt_long,
-                  //       size: 10,
-                  //       color: greyColor,
-                  //     ),
-                  //     const SizedBox(
-                  //       width: 5,
-                  //     ),
-                  //     Text(
-                  //       'INV-101321231',
-                  //       style: greyRdTextStyle.copyWith(fontSize: 10),
-                  //     ),
-                  //   ],
-                  // ),
-                  // const SizedBox(
-                  //   height: 4,
-                  // ),
-                  // Text(
-                  //   'Rp. 5000',
-                  //   style: blackRdTextStyle.copyWith(
-                  //       fontSize: 16, fontWeight: bold),
-                  // ),
                 ],
               ),
             ],
           ),
           const Spacer(),
           Align(
-              alignment: Alignment.topRight,
-              child: Text(
-                'Rp. $totalHarga',
-                style: mainRdTextStyle.copyWith(fontWeight: bold, fontSize: 16),
-              )
-              // Container(
-              //   width: 69,
-              //   height: 26,
-              //   decoration: BoxDecoration(
-              //       color: orangeColor,
-              //       borderRadius: const BorderRadius.all(Radius.circular(10))),
-              //   child: TextButton(
-              //     onPressed: () {},
-              //     child: Text(
-              //       'Bulanan',
-              //       style:
-              //           whiteRdTextStyle.copyWith(fontWeight: bold, fontSize: 8),
-              //     ),
-              //   ),
-              // ),
-              )
+            alignment: Alignment.topRight,
+            child: Text(
+              'Rp. $totalHarga',
+              style: mainRdTextStyle.copyWith(fontWeight: bold, fontSize: 16),
+            ),
+          )
         ],
       ),
     );

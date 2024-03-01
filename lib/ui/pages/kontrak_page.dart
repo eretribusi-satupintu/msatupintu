@@ -61,33 +61,6 @@ class KontrakPage extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Text(
-          //       'Surat Kontrak Humbang 1',
-          //       style: darRdBrownTextStyle.copyWith(
-          //         fontWeight: bold,
-          //       ),
-          //     ),
-          //     Text(
-          //       'DBA-II-1',
-          //       style: blueRdTextStyle.copyWith(fontSize: 12),
-          //     ),
-          //     const Spacer(),
-          //     Container(
-          //       color: orangeColor,
-          //       padding: const EdgeInsets.symmetric(horizontal: 4.5),
-          //       child: Text(
-          //         'Sudah diverifikasi',
-          //         style: whiteInTextStyle.copyWith(
-          //           fontSize: 8,
-          //         ),
-          //       ),
-          //     )
-          //   ],
-          // ),
-          // const Spacer(),
           Text(
             'Surat Kontrak Humbang 1',
             style: blueRdTextStyle.copyWith(fontSize: 16, fontWeight: bold),
