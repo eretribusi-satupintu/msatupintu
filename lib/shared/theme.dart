@@ -13,6 +13,7 @@ Color redColor = const Color(0xffEB4E4E);
 Color lightGreenColor = const Color(0xff85EB4E);
 Color greyColor = const Color(0xff808080);
 Color lightGreyColor = const Color(0xffD9D9D9);
+Color lightWhite = const Color(0xffF7F9F9);
 
 // readexPro
 TextStyle blackRdTextStyle = GoogleFonts.readexPro(color: blackColor);

@@ -19,13 +19,14 @@ class AuthService {
       if (res.statusCode == 200) {
         UserModel user = UserModel.fromJson(jsonDecode(res.body)['data']);
         user = user.copyWith(password: data.password);
+
         await storeCredentialToLocal(user);
-        print(getCredentialFromLocal());
         return user;
       } else {
         throw jsonDecode(res.body)['message'];
       }
     } catch (e) {
+      print({"error": e});
       rethrow;
     }
   }
@@ -36,6 +37,14 @@ class AuthService {
       await storage.write(key: 'email', value: user.email);
       await storage.write(key: 'password', value: user.password);
       await storage.write(key: 'token', value: user.token);
+      await storage.write(key: 'role_id', value: user.roleId.toString());
+      if (user.nik != null) {
+        await storage.write(key: 'nik', value: user.nik.toString());
+      }
+      if (user.role == 2) {
+        await storage.write(
+            key: 'subwilayah_id', value: user.subWilayahId.toString());
+      }
     } catch (e) {
       rethrow;
     }
@@ -71,6 +80,18 @@ class AuthService {
     }
 
     return token;
+  }
+
+  Future<String> getRoleId() async {
+    String? roleId = '';
+    const storage = FlutterSecureStorage();
+    String? value = await storage.read(key: 'role_id');
+
+    if (value != null) {
+      roleId = value;
+    }
+
+    return roleId;
   }
 
   Future<void> clearLocalStorage() async {

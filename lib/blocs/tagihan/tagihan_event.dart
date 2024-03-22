@@ -7,4 +7,9 @@ sealed class TagihanEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class TagihanGet extends TagihanEvent {}
+class TagihanNewestGet extends TagihanEvent {}
+
+class TagihanRetribusiGet extends TagihanEvent {
+  final int itemRetribusiId;
+  const TagihanRetribusiGet(this.itemRetribusiId);
+}

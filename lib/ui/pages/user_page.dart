@@ -41,7 +41,7 @@ class UserPage extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 18),
           child: Column(
             children: [
-              Container(
+              SizedBox(
                 child: Row(
                   children: [
                     Column(
@@ -62,16 +62,17 @@ class UserPage extends StatelessWidget {
                           style: darkRdBrownTextStyle.copyWith(
                               fontWeight: bold, fontSize: 12),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
-                              color: mainColor,
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(10),
-                              )),
+                            color: mainColor,
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
                           child: Text(
                             'Wajib Retribusi',
                             style: whiteRdTextStyle.copyWith(
@@ -129,7 +130,16 @@ class UserPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
         margin: const EdgeInsets.only(bottom: 21),
         decoration: BoxDecoration(
-            color: whiteColor, borderRadius: BorderRadius.circular(10)),
+          color: whiteColor,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 8,
+              color: lightBlueColor.withAlpha(30),
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
         child: Row(children: [
           Image.asset(
             icon,

@@ -89,7 +89,7 @@ class HomePage extends StatelessWidget {
           height: 20,
         ),
         BlocProvider(
-          create: (context) => TagihanBloc()..add(TagihanGet()),
+          create: (context) => TagihanBloc()..add(TagihanNewestGet()),
           child: BlocBuilder<TagihanBloc, TagihanState>(
             builder: (context, state) {
               if (state is TagihanSuccess) {
