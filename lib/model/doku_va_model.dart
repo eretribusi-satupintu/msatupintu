@@ -1,4 +1,5 @@
 class DokuVaModel {
+  final int? id;
   final String? bank;
   final String? virtualAccountNumber;
   final String? createdDate;
@@ -7,6 +8,7 @@ class DokuVaModel {
   final String? howToPayApi;
 
   DokuVaModel({
+    this.id,
     this.bank,
     this.virtualAccountNumber,
     this.howToPayPage,
@@ -16,6 +18,7 @@ class DokuVaModel {
   });
 
   factory DokuVaModel.fromJson(Map<String, dynamic> json) => DokuVaModel(
+        id: json['id'],
         bank: json['bank'],
         virtualAccountNumber: json['virtual_account_number'],
         howToPayPage: json['how_to_pay_page'],

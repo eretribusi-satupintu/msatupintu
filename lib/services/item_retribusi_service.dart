@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:satupintu_app/model/kontrak_item_retribusi_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
 import 'package:http/http.dart' as http;
+import 'package:satupintu_app/services/subwilayah_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class ItemRetribusiService {
@@ -34,12 +35,14 @@ class ItemRetribusiService {
   }
 
   Future<List<KontrakItemRetribusiModel>> getKontrakWajibRetribusi(
-      int wajibRetribusiId, int subWilayahId) async {
+      int wajibRetribusiId) async {
     try {
       final token = await AuthService().getToken();
+      final subWilayah =
+          await SubWilayahService().getSubwilayahFromLocalStorage();
       final res = await http.get(
           Uri.parse(
-              '$baseUrl/petugas/$wajibRetribusiId/wilayah/$subWilayahId/kontrak'),
+              '$baseUrl/petugas/$wajibRetribusiId/wilayah/${subWilayah.id}/kontrak'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token

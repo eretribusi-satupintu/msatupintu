@@ -2,14 +2,17 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
+import 'package:satupintu_app/blocs/user/user_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/home_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/home_petugas_page.dart';
 import 'package:satupintu_app/ui/pages/pembayaran_page.dart';
+import 'package:satupintu_app/ui/pages/petugas/pembayaran_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/wajib_retribusi_petugas_page.dart';
 import 'package:satupintu_app/ui/pages/qr_code_page.dart';
-import 'package:satupintu_app/ui/pages/retribusi_page.dart';
+import 'package:satupintu_app/ui/pages/tagihan_list_page.dart';
 import 'package:satupintu_app/ui/pages/user_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -27,6 +30,8 @@ class _MainPageState extends State<MainPage>
 
   @override
   void initState() {
+    // BlocProvider.of<UserBloc>(context).add(UserCheckRequested());
+
     super.initState();
     _controller = AnimationController(
         value: 0.0,
@@ -37,15 +42,32 @@ class _MainPageState extends State<MainPage>
       ..repeat();
   }
 
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed to avoid memory leaks
+    _controller.dispose();
+    super.dispose();
+  }
+
   // final items =
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy MMMM dd').format(now);
 
-    return BlocProvider(
-      create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
-      child: SafeArea(
+    return
+        // BlocProvider(
+        //   create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
+        //   child:
+
+        SafeArea(
+      child: BlocListener<UserBloc, UserState>(
+        listener: (context, state) {
+          if (state is UserFailed) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/login', (route) => false);
+          }
+        },
         child: Scaffold(
           appBar: PreferredSize(
               preferredSize: const Size(double.infinity, 100),
@@ -104,10 +126,15 @@ class _MainPageState extends State<MainPage>
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Icon(
-                              Icons.history,
-                              color: whiteColor,
-                              size: 20,
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/wajib-retribusi-kontrak');
+                              },
+                              child: Image.asset(
+                                'assets/ic_kontrak.png',
+                                width: 24,
+                              ),
                             ),
                             const SizedBox(
                               width: 17,
@@ -135,9 +162,13 @@ class _MainPageState extends State<MainPage>
                   index: selectedPage,
                   items: getBottomBaritem(state.user.role!),
                   onTap: (index) {
-                    setState(() {
-                      selectedPage = index;
-                    });
+                    if (state.user.role == 2 && index == 2) {
+                      Navigator.pushNamed(context, '/petugas-scan-qr-code');
+                    } else {
+                      setState(() {
+                        selectedPage = index;
+                      });
+                    }
                   },
                 );
               }
@@ -147,14 +178,32 @@ class _MainPageState extends State<MainPage>
           ),
           body: ListView(
             children: [
-              BlocBuilder<AuthBloc, AuthState>(
+              BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthFailed) {
+                    Center(
+                      child: Text('Tidak dapat terkoneksi ke server'),
+                    );
+                  }
+
+                  if (state is AuthInitial) {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/login', (route) => false);
+                  }
+                },
                 builder: (context, state) {
+                  if (state is AuthLoading) {
+                    Center(
+                      child: LoadingAnimationWidget.inkDrop(
+                          color: mainColor, size: 30),
+                    );
+                  }
                   if (state is AuthSuccess) {
                     if (state.user.role == 1) {
                       return getSelectedPage(index: selectedPage);
                     } else if (state.user.role == 2) {
-                      return getSelectedPagePetugas(selectedPage,
-                          state.user.roleId!, state.user.subWilayahId!);
+                      return getSelectedPagePetugas(
+                          selectedPage, state.user.roleId!);
                     }
                   }
 
@@ -171,6 +220,7 @@ class _MainPageState extends State<MainPage>
         ),
       ),
     );
+    // );
   }
 
   List<Widget> getBottomBaritem(int role) {
@@ -199,7 +249,7 @@ class _MainPageState extends State<MainPage>
               color: greenColor,
             ),
             Text(
-              'Retribusi',
+              'Tagihan',
               style: greenRdTextStyle.copyWith(fontSize: 8),
             )
           ],
@@ -322,7 +372,7 @@ class _MainPageState extends State<MainPage>
               color: greenColor,
             ),
             Text(
-              'Transaksi',
+              'Pembayaran',
               style: greenRdTextStyle.copyWith(fontSize: 8),
             )
           ],
@@ -347,7 +397,7 @@ class _MainPageState extends State<MainPage>
     return [const SizedBox()];
   }
 
-  Widget getSelectedPagePetugas(int index, int petugasId, int subWilayahId) {
+  Widget getSelectedPagePetugas(int index, int petugasId) {
     Widget widget;
 
     switch (index) {
@@ -357,8 +407,10 @@ class _MainPageState extends State<MainPage>
       case 1:
         widget = TagihanPetugasPage(
           petugasId: petugasId,
-          subWilayahiId: subWilayahId,
         );
+        break;
+      case 3:
+        widget = const PembayaranPetugasPage();
         break;
       case 4:
         widget = const UserPage();
@@ -378,13 +430,13 @@ class _MainPageState extends State<MainPage>
         widget = const HomePage();
         break;
       case 1:
-        widget = const RetribusiPage();
+        widget = const TagihanListPage();
         break;
       case 2:
         widget = const QrCodePage();
         break;
       case 3:
-        widget = const KontrakPage();
+        widget = const PembayaranPage();
         break;
       case 4:
         widget = const UserPage();
@@ -450,13 +502,13 @@ class _MainPageState extends State<MainPage>
     if (role == 1) {
       switch (index) {
         case 1:
-          title = 'Kontrak';
+          title = 'Tagihan';
           break;
         case 2:
           title = 'QR Code';
           break;
         case 3:
-          title = 'Pembayaran';
+          title = 'Aktivitas';
           break;
         case 4:
           title = 'User';
@@ -475,7 +527,7 @@ class _MainPageState extends State<MainPage>
           title = 'Scan';
           break;
         case 3:
-          title = 'Kontrak';
+          title = 'Pembayaran';
           break;
         case 4:
           title = 'User';

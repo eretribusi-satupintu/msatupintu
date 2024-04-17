@@ -3,28 +3,54 @@ import 'dart:convert';
 import 'package:satupintu_app/model/wajib_retribusi_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
 import 'package:http/http.dart' as http;
+import 'package:satupintu_app/services/subwilayah_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class WajibRetribusiService {
-  Future<List<WajibRetribusiModel>> getWajibRetribusi(
-      int petugasId, int subWilayahId) async {
+  Future<List<WajibRetribusiModel>> getWajibRetribusi(int petugasId) async {
     try {
       final token = await AuthService().getToken();
+      final subWilayah =
+          await SubWilayahService().getSubwilayahFromLocalStorage();
       final res = await http.get(
           Uri.parse(
-              '$baseUrl/petugas/$petugasId/wilayah/$subWilayahId/wajib-retribusi'),
+              '$baseUrl/petugas/$petugasId/wilayah/${subWilayah.id}/wajib-retribusi'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token
           });
 
       if (res.statusCode != 200) {
-        throw jsonDecode(res.body)['data'];
+        throw jsonDecode(res.body)['message'];
       }
 
       return List<WajibRetribusiModel>.from(jsonDecode(res.body)['data'].map(
               (wajibRetribusi) => WajibRetribusiModel.fromJson(wajibRetribusi)))
           .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<WajibRetribusiModel> getWajibRetribusiDetail(
+      int wajibRetribusiId) async {
+    try {
+      final token = await AuthService().getToken();
+      final subWilayah =
+          await SubWilayahService().getSubwilayahFromLocalStorage();
+      final res = await http.get(
+          Uri.parse(
+              '$baseUrl/wajib-retribusi/$wajibRetribusiId/sub-wilayah/${subWilayah.id}'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      return WajibRetribusiModel.fromJson(jsonDecode(res.body)['data']);
     } catch (e) {
       rethrow;
     }

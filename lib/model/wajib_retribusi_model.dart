@@ -18,9 +18,9 @@ class WajibRetribusiModel {
       WajibRetribusiModel(
         id: json['id'],
         name: json['name'],
-        nik: json['nik'],
-        noTelepon: json['no_telepon'],
-        photoProfil: json['photo_profile'],
+        nik: json['nik'] ?? '-',
+        noTelepon: json['no_telepon'] ?? '-',
+        photoProfil: json['photo_profile'] ?? '-',
         jumlahKontrak: json['jumlah_kontrak'],
       );
 }

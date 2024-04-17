@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
+import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
+import 'package:satupintu_app/ui/widget/empty_data_info.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
+import 'package:satupintu_app/ui/widget/shimmer_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -71,7 +75,8 @@ class HomePage extends StatelessWidget {
               children: [
                 Icon(
                   Icons.receipt_long_outlined,
-                  color: greenColor,
+                  color: mainColor,
+                  size: 18,
                 ),
                 const SizedBox(
                   width: 6,
@@ -79,7 +84,6 @@ class HomePage extends StatelessWidget {
                 Text(
                   'Tagihan Terbaru',
                   style: darkRdBrownTextStyle.copyWith(
-                    fontSize: 16,
                     fontWeight: bold,
                   ),
                 ),
@@ -90,7 +94,14 @@ class HomePage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => TagihanBloc()..add(TagihanNewestGet()),
-          child: BlocBuilder<TagihanBloc, TagihanState>(
+          child: BlocConsumer<TagihanBloc, TagihanState>(
+            listener: (context, state) {
+              if (state is TagihanFailed) {
+                if (state.e == 'Unauthorized') {
+                  Navigator.pushNamed(context, '/timesout');
+                }
+              }
+            },
             builder: (context, state) {
               if (state is TagihanSuccess) {
                 if (state.data.isNotEmpty) {
@@ -102,45 +113,33 @@ class HomePage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      TagihanDetailPage(tagihan: tagihan),
+                                  builder: (context) => TagihanDetailPage(
+                                      tagihanId: tagihan.id!,
+                                      status: tagihan.status!),
                                 ),
                               );
                             },
                             child: tagihanTerbaru(
-                              tagihan.nama.toString(),
-                              int.parse(
-                                tagihan.totalHarga.toString(),
-                              ),
+                              tagihan.tagihanName!,
+                              tagihan.price!,
                             ),
                           ),
                         )
                         .toList(),
                   );
                 } else {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Text(
-                      'Anda tidak memiliki tagihan',
-                      style:
-                          blueRdTextStyle.copyWith(fontStyle: FontStyle.italic),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
+                  return const EmptyData(
+                      message: 'Anda belum memiliki tagihan');
                 }
               }
 
-              if (state is TagihanFailed) {
-                return const Column(
-                  children: [
-                    Text("Tidak dapat mengakses server"),
-                  ],
-                );
+              if (state is AuthFailed) {
+                return const ErrorInfo();
               }
 
-              return Center(
-                child:
-                    LoadingAnimationWidget.inkDrop(color: mainColor, size: 24),
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 18),
+                child: ShimmerCard(length: 3),
               );
             },
           ),

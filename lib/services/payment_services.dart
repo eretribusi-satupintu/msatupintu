@@ -7,11 +7,12 @@ import 'package:http/http.dart' as http;
 import 'package:satupintu_app/shared/values.dart';
 
 class PaymentServices {
-  Future<DokuVaModel> getVaPayment(PaymentVaModel data) async {
+  Future<DokuVaModel> getVaPayment(int tagihanId, PaymentVaModel data) async {
     try {
       final token = await AuthService().getToken();
       final body = jsonEncode(
         {
+          "tagihan_id": tagihanId,
           "request_id": data.requestId.toString(),
           "bank": data.bank.toString(),
           "payment_order": {

@@ -9,7 +9,18 @@ sealed class WajibRetribusiEvent extends Equatable {
 
 class WajibRetribusiGet extends WajibRetribusiEvent {
   final int petugasId;
-  final int subWilayahId;
 
-  const WajibRetribusiGet(this.petugasId, this.subWilayahId);
+  const WajibRetribusiGet(this.petugasId);
+}
+
+class WajibRetribusiGetDetail extends WajibRetribusiEvent {
+  final int wajibRetribusiId;
+
+  const WajibRetribusiGetDetail(this.wajibRetribusiId);
+}
+
+class WajibRetribusiGetDetailFromScan extends WajibRetribusiEvent {
+  final String nik;
+
+  const WajibRetribusiGetDetailFromScan(this.nik);
 }

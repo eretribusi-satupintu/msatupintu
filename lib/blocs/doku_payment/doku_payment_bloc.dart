@@ -15,7 +15,8 @@ class DokuPaymentBloc extends Bloc<DokuPaymentEvent, DokuPaymentState> {
       if (event is DokuVaGet) {
         try {
           emit(DokuPaymentLoading());
-          final payment = await PaymentServices().getVaPayment(event.data);
+          final payment =
+              await PaymentServices().getVaPayment(event.tagihanId, event.data);
           emit(DokuPaymentSuccess(payment));
         } catch (e) {
           emit(DokuPaymentFailed(e.toString()));

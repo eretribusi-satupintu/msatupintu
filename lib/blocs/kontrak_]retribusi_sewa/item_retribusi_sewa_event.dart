@@ -14,7 +14,6 @@ class ItemRetribusiSewaGet extends ItemRetribusiSewaEvent {
 
 class KontrakWajibRetribusiGet extends ItemRetribusiSewaEvent {
   final int wajibRetribusiId;
-  final int subWilayahId;
 
-  const KontrakWajibRetribusiGet(this.wajibRetribusiId, this.subWilayahId);
+  const KontrakWajibRetribusiGet(this.wajibRetribusiId);
 }

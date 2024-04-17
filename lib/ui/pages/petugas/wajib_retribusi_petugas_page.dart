@@ -4,18 +4,17 @@ import 'package:satupintu_app/blocs/wajib_retribusi/wajib_retribusi_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/kontrak_list_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_list_page.dart';
+import 'package:satupintu_app/ui/pages/petugas/wajib_retribusi_tagihan_list.dart';
 
 class TagihanPetugasPage extends StatelessWidget {
-  final int subWilayahiId;
   final int petugasId;
-  const TagihanPetugasPage(
-      {super.key, required this.petugasId, required this.subWilayahiId});
+  const TagihanPetugasPage({super.key, required this.petugasId});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => WajibRetribusiBloc()
-        ..add(WajibRetribusiGet(petugasId, subWilayahiId)),
+      create: (context) =>
+          WajibRetribusiBloc()..add(WajibRetribusiGet(petugasId)),
       child: Column(
         children: [
           DefaultTabController(
@@ -83,13 +82,12 @@ class TagihanPetugasPage extends StatelessWidget {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      KontrakListPage(
-                                                    wajibRetribusiId:
-                                                        wajibRetribusi.id!,
-                                                    subWilayahId: subWilayahiId,
-                                                  ),
-                                                ),
+                                                    builder: (context) =>
+                                                        WajibRetribusiTagihanListPage(
+                                                          wajibRetribusiId:
+                                                              wajibRetribusi
+                                                                  .id!,
+                                                        )),
                                               );
                                             },
                                             child: wajibRetribusiCardItem(

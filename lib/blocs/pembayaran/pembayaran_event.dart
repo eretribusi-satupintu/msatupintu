@@ -7,4 +7,7 @@ sealed class PembayaranEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class PembayaranGet extends PembayaranEvent {}
+class PembayaranGet extends PembayaranEvent {
+  final String status;
+  const PembayaranGet(this.status);
+}

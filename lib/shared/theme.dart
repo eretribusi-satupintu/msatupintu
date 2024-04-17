@@ -16,16 +16,16 @@ Color lightGreyColor = const Color(0xffD9D9D9);
 Color lightWhite = const Color(0xffF7F9F9);
 
 // readexPro
-TextStyle blackRdTextStyle = GoogleFonts.readexPro(color: blackColor);
-TextStyle whiteRdTextStyle = GoogleFonts.readexPro(color: whiteColor);
-TextStyle greyRdTextStyle = GoogleFonts.readexPro(color: greyColor);
-TextStyle greenRdTextStyle = GoogleFonts.readexPro(color: greenColor);
-TextStyle darkRdBrownTextStyle = GoogleFonts.readexPro(color: darkBrownColor);
-TextStyle mainRdTextStyle = GoogleFonts.readexPro(color: mainColor);
-TextStyle blueRdTextStyle = GoogleFonts.readexPro(color: blueColor);
-TextStyle redRdTextStyle = GoogleFonts.readexPro(color: redColor);
-TextStyle orangeRdTextStyle = GoogleFonts.readexPro(color: orangeColor);
-TextStyle lightGreyRdTextStyle = GoogleFonts.readexPro(color: lightGreyColor);
+TextStyle blackRdTextStyle = GoogleFonts.roboto(color: blackColor);
+TextStyle whiteRdTextStyle = GoogleFonts.roboto(color: whiteColor);
+TextStyle greyRdTextStyle = GoogleFonts.roboto(color: greyColor);
+TextStyle greenRdTextStyle = GoogleFonts.roboto(color: greenColor);
+TextStyle darkRdBrownTextStyle = GoogleFonts.roboto(color: darkBrownColor);
+TextStyle mainRdTextStyle = GoogleFonts.roboto(color: mainColor);
+TextStyle blueRdTextStyle = GoogleFonts.roboto(color: blueColor);
+TextStyle redRdTextStyle = GoogleFonts.roboto(color: redColor);
+TextStyle orangeRdTextStyle = GoogleFonts.roboto(color: orangeColor);
+TextStyle lightGreyRdTextStyle = GoogleFonts.roboto(color: lightGreyColor);
 
 // inter
 TextStyle blackInTextStyle = GoogleFonts.inter(color: blackColor);

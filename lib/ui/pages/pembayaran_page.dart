@@ -1,138 +1,216 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:satupintu_app/blocs/doku_payment/doku_payment_bloc.dart';
 import 'package:satupintu_app/blocs/pembayaran/pembayaran_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/ui/pages/doku_payment_va_page.dart';
+import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
 
-class KontrakPage extends StatefulWidget {
-  const KontrakPage({super.key});
+class PembayaranPage extends StatefulWidget {
+  const PembayaranPage({super.key});
 
   @override
-  State<KontrakPage> createState() => _KontrakPageState();
+  State<PembayaranPage> createState() => _PembayaranPageState();
 }
 
-class _KontrakPageState extends State<KontrakPage> {
+class _PembayaranPageState extends State<PembayaranPage>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+  late String pembayaranStatus;
+
+  @override
+  void initState() {
+    tabController = TabController(
+      length: 3,
+      vsync: this,
+    );
+    pembayaranStatus = 'SUCCESS';
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 4,
-        child: SizedBox(
-          child: Column(
-            children: [
-              TabBar(
-                labelStyle:
-                    mainRdTextStyle.copyWith(fontSize: 12, fontWeight: bold),
-                unselectedLabelColor: greyColor,
-                indicatorColor: mainColor,
-                padding: EdgeInsets.zero,
-                labelPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                isScrollable: true,
-                indicatorSize: TabBarIndicatorSize.tab,
-                // dividerHeight: 12,
-                tabAlignment: TabAlignment.start,
-                indicatorPadding: const EdgeInsets.symmetric(horizontal: 4),
-                tabs: const [
-                  Tab(
-                    text: 'Semua',
-                  ),
-                  Tab(
-                    text: 'Belum dibayar',
-                  ),
-                  Tab(
-                    text: 'Sudah dibayar',
-                  ),
-                  Tab(
-                    text: 'Dibatalkan',
-                  )
-                ],
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                height: MediaQuery.of(context)
-                    .size
-                    .height, // Adjust the height as needed
-                child: TabBarView(
-                  children: [
-                    BlocProvider(
-                        create: (context) =>
-                            PembayaranBloc()..add(PembayaranGet()),
-                        child: BlocBuilder<PembayaranBloc, PembayaranState>(
-                          builder: (context, state) {
-                            if (state is PembayaranLoading) {
-                              return LoadingAnimationWidget.inkDrop(
-                                  color: mainColor, size: 24);
-                            }
-                            if (state is PembayaranSuccess) {
-                              if (state.data.isNotEmpty) {
-                                return Column(
-                                  children: state.data
-                                      .map(
-                                        (pembayaran) => GestureDetector(
-                                          onTap: () {
-                                            // Navigator.push(
-                                            //   context,
-                                            //   MaterialPageRoute(
-                                            //     builder: (context) =>
-                                            //         DokuPaymentVaPage(
-                                            //             virtualAccount: pembayaran.
-                                            //                 ),
-                                            //   ),
-                                            // );
-                                          },
-                                          child: paymentCard(
-                                            pembayaran.name.toString(),
-                                            pembayaran.retributionItemName
-                                                .toString(),
-                                            pembayaran.paymentMethod.toString(),
-                                            pembayaran.date.toString(),
-                                            pembayaran.status.toString(),
-                                            pembayaran.amount.toString(),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                );
-                              } else {
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 18),
-                                  child: Text(
-                                    'Anda tidak memiliki pembayaran',
-                                    style: blueRdTextStyle.copyWith(
-                                        fontStyle: FontStyle.italic),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                );
-                              }
-                            }
+    return BlocProvider(
+      create: (context) =>
+          PembayaranBloc()..add(PembayaranGet(pembayaranStatus)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        height: MediaQuery.of(context).size.height,
+        child: SingleChildScrollView(
+          child: BlocBuilder<PembayaranBloc, PembayaranState>(
+            builder: (context, state) {
+              if (state is PembayaranLoading) {
+                return Center(
+                  child: LoadingAnimationWidget.inkDrop(
+                      color: mainColor, size: 30),
+                );
+              }
 
-                            return Column(
-                              children: [
-                                Text(
-                                  'Gagal memuat',
-                                  style: greyRdTextStyle,
-                                ),
-                              ],
-                            );
-                          },
-                        )),
-                    const Center(
-                      child: Text('Menu 2'),
-                    ),
-                    const Center(
-                      child: Text('Menu 3'),
-                    ),
-                    const Center(
-                      child: Text('Menu '),
-                    )
-                  ],
-                ),
-              ),
-            ],
+              if (state is PembayaranSuccess) {
+                return Column(
+                  children: state.data
+                      .map((pembayaran) => GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (contex) => TagihanDetailPage(
+                                          tagihanId: pembayaran.tagihanId!,
+                                          status: 'VERIFIED')));
+                            },
+                            child: paymentCard(
+                                pembayaran.name!,
+                                pembayaran.retributionItemName!,
+                                pembayaran.paymentMethod!,
+                                pembayaran.date!,
+                                pembayaran.status!,
+                                pembayaran.amount.toString()),
+                          ))
+                      .toList(),
+                );
+              }
+
+              if (state is PembayaranFailed) {
+                return ErrorInfo(
+                  e: state.e,
+                );
+              }
+
+              return Text('Memuat...');
+            },
           ),
-        ));
+        ),
+        // Column(
+        //   children: [
+        //     const SizedBox(
+        //       height: 18,
+        //     ),
+        //     Container(
+        //       width: MediaQuery.of(context).size.width,
+        //       decoration: BoxDecoration(
+        //           color: whiteColor, borderRadius: BorderRadius.circular(5)),
+        //       child: Column(
+        //         children: [
+        //           Container(
+        //             height: 50,
+        //             child: TabBar(
+        //               unselectedLabelColor: mainColor,
+        //               padding: const EdgeInsets.symmetric(
+        //                   vertical: 6, horizontal: 8),
+        //               labelColor: whiteColor,
+        //               indicatorSize: TabBarIndicatorSize.tab,
+        //               indicator: BoxDecoration(
+        //                   color: mainColor,
+        //                   borderRadius: BorderRadius.circular(30)),
+        //               dividerHeight: 0,
+        //               controller: tabController,
+        //               labelStyle: TextStyle(fontSize: 12, fontWeight: bold),
+        //               labelPadding: EdgeInsets.zero,
+        //               onTap: (idx) {
+        //                 if (idx == 0) {
+        //                   setState(() {
+        //                     pembayaranStatus == 'SUCCESS';
+        //                   });
+        //                 }
+
+        //                 if (idx == 1) {
+        //                   setState(() {
+        //                     pembayaranStatus == 'WAITING';
+        //                   });
+        //                 }
+
+        //                 if (idx == 2) {
+        //                   setState(() {
+        //                     pembayaranStatus == 'CANCEL';
+        //                   });
+        //                 }
+        //               },
+        //               tabs: const [
+        //                 Tab(
+        //                   text: 'Berhasil',
+        //                 ),
+        //                 Tab(
+        //                   text: 'Menunggu',
+        //                 ),
+        //                 Tab(
+        //                   text: 'Batal',
+        //                 )
+        //               ],
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //     Expanded(
+        //         child: TabBarView(
+        //       controller: tabController,
+        //       children: [
+        //         SingleChildScrollView(
+        //           child: BlocBuilder<PembayaranBloc, PembayaranState>(
+        //             builder: (context, state) {
+        //               if (state is PembayaranLoading) {
+        //                 return Center(
+        //                   child: LoadingAnimationWidget.inkDrop(
+        //                       color: mainColor, size: 30),
+        //                 );
+        //               }
+
+        //               if (state is PembayaranSuccess) {
+        //                 return Column(
+        //                   children: state.data
+        //                       .map((pembayaran) => GestureDetector(
+        //                             onTap: () {
+        //                               Navigator.push(
+        //                                   context,
+        //                                   MaterialPageRoute(
+        //                                       builder: (contex) =>
+        //                                           TagihanDetailPage(
+        //                                               tagihanId:
+        //                                                   pembayaran.tagihanId!,
+        //                                               status: 'VERIFIED')));
+        //                             },
+        //                             child: paymentCard(
+        //                                 pembayaran.name!,
+        //                                 pembayaran.retributionItemName!,
+        //                                 pembayaran.paymentMethod!,
+        //                                 pembayaran.date!,
+        //                                 pembayaran.status!,
+        //                                 pembayaran.amount.toString()),
+        //                           ))
+        //                       .toList(),
+        //                 );
+        //               }
+
+        //               if (state is PembayaranFailed) {
+        //                 return ErrorInfo(
+        //                   e: state.e,
+        //                 );
+        //               }
+
+        //               return Text('Memuat...');
+        //             },
+        //           ),
+        //         ),
+        //         Text('ext2'),
+        //         Text('ext23'),
+        //         // PembayaranCancelTab(),
+        //       ],
+        //     ))
+        //   ],
+        // ),
+      ),
+    );
   }
 
   Widget paymentCard(

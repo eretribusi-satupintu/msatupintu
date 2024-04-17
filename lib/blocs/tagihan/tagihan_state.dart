@@ -26,3 +26,13 @@ final class TagihanSuccess extends TagihanState {
   @override
   List<Object> get props => [data];
 }
+
+final class TagihanScannedSuccess extends TagihanState {}
+
+final class TagihanDetailSuccess extends TagihanState {
+  final TagihanModel data;
+  const TagihanDetailSuccess(this.data);
+
+  @override
+  List<Object> get props => [data];
+}

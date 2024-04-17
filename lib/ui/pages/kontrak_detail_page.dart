@@ -1,212 +1,322 @@
 import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:satupintu_app/blocs/kontrak/kontrak_bloc.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/model/kontrak_item_retribusi_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
-import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
-import 'package:satupintu_app/ui/pages/template_page.dart';
+import 'package:satupintu_app/ui/widget/buttons.dart';
+import 'package:satupintu_app/ui/widget/draggable_scrollable_modal.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+// import 'synfusi'
 
-class KontrakDetailPage extends StatelessWidget {
+class KontrakDetailPage extends StatefulWidget {
   final KontrakItemRetribusiModel itemRetribusi;
   const KontrakDetailPage({super.key, required this.itemRetribusi});
 
   @override
+  State<KontrakDetailPage> createState() => _KontrakDetailPageState();
+}
+
+class _KontrakDetailPageState extends State<KontrakDetailPage> {
+  late String statusKontrak;
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      statusKontrak = widget.itemRetribusi.status!;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return TemplateMain(
-        title: 'Detail Retribusi',
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 16,
-                horizontal: 19,
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Kontrak ${widget.itemRetribusi.categoryName}',
+          style: mainRdTextStyle.copyWith(fontWeight: semiBold, fontSize: 16),
+          overflow: TextOverflow.ellipsis,
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop('refresh');
+          },
+          icon: Icon(
+            Icons.chevron_left_rounded,
+            size: 30,
+            color: mainColor,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              CustomModalBottomSheet.show(
+                context,
+                BlocProvider(
+                  create: (context) => TagihanBloc()
+                    ..add(TagihanWajibRetribusiMasyarakatProgressGet(
+                        widget.itemRetribusi.id!)),
+                  child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            'Daftar Tagihan',
+                            style: darkRdBrownTextStyle.copyWith(
+                                fontWeight: semiBold),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          BlocBuilder<TagihanBloc, TagihanState>(
+                            builder: (context, state) {
+                              if (state is TagihanLoading) {
+                                return Center(
+                                    child: LoadingAnimationWidget.inkDrop(
+                                        color: mainColor, size: 30));
+                              }
+
+                              if (state is TagihanSuccess) {
+                                return Column(
+                                  children: state.data
+                                      .map((tagihan) => tagihanCard(
+                                          tagihan.tagihanName!,
+                                          tagihan.dueDate!,
+                                          tagihan.price.toString(),
+                                          tagihan.status!))
+                                      .toList(),
+                                );
+                              }
+
+                              if (state is TagihanFailed) {
+                                return Center(child: Text(state.e));
+                              }
+
+                              return Center(
+                                child: Text('Gagal memuat...'),
+                              );
+                            },
+                          ),
+                        ],
+                      )),
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               decoration: BoxDecoration(
-                color: whiteColor,
-                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: lightBlueColor.withAlpha(50),
+                    blurRadius: 12,
+                  ),
+                ],
               ),
-              child: Row(children: [
-                Image.asset(
-                  'assets/logo_kopenaker_humbahas.png',
-                  width: 42,
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        itemRetribusi.kedinasanName!,
-                        style: darkInBrownTextStyle.copyWith(
-                          fontWeight: medium,
-                        ),
-                        overflow: TextOverflow.visible,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.receipt_long_rounded,
+                    color: greenColor,
+                    size: 18,
+                  ),
+                  const SizedBox(
+                    width: 4,
+                  ),
+                  Text(
+                    'Tampilkan progress Tagihan',
+                    style: darkInBrownTextStyle.copyWith(
+                        fontWeight: semiBold, fontSize: 12),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.arrow_drop_down_outlined)
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: SfPdfViewer.network(
+              'https://d1wqtxts1xzle7.cloudfront.net/31029505/index.htm-libre.pdf?1392227636=&response-content-disposition=inline%3B+filename%3DOptimalisasi_Pajak_Daerah_dan_Retribusi.pdf&Expires=1712645435&Signature=GCNke1tC228q9VOrTE7dknz4CWpAb3sIORXLVqCK~C7wBFoJAc1X0SmhKx41AXeMwV5A8otAsSMXcL-53qmpGWCV66BBr7omrsvrGANNx7Hw-q-2bKsojJZZgfbheKVqmFL3kmETFXBie8XXhXOPLAyh8X9fyKlNtYvN3CzVl46q6yFekuJoOQ859mGw68Rlk4aO88DYrH~Zu2pBxT1HOMP05yq-eEHn3Qk19fHgnWcA5ZMd~tXjKXMLnftlVgDSWslvUzrYPZ2v5eHuuscDs5FyBG6D1F68o7mZDQc8B5GYZUxlrNo7ByvRRH8i9LDzfipBMwsSgHigGNd3tKZphw__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA',
+            ),
+          ),
+          BlocProvider(
+            create: (context) => KontrakBloc(),
+            child: BlocConsumer<KontrakBloc, KontrakState>(
+              listener: (context, state) {
+                if (state is KontrakSuccess) {
+                  setState(() {
+                    statusKontrak = state.kontrak.status!;
+                  });
+                  print(statusKontrak);
+                }
+              },
+              builder: (context, state) {
+                if (state is KontrakLoading) {
+                  return Center(
+                    child: LoadingAnimationWidget.inkDrop(
+                        color: mainColor, size: 30),
+                  );
+                }
+
+                if (state is KontrakFailed) {
+                  return Center(
+                    child: Text(state.e),
+                  );
+                }
+
+                return Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                  decoration: BoxDecoration(
+                    color: whiteColor,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 20,
+                        color: lightBlueColor.withAlpha(70),
                       ),
                     ],
                   ),
-                ),
-              ]),
+                  child: statusKontrak == 'DITERIMA'
+                      ? Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_outline_outlined,
+                                  color: greenColor,
+                                  size: 18,
+                                ),
+                                const SizedBox(
+                                  width: 6,
+                                ),
+                                Text(
+                                  'Anda telah menyetujui kontrak ini',
+                                  style: darkInBrownTextStyle.copyWith(
+                                      fontWeight: bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outlined,
+                                  color: mainColor,
+                                  size: 18,
+                                ),
+                                const SizedBox(
+                                  width: 4,
+                                ),
+                                Text(
+                                  'Info',
+                                  style: darkInBrownTextStyle.copyWith(
+                                      fontWeight: bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 6,
+                            ),
+                            Text(
+                              statusKontrak == 'DIPROSES'
+                                  ? 'Kontrak masih menunggu konfirmasi dari anda, konfirmasi persetujuan jika kontrak sudah sesuai $statusKontrak'
+                                  : 'Kontrak sedang diperbarui, mohon menunggu hingga tombol konfirmasi aktif kembali',
+                              style: greyRdTextStyle.copyWith(fontSize: 12),
+                              textAlign: TextAlign.justify,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            statusKontrak == 'DIPROSES'
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          context.read<KontrakBloc>().add(
+                                                KontrakUpdateStatus(
+                                                    widget.itemRetribusi.id!,
+                                                    'DITOLAK'),
+                                              );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 8),
+                                          decoration: BoxDecoration(
+                                              color: whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                              border: Border.all(
+                                                  width: 2, color: mainColor)),
+                                          child: Text(
+                                            'Belum sesuai',
+                                            style: mainRdTextStyle.copyWith(
+                                                fontWeight: semiBold),
+                                          ),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      GestureDetector(
+                                        onTap: () {
+                                          context.read<KontrakBloc>().add(
+                                              KontrakUpdateStatus(
+                                                  widget.itemRetribusi.id!,
+                                                  'DITERIMA'));
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 8),
+                                          decoration: BoxDecoration(
+                                              color: mainColor,
+                                              border: Border.all(
+                                                  width: 2, color: mainColor),
+                                              borderRadius:
+                                                  BorderRadius.circular(6)),
+                                          child: Text(
+                                            'Sudah Sesuai',
+                                            style: whiteRdTextStyle.copyWith(
+                                                fontWeight: semiBold),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox()
+                          ],
+                        ),
+                );
+              },
             ),
-            const SizedBox(
-              height: 28,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 18),
-              child: Text(
-                'Kontrak',
-                style: darkRdBrownTextStyle.copyWith(fontWeight: bold),
-              ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 18),
-              child: kontrakCard(),
-            ),
-            const SizedBox(
-              height: 28,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 18),
-              child: Text(
-                'Tagihan',
-                style: darkRdBrownTextStyle.copyWith(fontWeight: bold),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            BlocProvider(
-              create: (context) =>
-                  TagihanBloc()..add(TagihanRetribusiGet(itemRetribusi.id!)),
-              child: BlocBuilder<TagihanBloc, TagihanState>(
-                builder: (context, state) {
-                  if (state is TagihanLoading) {
-                    return Center(
-                      child: LoadingAnimationWidget.inkDrop(
-                          color: mainColor, size: 20),
-                    );
-                  }
-
-                  if (state is TagihanSuccess) {
-                    if (state.data.isNotEmpty) {
-                      return Column(
-                        children: state.data
-                            .map((tagihan) => GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                TagihanDetailPage(
-                                                    tagihan: tagihan)));
-                                  },
-                                  child: tagihanCard(
-                                      tagihan.nama!,
-                                      tagihan.dueDate!,
-                                      tagihan.totalHarga!,
-                                      tagihan.status!),
-                                ))
-                            .toList(),
-                      );
-                    }
-                    return Center(
-                        child: Text(
-                      'Tidak ada tagihan',
-                      style: lightGreyRdTextStyle.copyWith(fontWeight: medium),
-                    ));
-                  }
-
-                  if (state is TagihanFailed) {
-                    Text(state.e);
-                  }
-
-                  return Center(
-                      child: Text(
-                    'Tidak ada tagihan',
-                    style: lightGreyRdTextStyle.copyWith(fontWeight: medium),
-                  ));
-                },
-              ),
-            ),
-          ],
-        ));
-  }
-
-  Widget kontrakCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-      decoration: BoxDecoration(
-        color: whiteColor,
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-        border: Border.all(width: 0.8, color: lightGreyColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Image.asset('assets/ic_kontrak.png', width: 20, height: 13),
-              const SizedBox(
-                width: 4,
-              ),
-              Text(
-                'Retribusi Sampah',
-                style: blackInTextStyle.copyWith(
-                  fontSize: 10,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: orangeColor.withAlpha(25),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(100),
-                  ),
-                ),
-                child: Text(
-                  itemRetribusi.status!,
-                  style:
-                      orangeRdTextStyle.copyWith(fontSize: 8, fontWeight: bold),
-                ),
-              ),
-            ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            'Surat Kontrak ${itemRetribusi.categoryName}',
-            style: darkRdBrownTextStyle.copyWith(
-                fontWeight: semiBold, fontSize: 16),
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          Text(
-            'Item yang disewa : DBA-II-1',
-            style: greyRdTextStyle.copyWith(fontSize: 12),
-          )
         ],
       ),
     );
   }
 
-  Widget tagihanCard(String name, String dueDate, String price, String status) {
+  Widget tagihanCard(
+    String name,
+    String dueDate,
+    String price,
+    String status,
+  ) {
     return Container(
-      padding: const EdgeInsets.only(
-        right: 18,
-        left: 18,
-      ),
       decoration: BoxDecoration(
         color: whiteColor,
         borderRadius: BorderRadius.circular(5),

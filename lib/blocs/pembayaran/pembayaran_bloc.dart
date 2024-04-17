@@ -12,7 +12,8 @@ class PembayaranBloc extends Bloc<PembayaranEvent, PembayaranState> {
       if (event is PembayaranGet) {
         try {
           emit(PembayaranLoading());
-          final pembayaran = await PembayaranService().getPembayaran();
+          final pembayaran =
+              await PembayaranService().getPembayaran(event.status);
           emit(PembayaranSuccess(pembayaran));
         } catch (e) {
           print(e.toString());

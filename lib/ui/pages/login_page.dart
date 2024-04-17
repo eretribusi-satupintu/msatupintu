@@ -49,8 +49,13 @@ class _LoginPageState extends State<LoginPage> {
             }
 
             if (state is AuthSuccess) {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/home', (route) => false);
+              if (state.user.role == 2) {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/subwilayah-select', (route) => false);
+              } else {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/home', (route) => false);
+              }
             }
           },
           builder: (context, state) {

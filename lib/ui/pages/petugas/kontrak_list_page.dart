@@ -9,9 +9,15 @@ import 'package:satupintu_app/ui/pages/template_page.dart';
 
 class KontrakListPage extends StatelessWidget {
   final int wajibRetribusiId;
-  final int subWilayahId;
-  const KontrakListPage(
-      {super.key, required this.wajibRetribusiId, required this.subWilayahId});
+  final String wajibRetribusiName;
+  final String wajibRetribusiPhone;
+
+  const KontrakListPage({
+    super.key,
+    required this.wajibRetribusiId,
+    required this.wajibRetribusiName,
+    required this.wajibRetribusiPhone,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,35 +27,50 @@ class KontrakListPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 18),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
-            decoration: BoxDecoration(
-              color: blueColor.withAlpha(25),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(10),
-              ),
-            ),
+            // margin: const EdgeInsets.symmetric(horizontal: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                Text(
-                  "Cari item retribusi...",
-                  style: greyRdTextStyle.copyWith(
-                    fontSize: 10,
-                    fontStyle: FontStyle.italic,
-                  ),
+                Image.asset(
+                  'assets/img_user.png',
+                  width: 38,
+                  height: 38,
                 ),
-                const Spacer(), // Use Expanded instead of Spacer
-                Icon(
-                  Icons.search,
-                  size: 20,
-                  color: mainColor,
+                const SizedBox(
+                  width: 12,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      wajibRetribusiName,
+                      style: darkRdBrownTextStyle.copyWith(
+                        fontWeight: medium,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.phone,
+                          size: 12,
+                          color: greyColor,
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          wajibRetribusiPhone,
+                          style: greyRdTextStyle.copyWith(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           const SizedBox(
-            height: 32,
+            height: 20,
           ),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 18),
@@ -65,7 +86,7 @@ class KontrakListPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 18),
             child: BlocProvider(
               create: (context) => ItemRetribusiSewaBloc()
-                ..add(KontrakWajibRetribusiGet(wajibRetribusiId, subWilayahId)),
+                ..add(KontrakWajibRetribusiGet(wajibRetribusiId)),
               child: BlocBuilder<ItemRetribusiSewaBloc, ItemRetribusiSewaState>(
                 builder: (context, state) {
                   if (state is ItemRetribusiSewaLoading) {
@@ -86,7 +107,9 @@ class KontrakListPage extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const TagihanListPetugas()),
+                                            TagihanListPetugas(
+                                              kontrakId: itemRetribusi.id!,
+                                            )),
                                   );
                                 },
                                 child: itemRetribusiCard(

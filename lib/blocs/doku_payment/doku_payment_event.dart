@@ -9,7 +9,8 @@ sealed class DokuPaymentEvent extends Equatable {
 
 class DokuVaGet extends DokuPaymentEvent {
   final PaymentVaModel data;
-  const DokuVaGet(this.data);
+  final int tagihanId;
+  const DokuVaGet(this.tagihanId, this.data);
 
   @override
   List<Object> get props => [data];

@@ -18,16 +18,23 @@ class TemplateMain extends StatelessWidget {
               style: whiteInTextStyle.copyWith(fontWeight: bold, fontSize: 14),
             ),
             toolbarHeight: 50,
+            leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(
+                Icons.chevron_left_outlined,
+                size: 24,
+              ),
+            ),
             iconTheme: IconThemeData(color: whiteColor),
             backgroundColor: mainColor,
             elevation: null,
             centerTitle: true,
           ),
           body: ListView(
-            // padding: const EdgeInsets.symmetric(horizontal: 18),
             children: [
               Stack(
-                // alignment: AlignmentDirectional.center,
                 children: [
                   Container(
                       width: double.infinity,
@@ -40,9 +47,7 @@ class TemplateMain extends StatelessWidget {
                           topLeft: Radius.circular(30),
                         ),
                       ),
-                      child: ListView(
-                        children: [body],
-                      )),
+                      child: body),
                 ],
               ),
             ],

@@ -28,8 +28,8 @@ class ItemRetribusiSewaBloc
       if (event is KontrakWajibRetribusiGet) {
         try {
           emit(ItemRetribusiSewaLoading());
-          final res = await ItemRetribusiService().getKontrakWajibRetribusi(
-              event.wajibRetribusiId, event.subWilayahId);
+          final res = await ItemRetribusiService()
+              .getKontrakWajibRetribusi(event.wajibRetribusiId);
           emit(ItemRetribusiSewaSuccess(res));
         } catch (e) {
           emit(ItemRetribusiSewaFailed(e.toString()));

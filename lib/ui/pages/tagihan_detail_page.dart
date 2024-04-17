@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
 import 'package:satupintu_app/blocs/doku_payment/doku_payment_bloc.dart';
+import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/model/payment_va_model.dart';
 import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/shared/method.dart';
@@ -16,8 +18,10 @@ import 'package:satupintu_app/ui/widget/draggable_scrollable_modal.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class TagihanDetailPage extends StatefulWidget {
-  final TagihanModel tagihan;
-  const TagihanDetailPage({super.key, required this.tagihan});
+  final int tagihanId;
+  final String status;
+  const TagihanDetailPage(
+      {super.key, required this.tagihanId, required this.status});
 
   @override
   State<TagihanDetailPage> createState() => _TagihanDetailPageState();
@@ -28,553 +32,769 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
   bool isBankSelected = false;
   String erm = "";
   List<String> bankList = ['bri', 'bni', 'mandiri'];
+  late String isPaid;
+
+  @override
+  void initState() {
+    super.initState();
+    isPaid = widget.status;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return TemplateMain(
-        title: 'Detail Tagihan',
-        body: BlocConsumer<DokuPaymentBloc, DokuPaymentState>(
-          listener: (context, state) {
-            if (state is DokuPaymentFailed) {
-              // Lo({"error": "asdfasd"});
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: CustomSnackbar(
-                    message: state.e.toString(),
-                  ),
-                  behavior: SnackBarBehavior.fixed,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                ),
-              );
-            }
+    return Scaffold(
+      backgroundColor: mainColor,
+      appBar: AppBar(
+        backgroundColor: mainColor,
+        title: Text(
+          'Detail Tagihan',
+          style: whiteRdTextStyle.copyWith(fontSize: 16, fontWeight: bold),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: whiteColor,
+              size: 18,
+            )),
+      ),
+      body: SingleChildScrollView(
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) =>
+                  TagihanBloc()..add(TagihanGetDetail(widget.tagihanId)),
+            ),
+            BlocProvider(
+              create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
+            ),
+          ],
+          child: BlocBuilder<TagihanBloc, TagihanState>(
+            builder: (context, state) {
+              if (state is TagihanLoading) {
+                return Center(
+                  child: LoadingAnimationWidget.inkDrop(
+                      color: mainColor, size: 30),
+                );
+              }
 
-            if (state is DokuPaymentSuccess) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      DokuPaymentVaPage(virtualAccount: state.data),
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            if (state is DokuPaymentLoading) {
-              return Center(
-                child: Container(
-                  height: 100,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: whiteColor,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      LoadingAnimationWidget.inkDrop(
-                          color: mainColor, size: 30),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Permintaan anda sedang diproses',
-                        style: darkRdBrownTextStyle.copyWith(fontSize: 12),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            }
-            return Column(
-              children: [
-                Stack(
-                  alignment: Alignment.topCenter,
+              if (state is TagihanDetailSuccess) {
+                return Column(
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 50),
-                      width: 284,
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                        color: whiteColor,
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 27,
+                    Stack(
+                      alignment: Alignment.topCenter,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(
+                              top: 50, left: 18, right: 18),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
+                            color: whiteColor,
+                            // border: Border.all(
+                            //     width: 6,
+                            //     color: isPaid == 'VERIFIED'
+                            //         ? greenColor.withAlpha(60)
+                            //         : lightBlueColor),
                           ),
-                          Text(
-                            formatCurrency(
-                              int.parse(widget.tagihan.totalHarga!),
-                            ),
-                            style: darkRdBrownTextStyle.copyWith(
-                                fontSize: 22, fontWeight: bold),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            'INV-123123123123',
-                            style: greyRdTextStyle.copyWith(
-                              fontSize: 10,
-                              fontWeight: regular,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          DottedLine(
-                            dashLength: 8,
-                            lineThickness: 4.0,
-                            dashColor: orangeColor,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          tagihanInfo('Tagihan', widget.tagihan.nama!),
-                          tagihanInfo('Pasar', 'Balige'),
-                          tagihanInfo('No unit', 'AIIK04'),
-                          DottedLine(
-                            dashLength: 8,
-                            lineThickness: 2.0,
-                            dashColor: lightGreyColor,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Row(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
                             children: [
-                              Text(
-                                'Total',
-                                style: blackRdTextStyle.copyWith(
-                                    fontSize: 10, fontWeight: bold),
+                              const SizedBox(
+                                height: 27,
                               ),
-                              const Spacer(),
                               Text(
                                 formatCurrency(
-                                  int.parse(widget.tagihan.totalHarga!),
-                                ),
-                                style: blackRdTextStyle.copyWith(
-                                    fontSize: 16, fontWeight: bold),
+                                    int.parse(state.data.price.toString())),
+                                style: darkRdBrownTextStyle.copyWith(
+                                    fontSize: 22, fontWeight: bold),
                               ),
                               const SizedBox(
-                                height: 48,
+                                height: 5,
                               ),
-                            ],
-                          ),
-                          Text(
-                            'Tagihan dilakukan pada tanggal',
-                            style: greyRdTextStyle.copyWith(fontSize: 12),
-                          ),
-                          Text(
-                            DateFormat('dd MMMM yyyy')
-                                .format(DateTime.now())
-                                .toString(),
-                            style: greyRdTextStyle.copyWith(
-                                fontSize: 12, fontWeight: bold),
-                          ),
-                          // +++++++
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: mainColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(width: 6, color: lightBlueColor),
-                      ),
-                      child: Image.asset(
-                        'assets/ic_bill.png',
-                        width: 28,
-                        height: 27,
-                        color: whiteColor,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 23,
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 18),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 23, horizontal: 19),
-                  decoration: BoxDecoration(
-                    color: whiteColor,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        erm,
-                        // 'Pastikan nominl tagihan sudah sesuai dengan kesepakatan dan ketentuan',
-                        style: darkRdBrownTextStyle.copyWith(
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        textAlign: TextAlign.justify,
-                      ),
-                      const SizedBox(
-                        height: 21,
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'Total',
-                            style: blackInTextStyle.copyWith(
-                              fontSize: 16,
-                              fontWeight: bold,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            formatCurrency(
-                              int.parse(widget.tagihan.totalHarga!),
-                            ),
-                            style: blackInTextStyle.copyWith(
-                              fontSize: 18,
-                              fontWeight: bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      CustomFilledButton(
-                        title: 'Bayar Non Tunai',
-                        onPressed: () {
-                          CustomModalBottomSheet.show(
-                            context,
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  height: 30,
+                              Text(
+                                state.data.invoiceNumber!,
+                                style: greyRdTextStyle.copyWith(
+                                  fontSize: 10,
+                                  fontWeight: regular,
                                 ),
-                                Text(
-                                  'Pilih Metode Pembayaran',
-                                  style: darkRdBrownTextStyle.copyWith(
-                                      fontSize: 16, fontWeight: bold),
-                                ),
-                                Center(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    decoration: BoxDecoration(
-                                        color: whiteColor,
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(8))),
-                                    child: Column(
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              DottedLine(
+                                dashLength: 8,
+                                lineThickness: 4.0,
+                                dashColor: orangeColor,
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              tagihanInfo('Tagihan', state.data.tagihanName!),
+                              tagihanInfo('Pasar', 'Balige'),
+                              tagihanInfo('No unit', 'AIIK04'),
+                              DottedLine(
+                                dashLength: 8,
+                                lineThickness: 2.0,
+                                dashColor: lightGreyColor,
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              isPaid == 'VERIFIED'
+                                  ? Column(
                                       children: [
-                                        LoadingAnimationWidget.inkDrop(
-                                            color: mainColor, size: 24),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                        Text(
+                                          'Pembayaran Berhasil!',
+                                          style: mainRdTextStyle.copyWith(
+                                              fontWeight: bold, fontSize: 18),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                        Text(
+                                          'Pembayaran tagihan dilakukan pada',
+                                          style: greyRdTextStyle.copyWith(
+                                              fontSize: 12),
+                                        ),
+                                        Text(
+                                          iso8601toDateTime(
+                                              state.data.paymentTime!),
+                                        ),
                                         const SizedBox(
                                           height: 20,
                                         ),
-                                        Text(
-                                          'Sedang Diproses',
-                                          style: darkRdBrownTextStyle.copyWith(
-                                              fontSize: 12, fontWeight: bold),
-                                        )
                                       ],
+                                    )
+                                  : Column(
+                                      children: [
+                                        Text(
+                                          'Tagihan dilakukan pada tanggal',
+                                          style: greyRdTextStyle.copyWith(
+                                              fontSize: 12),
+                                        ),
+                                        Text(
+                                          DateFormat('dd MMMM yyyy')
+                                              .format(DateTime.now())
+                                              .toString(),
+                                          style: greyRdTextStyle.copyWith(
+                                              fontSize: 12, fontWeight: bold),
+                                        ),
+                                      ],
+                                    )
+                            ],
+                          ),
+                        ),
+                        isPaid == 'VERIFIED'
+                            ? Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: greenColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      width: 6,
+                                      color: whiteColor.withAlpha(80)),
+                                ),
+                                child: Icon(
+                                  Icons.check_circle_outline_rounded,
+                                  size: 40,
+                                  color: whiteColor,
+                                ),
+                              )
+                            : isPaid == 'REQUEST'
+                                ? Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: orangeColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          width: 6, color: whiteColor),
                                     ),
-                                  ),
+                                    child: Icon(
+                                      Icons.lock_clock,
+                                      color: whiteColor,
+                                      size: 32,
+                                    ))
+                                : Container(
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: mainColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          width: 6, color: whiteColor),
+                                    ),
+                                    child: Image.asset(
+                                      'assets/ic_bill.png',
+                                      width: 28,
+                                      height: 27,
+                                      color: whiteColor,
+                                    ),
+                                  )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 35,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 18),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 23, horizontal: 19),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: BlocConsumer<DokuPaymentBloc, DokuPaymentState>(
+                        listener: (context, dokuState) {
+                          if (dokuState is DokuPaymentFailed) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: CustomSnackbar(
+                                  message: dokuState.e.toString(),
                                 ),
-                                const SizedBox(
-                                  height: 6,
+                                behavior: SnackBarBehavior.fixed,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                              ),
+                            );
+                          }
+
+                          if (dokuState is DokuPaymentSuccess) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DokuPaymentVaPage(
+                                    virtualAccount: dokuState.data),
+                              ),
+                            );
+                          }
+                        },
+                        builder: (context, dokuState) {
+                          if (dokuState is DokuPaymentLoading) {
+                            return Center(
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    color: whiteColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(8))),
+                                child: Column(
+                                  children: [
+                                    LoadingAnimationWidget.inkDrop(
+                                        color: mainColor, size: 24),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Text(
+                                      'Sedang Diproses',
+                                      style: darkRdBrownTextStyle.copyWith(
+                                          fontSize: 12, fontWeight: bold),
+                                    )
+                                  ],
                                 ),
+                              ),
+                            );
+                          }
+
+                          // if () {
+
+                          // }
+                          if (isPaid == 'VERIFIED') {
+                            return Container(
+                              child: Text('Pembayaran telah berhasil dilakauk'),
+                            );
+                          } else {
+                            return Column(
+                              children: [
                                 Text(
-                                  'Silahkan  pilih metode pembayaran yang akan anda gunakan untuk membayar tagihan',
-                                  style: greyRdTextStyle.copyWith(fontSize: 10),
+                                  'Pastikan nominal tagihan sudah sesuai dengan kesepakatan dan ketentuan',
+                                  style: darkRdBrownTextStyle.copyWith(
+                                    fontSize: 12,
+                                    fontStyle: FontStyle.italic,
+                                  ),
                                   textAlign: TextAlign.justify,
                                 ),
                                 const SizedBox(
-                                  height: 14,
+                                  height: 21,
                                 ),
-                                ExpansionTile(
-                                  title: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/img_payment.png',
-                                        width: 20,
-                                      ),
-                                      const SizedBox(
-                                        width: 6,
-                                      ),
-                                      Text(
-                                        'Virtual Account',
-                                        style: darkInBrownTextStyle.copyWith(
-                                            fontSize: 14, fontWeight: bold),
-                                      )
-                                    ],
-                                  ),
-                                  collapsedShape: Border.all(
-                                      width: 2, color: mainColor.withAlpha(25)),
-                                  subtitle: Text(
-                                    'Pilih pembayaran dengan va number melalui bank',
-                                    style:
-                                        greyRdTextStyle.copyWith(fontSize: 10),
-                                  ),
+                                Row(
                                   children: [
-                                    StatefulBuilder(builder:
-                                        (BuildContext context,
-                                            StateSetter setState) {
-                                      return Container(
-                                        width: double.infinity,
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Pilih Bank',
-                                                style: darkRdBrownTextStyle
-                                                    .copyWith(
-                                                        fontSize: 12,
-                                                        fontWeight: bold),
-                                                textAlign: TextAlign.left),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Column(
-                                              children: bankList
-                                                  .map(
-                                                    (String bank) => bankItem(
-                                                        'assets/img_$bank.png',
-                                                        bank,
-                                                        'VIA ${bank.toUpperCase()}',
-                                                        selectedBank,
-                                                        (String? data) {
-                                                      Future.delayed(
-                                                          const Duration(
-                                                              milliseconds:
-                                                                  100), () {
-                                                        setState(() {
-                                                          selectedBank = data!;
-                                                          print(selectedBank);
-                                                        });
-                                                      });
-                                                    }),
-                                                  )
-                                                  .toList(),
-                                            ),
-                                            Visibility(
-                                                visible:
-                                                    selectedBank.isNotEmpty,
-                                                child: Column(
-                                                  children: [
-                                                    const SizedBox(
-                                                      height: 25,
-                                                    ),
-                                                    CustomFilledButton(
-                                                      title: 'Lanjutkan',
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                        // try {
-                                                        context
-                                                            .read<
-                                                                DokuPaymentBloc>()
-                                                            .add(
-                                                              DokuVaGet(
-                                                                PaymentVaModel(
-                                                                  requestId: widget
-                                                                      .tagihan
-                                                                      .requestId,
-                                                                  bank:
-                                                                      selectedBank,
-                                                                  invoiceNumber:
-                                                                      widget
-                                                                          .tagihan
-                                                                          .invoiceNumber,
-                                                                  amount: double
-                                                                      .parse(widget
-                                                                          .tagihan
-                                                                          .totalHarga!),
-                                                                  expiredTime:
-                                                                      60,
-                                                                  reusableStatus:
-                                                                      false,
-                                                                  info1:
-                                                                      'Satu Pintu Retribusi',
-                                                                  name: widget
-                                                                      .tagihan
-                                                                      .name,
-                                                                  email: widget
-                                                                      .tagihan
-                                                                      .email,
-                                                                ),
-                                                              ),
-                                                            );
-                                                        // } catch (e) {
-
-                                                        // }
-
-                                                        // print(selectedBank);
-                                                      },
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 20,
-                                                    )
-                                                  ],
-                                                ))
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                ExpansionTile(
-                                  title: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/img_qris.png',
-                                        width: 20,
+                                    Text(
+                                      'Total',
+                                      style: blackInTextStyle.copyWith(
+                                        fontSize: 16,
+                                        fontWeight: bold,
                                       ),
-                                      const SizedBox(
-                                        width: 6,
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      formatCurrency(
+                                        state.data.price!,
                                       ),
-                                      Text(
-                                        'QRIS',
-                                        style: darkInBrownTextStyle.copyWith(
-                                            fontSize: 14, fontWeight: bold),
-                                      )
-                                    ],
-                                  ),
-                                  collapsedShape: Border.all(
-                                      width: 2, color: mainColor.withAlpha(25)),
-                                  subtitle: Text(
-                                    'Pilih pembayaran dengan dcan kode QR',
-                                    style:
-                                        greyRdTextStyle.copyWith(fontSize: 10),
-                                  ),
-                                  children: const [
-                                    ListTile(
-                                      title: Text('Trailiung expansion'),
-                                    )
+                                      style: blackInTextStyle.copyWith(
+                                        fontSize: 18,
+                                        fontWeight: bold,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 20,
                                 ),
-                              ],
-                            ),
-                            // },
-                            // ),
-                          );
-                        },
-                      ),
-                      const SizedBox(
-                        height: 11,
-                      ),
-                      CustomOutlinedButton(
-                        title: 'Bayar Tunai',
-                        color: mainColor,
-                        onPressed: () {
-                          CustomModalBottomSheet.show(
-                              context,
-                              SizedBox(
-                                width: double.infinity,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      height: 30,
-                                    ),
-                                    Text(
-                                      'Kode SatuPintu ',
-                                      style: darkRdBrownTextStyle.copyWith(
-                                          fontSize: 16, fontWeight: bold),
-                                    ),
-                                    const SizedBox(
-                                      height: 6,
-                                    ),
-                                    Text(
-                                      'Perlihatkan kode anda dibawah ini kepada petugas untuk menyelesaikan pembayaran',
-                                      style: greyRdTextStyle.copyWith(
-                                          fontSize: 10),
-                                      textAlign: TextAlign.justify,
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 50),
-                                      decoration: const BoxDecoration(
-                                        image: DecorationImage(
-                                            image: AssetImage(
-                                                'assets/img_qris_background.png'),
-                                            fit: BoxFit.fill),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(10),
-                                        ),
+                                CustomFilledButton(
+                                  title: 'Bayar Non Tunai',
+                                  onPressed: () {
+                                    CustomModalBottomSheet.show(
+                                      context,
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            height: 30,
+                                          ),
+                                          Text(
+                                            'Pilih Metode Pembayaran',
+                                            style:
+                                                darkRdBrownTextStyle.copyWith(
+                                                    fontSize: 16,
+                                                    fontWeight: bold),
+                                          ),
+                                          // Center(
+                                          //   child: Container(
+                                          //     padding: const EdgeInsets.symmetric(
+                                          //         vertical: 10),
+                                          //     decoration: BoxDecoration(
+                                          //         color: whiteColor,
+                                          //         borderRadius:
+                                          //             const BorderRadius.all(
+                                          //                 Radius.circular(8))),
+                                          //     child: Column(
+                                          //       children: [
+                                          //         LoadingAnimationWidget.inkDrop(
+                                          //             color: mainColor, size: 24),
+                                          //         const SizedBox(
+                                          //           height: 20,
+                                          //         ),
+                                          //         Text(
+                                          //           'Sedang Diproses',
+                                          //           style:
+                                          //               darkRdBrownTextStyle.copyWith(
+                                          //                   fontSize: 12,
+                                          //                   fontWeight: bold),
+                                          //         )
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          const SizedBox(
+                                            height: 6,
+                                          ),
+                                          Text(
+                                            'Silahkan  pilih metode pembayaran yang akan anda gunakan untuk membayar tagihan',
+                                            style: greyRdTextStyle.copyWith(
+                                                fontSize: 10),
+                                            textAlign: TextAlign.justify,
+                                          ),
+                                          const SizedBox(
+                                            height: 14,
+                                          ),
+
+                                          ExpansionTile(
+                                            title: Row(
+                                              children: [
+                                                Image.asset(
+                                                  'assets/img_payment.png',
+                                                  width: 20,
+                                                ),
+                                                const SizedBox(
+                                                  width: 6,
+                                                ),
+                                                Text(
+                                                  'Virtual Account',
+                                                  style: darkInBrownTextStyle
+                                                      .copyWith(
+                                                          fontSize: 14,
+                                                          fontWeight: bold),
+                                                )
+                                              ],
+                                            ),
+                                            collapsedShape: Border.all(
+                                                width: 2,
+                                                color: mainColor.withAlpha(25)),
+                                            subtitle: Text(
+                                              'Pilih pembayaran dengan va number melalui bank',
+                                              style: greyRdTextStyle.copyWith(
+                                                  fontSize: 10),
+                                            ),
+                                            children: [
+                                              StatefulBuilder(builder:
+                                                  (BuildContext context,
+                                                      StateSetter setState) {
+                                                return Container(
+                                                  width: double.infinity,
+                                                  margin: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 16),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text('Pilih Bank',
+                                                          style:
+                                                              darkRdBrownTextStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          bold),
+                                                          textAlign:
+                                                              TextAlign.left),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Column(
+                                                        children: bankList
+                                                            .map(
+                                                              (String bank) => bankItem(
+                                                                  'assets/img_$bank.png',
+                                                                  bank,
+                                                                  'VIA ${bank.toUpperCase()}',
+                                                                  selectedBank,
+                                                                  (String?
+                                                                      data) {
+                                                                Future.delayed(
+                                                                    const Duration(
+                                                                        milliseconds:
+                                                                            100),
+                                                                    () {
+                                                                  setState(() {
+                                                                    selectedBank =
+                                                                        data!;
+                                                                    print(
+                                                                        selectedBank);
+                                                                  });
+                                                                });
+                                                              }),
+                                                            )
+                                                            .toList(),
+                                                      ),
+                                                      Visibility(
+                                                          visible: selectedBank
+                                                              .isNotEmpty,
+                                                          child: Column(
+                                                            children: [
+                                                              const SizedBox(
+                                                                height: 25,
+                                                              ),
+                                                              CustomFilledButton(
+                                                                title:
+                                                                    'Lanjutkan',
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                  // try {
+                                                                  context
+                                                                      .read<
+                                                                          DokuPaymentBloc>()
+                                                                      .add(
+                                                                        DokuVaGet(
+                                                                          state
+                                                                              .data
+                                                                              .id!,
+                                                                          PaymentVaModel(
+                                                                            requestId:
+                                                                                state.data.requestId,
+                                                                            bank:
+                                                                                selectedBank,
+                                                                            invoiceNumber:
+                                                                                state.data.invoiceNumber,
+                                                                            amount:
+                                                                                double.parse(state.data.price.toString()),
+                                                                            expiredTime:
+                                                                                60,
+                                                                            reusableStatus:
+                                                                                false,
+                                                                            info1:
+                                                                                'Satu Pintu Retribusi',
+                                                                            name:
+                                                                                state.data.tagihanName,
+                                                                            email:
+                                                                                state.data.email,
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                  // } catch (e) {
+
+                                                                  // }
+
+                                                                  // print(selectedBank);
+                                                                },
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 20,
+                                                              )
+                                                            ],
+                                                          ))
+                                                    ],
+                                                  ),
+                                                );
+                                              }),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 16,
+                                          ),
+                                          ExpansionTile(
+                                            title: Row(
+                                              children: [
+                                                Image.asset(
+                                                  'assets/img_qris.png',
+                                                  width: 20,
+                                                ),
+                                                const SizedBox(
+                                                  width: 6,
+                                                ),
+                                                Text(
+                                                  'QRIS',
+                                                  style: darkInBrownTextStyle
+                                                      .copyWith(
+                                                          fontSize: 14,
+                                                          fontWeight: bold),
+                                                )
+                                              ],
+                                            ),
+                                            collapsedShape: Border.all(
+                                                width: 2,
+                                                color: mainColor.withAlpha(25)),
+                                            subtitle: Text(
+                                              'Pilih pembayaran dengan dcan kode QR',
+                                              style: greyRdTextStyle.copyWith(
+                                                  fontSize: 10),
+                                            ),
+                                            children: const [
+                                              ListTile(
+                                                title:
+                                                    Text('Trailiung expansion'),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                        ],
                                       ),
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: QrImageView(
-                                          gapless: false,
-                                          backgroundColor: whiteColor,
-                                          data: '123123123',
-                                          version: QrVersions.auto,
-                                          size: 300.0,
-                                          padding: const EdgeInsets.all(20),
-                                          embeddedImage: const AssetImage(
-                                              'assets/img_logo_with_background.png'),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 18,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.shield_outlined,
-                                          color: mainColor,
-                                        ),
-                                        Text(
-                                          'Penting!',
-                                          style: darkRdBrownTextStyle.copyWith(
-                                              fontWeight: bold),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 6,
-                                    ),
-                                    Text(
-                                      'Mohon mencek status pembayaran tagihan anda secara berkala untuk memastikan tagihan telah dibayarkan kepada petugas, sebelum petugas pergi',
-                                      style: greyRdTextStyle.copyWith(
-                                          fontSize: 10,
-                                          fontStyle: FontStyle.italic),
-                                      textAlign: TextAlign.justify,
-                                    ),
-                                  ],
+                                      // },
+                                      // ),
+                                    );
+                                  },
                                 ),
-                              ));
+                                const SizedBox(
+                                  height: 11,
+                                ),
+                                CustomOutlinedButton(
+                                  title: 'Bayar Tunai',
+                                  color: mainColor,
+                                  onPressed: () {
+                                    CustomModalBottomSheet.show(
+                                      context,
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: BlocBuilder<AuthBloc, AuthState>(
+                                          builder: (context, state) {
+                                            if (state is AuthLoading) {
+                                              return Center(
+                                                child: LoadingAnimationWidget
+                                                    .inkDrop(
+                                                        color: mainColor,
+                                                        size: 30),
+                                              );
+                                            }
+                                            if (state is AuthSuccess) {
+                                              if (state.user.nik != null) {
+                                                return Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 30,
+                                                    ),
+                                                    Text(
+                                                      'Kode SatuPintu ',
+                                                      style:
+                                                          darkRdBrownTextStyle
+                                                              .copyWith(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      bold),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 6,
+                                                    ),
+                                                    Text(
+                                                      'Perlihatkan kode anda dibawah ini kepada petugas untuk menyelesaikan pembayaran',
+                                                      style: greyRdTextStyle
+                                                          .copyWith(
+                                                              fontSize: 10),
+                                                      textAlign:
+                                                          TextAlign.justify,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                    Container(
+                                                      width: double.infinity,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 50),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        image: DecorationImage(
+                                                            image: AssetImage(
+                                                                'assets/img_qris_background.png'),
+                                                            fit: BoxFit.fill),
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: QrImageView(
+                                                          gapless: false,
+                                                          backgroundColor:
+                                                              whiteColor,
+                                                          data: state.user.nik!,
+                                                          version:
+                                                              QrVersions.auto,
+                                                          size: 300.0,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(20),
+                                                          embeddedImage:
+                                                              const AssetImage(
+                                                                  'assets/img_logo_with_background.png'),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 18,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.shield_outlined,
+                                                          color: mainColor,
+                                                        ),
+                                                        Text(
+                                                          'Penting!',
+                                                          style:
+                                                              darkRdBrownTextStyle
+                                                                  .copyWith(
+                                                                      fontWeight:
+                                                                          bold),
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 6,
+                                                    ),
+                                                    Text(
+                                                      'Mohon mencek status pembayaran tagihan anda secara berkala untuk memastikan tagihan telah dibayarkan kepada petugas, sebelum petugas pergi',
+                                                      style: greyRdTextStyle
+                                                          .copyWith(
+                                                              fontSize: 10,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic),
+                                                      textAlign:
+                                                          TextAlign.justify,
+                                                    ),
+                                                  ],
+                                                );
+                                              }
+
+                                              return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 50,
+                                                    ),
+                                                    Text(
+                                                      'NIK anda belum terdaftar',
+                                                      style:
+                                                          darkRdBrownTextStyle
+                                                              .copyWith(
+                                                                  fontWeight:
+                                                                      bold),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      'Sistem tidak dapat mendeteksi NIK anda pastikan NIK anda sudah terdaftar',
+                                                      style: greyRdTextStyle
+                                                          .copyWith(
+                                                              fontSize: 12),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ]);
+                                            }
+
+                                            if (state is AuthFailed) {
+                                              return Center(
+                                                child: Text(state.e),
+                                              );
+                                            }
+
+                                            return const Center(
+                                              child: Text(
+                                                  'Tidak dapat memuat qr code anda'),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              ],
+                            );
+                          }
                         },
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ));
-    // },
-    // );
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                );
+              }
+
+              if (state is TagihanFailed) {
+                return Center(
+                  child: Text(state.e),
+                );
+              }
+
+              return const Text('Terjadi kealahan');
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   Widget tagihanInfo(String key, String value) {

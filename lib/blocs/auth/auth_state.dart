@@ -20,9 +20,14 @@ final class AuthFailed extends AuthState {
 }
 
 final class AuthSuccess extends AuthState {
-  final UserModel user;
+  final UserAuthModel user;
   const AuthSuccess(this.user);
 
   @override
   List<Object> get props => [user];
 }
+
+// final class IsAuthenticated extends AuthState {
+//   final UserModel user;
+//   const IsAuthenticated(this.user);
+// }

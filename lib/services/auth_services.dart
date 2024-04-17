@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:satupintu_app/model/login_form_model.dart';
-import 'package:satupintu_app/model/user_model.dart';
+import 'package:satupintu_app/model/user_auth_model.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class AuthService {
-  Future<UserModel> login(LoginFormModel data) async {
+  Future<UserAuthModel> login(LoginFormModel data) async {
     // print(data.toJson());
     try {
       final res = await http.post(
@@ -17,7 +17,8 @@ class AuthService {
       );
 
       if (res.statusCode == 200) {
-        UserModel user = UserModel.fromJson(jsonDecode(res.body)['data']);
+        UserAuthModel user =
+            UserAuthModel.fromJson(jsonDecode(res.body)['data']);
         user = user.copyWith(password: data.password);
 
         await storeCredentialToLocal(user);
@@ -26,12 +27,11 @@ class AuthService {
         throw jsonDecode(res.body)['message'];
       }
     } catch (e) {
-      print({"error": e});
       rethrow;
     }
   }
 
-  Future<void> storeCredentialToLocal(UserModel user) async {
+  Future<void> storeCredentialToLocal(UserAuthModel user) async {
     try {
       const storage = FlutterSecureStorage();
       await storage.write(key: 'email', value: user.email);
@@ -40,10 +40,6 @@ class AuthService {
       await storage.write(key: 'role_id', value: user.roleId.toString());
       if (user.nik != null) {
         await storage.write(key: 'nik', value: user.nik.toString());
-      }
-      if (user.role == 2) {
-        await storage.write(
-            key: 'subwilayah_id', value: user.subWilayahId.toString());
       }
     } catch (e) {
       rethrow;
@@ -101,11 +97,9 @@ class AuthService {
 
   Future<void> logout() async {
     try {
-      final token = await AuthService().getToken();
-
       final res = await http.post(
         Uri.parse('$baseUrl/auth/logout'),
-        headers: {'Content-Type': 'application/json', 'Authorization': token},
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (res.statusCode != 200) {

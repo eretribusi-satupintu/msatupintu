@@ -20,10 +20,27 @@ final class WajibRetribusiSuccess extends WajibRetribusiState {
   List<Object> get props => [data];
 }
 
+final class WajibRetribusiSuccessDetail extends WajibRetribusiState {
+  final WajibRetribusiModel data;
+
+  const WajibRetribusiSuccessDetail(this.data);
+
+  @override
+  List<Object> get props => [data];
+}
+
 final class WajibRetribusiFailed extends WajibRetribusiState {
   final String e;
   const WajibRetribusiFailed(this.e);
 
   @override
   List<Object> get props => [e];
+}
+
+final class WajibRetribusiPresent extends WajibRetribusiState {
+  final int wajibRetribusiId;
+  const WajibRetribusiPresent(this.wajibRetribusiId);
+
+  @override
+  List<Object> get props => [wajibRetribusiId];
 }
