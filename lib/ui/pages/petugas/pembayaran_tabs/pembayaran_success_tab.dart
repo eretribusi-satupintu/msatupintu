@@ -25,8 +25,28 @@ class PembayaranSuccessTab extends StatelessWidget {
             BlocBuilder<TagihanBloc, TagihanState>(
               builder: (context, state) {
                 if (state is TagihanLoading) {
-                  return LoadingAnimationWidget.inkDrop(
-                      color: mainColor, size: 30);
+                  return Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: whiteColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        children: [
+                          LoadingAnimationWidget.staggeredDotsWave(
+                              color: mainColor, size: 30),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            'Loading...',
+                            style: darkRdBrownTextStyle,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
                 }
 
                 if (state is TagihanSuccess) {

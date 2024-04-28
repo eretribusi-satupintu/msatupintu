@@ -10,3 +10,9 @@ sealed class UserEvent extends Equatable {
 class UserGet extends UserEvent {}
 
 class UserCheckRequested extends UserEvent {}
+
+class UserUpdate extends UserEvent {
+  final int userId;
+  final UserUpdateFormModel user;
+  const UserUpdate(this.user, this.userId);
+}

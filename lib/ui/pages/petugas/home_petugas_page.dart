@@ -8,6 +8,8 @@ import 'package:satupintu_app/blocs/subwilayah/subwilayah_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/bukti_bayar_print.dart';
+import 'package:satupintu_app/ui/pages/petugas/tagihan_manual_add_page.dart';
+import 'package:satupintu_app/ui/pages/petugas/tagihan_sinkronisasi_page.dart';
 
 class HomePetugasPage extends StatelessWidget {
   const HomePetugasPage({super.key});
@@ -134,7 +136,7 @@ class HomePetugasPage extends StatelessWidget {
 
                       if (state is PetugasBillAmountSuccess) {
                         return Text(
-                          formatCurrency(state.amount),
+                          formatCurrency(state.data.total),
                           style: whiteInTextStyle.copyWith(
                               fontSize: 24, fontWeight: bold),
                         );
@@ -199,9 +201,38 @@ class HomePetugasPage extends StatelessWidget {
                     },
                     child: homeMenuItem(
                         'Ungggah Setoran', 'assets/ic_deposit.png')),
-                homeMenuItem(
-                    'Sinkronisasi Tagihan', 'assets/ic_sinkronisasi.png'),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TagihanSinkronisasiPage()));
+                  },
+                  child: homeMenuItem(
+                      'Sinkronisasi Tagihan', 'assets/ic_sinkronisasi.png'),
+                ),
                 // homeMenuItem('Cetak\nBukti Bayar', 'assets/ic_print.png'),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 18),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TagihanAddPage()));
+                  },
+                  child: homeMenuItem(
+                      'Tagihan Manual', 'assets/img_invoice_list.png'),
+                )
               ],
             ),
           )

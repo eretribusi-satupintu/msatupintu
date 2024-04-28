@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:satupintu_app/model/tagihan_local_model.dart';
 import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
 import 'package:http/http.dart' as http;
@@ -7,6 +8,8 @@ import 'package:satupintu_app/services/subwilayah_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class TagihanService {
+ 
+
   Future<List<TagihanModel>> getNewestTagihan() async {
     try {
       final token = await AuthService().getToken();

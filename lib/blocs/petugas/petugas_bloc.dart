@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:satupintu_app/model/bill_amount_model.dart';
 import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/model/tagihan_update_model.dart';
 import 'package:satupintu_app/model/transaksi_petugas_model.dart';

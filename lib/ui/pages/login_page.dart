@@ -61,8 +61,20 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context, state) {
             if (state is AuthLoading) {
               return Center(
-                  child:
-                      LoadingAnimationWidget.inkDrop(color: mainColor, size: 56)
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LoadingAnimationWidget.staggeredDotsWave(
+                      color: mainColor, size: 60),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Memasuki SatuPintu',
+                    style: darkRdBrownTextStyle,
+                  )
+                ],
+              )
                   // CircularProgressIndicator(),
                   );
             }

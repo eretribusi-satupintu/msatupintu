@@ -27,10 +27,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthLoading());
           final LoginFormModel data =
               await AuthService().getCredentialFromLocal();
-          final token = await AuthService().getToken();
-          final UserAuthModel user = await AuthService().login(data);
-          print({"current_user": token});
-          emit(AuthSuccess(user));
+
+          try {
+            final UserAuthModel user = await AuthService().login(data);
+            emit(AuthSuccess(user));
+          } catch (e) {
+            if (data.role == 2) {
+              emit(AuthPetugasFailed());
+            } else {
+              emit(AuthFailed(e.toString()));
+            }
+          }
         } catch (e) {
           emit(AuthFailed(e.toString()));
         }

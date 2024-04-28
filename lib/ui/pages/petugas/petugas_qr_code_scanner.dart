@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/blocs/wajib_retribusi/wajib_retribusi_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
-import 'package:satupintu_app/ui/pages/petugas/tagihan_list_page.dart';
-import 'package:satupintu_app/ui/pages/petugas/wajib_retribusi_tagihan_list.dart';
+import 'package:satupintu_app/ui/pages/petugas/petugas_tagihan_list.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 
 class PetugasScanQrCodePage extends StatefulWidget {
@@ -51,8 +51,15 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
         ),
         centerTitle: true,
       ),
-      body: BlocProvider(
-        create: (context) => WajibRetribusiBloc(),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => WajibRetribusiBloc(),
+          ),
+          BlocProvider(
+            create: (context) => TagihanBloc(),
+          ),
+        ],
         child: BlocConsumer<WajibRetribusiBloc, WajibRetribusiState>(
           listener: (context, state) {
             if (state is WajibRetribusiFailed) {
@@ -97,6 +104,15 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                         print(result!.code!);
                         context.read<WajibRetribusiBloc>().add(
                             WajibRetribusiGetDetailFromScan(result!.code!));
+                        // final splittedCode = result!.code!.split('-');
+                        // if (splittedCode[0] == 'list') {
+                        //   context.read<WajibRetribusiBloc>().add(
+                        //       WajibRetribusiGetDetailFromScan(splittedCode[1]));
+                        // } else if (splittedCode[0] == 'detail') {
+                        //   context.read<WajibRetribusiBloc>().add(
+                        //       WajibRetribusiGetDetailFromScan(splittedCode[1]));
+                        // } else {}
+                        // print(splittedCode[0]);
                       });
                     },
                     overlay: QrScannerOverlayShape(

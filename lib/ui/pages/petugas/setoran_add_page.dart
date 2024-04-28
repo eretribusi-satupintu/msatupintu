@@ -7,10 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/petugas/petugas_bloc.dart';
 import 'package:satupintu_app/blocs/setoran/setoran_bloc.dart';
+import 'package:satupintu_app/model/bill_amount_model.dart';
 import 'package:satupintu_app/model/setoran_form_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
-import 'package:satupintu_app/ui/pages/petugas/setoran_list_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/setoran_detail_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
@@ -26,11 +26,13 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
   DateTime now = DateTime.now();
   final keteranganController = TextEditingController(text: '');
   int totalSetoran = 0;
+  List<TransaksiPetugasModel> transaksiPetugasIdList = [];
   String lokasiSetoran = '';
+  bool totalSetoranisNull = false;
   XFile? image;
 
   bool validate() {
-    if (lokasiSetoran == '' || image == null) {
+    if (lokasiSetoran == '' || image == null || totalSetoran <= 0) {
       return false;
     }
     return true;
@@ -68,6 +70,11 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
 
   @override
   void initState() {
+    if (totalSetoran <= 0) {
+      setState(() {
+        totalSetoranisNull = true;
+      });
+    }
     super.initState();
   }
 
@@ -197,7 +204,9 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                               listener: (context, state) {
                                 if (state is PetugasBillAmountSuccess) {
                                   setState(() {
-                                    totalSetoran = state.amount;
+                                    totalSetoran = state.data.total;
+                                    transaksiPetugasIdList =
+                                        state.data.transaksiPetugas;
                                   });
                                 }
                               },
@@ -206,13 +215,26 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                                   return LoadingAnimationWidget.inkDrop(
                                       color: mainColor, size: 30);
                                 }
-                                return Text(
-                                  formatCurrency(totalSetoran),
-                                  style: darkInBrownTextStyle.copyWith(
-                                      fontWeight: bold, fontSize: 18),
-                                );
+                                return totalSetoran <= 0
+                                    ? Text(
+                                        'Anda belum memiliki total tagihan!',
+                                        style: redRdTextStyle.copyWith(
+                                            fontSize: 10),
+                                      )
+                                    : Text(
+                                        formatCurrency(totalSetoran),
+                                        style: darkInBrownTextStyle.copyWith(
+                                            fontWeight: bold, fontSize: 18),
+                                      );
                               },
                             ),
+                            // totalSetoranisNull
+                            //     ? Text(
+                            //         'Anda belum memiliki total tagihan!',
+                            //         style:
+                            //             redRdTextStyle.copyWith(fontSize: 10),
+                            //       )
+                            //     : const SizedBox(),
                             const SizedBox(
                               height: 20,
                             ),
@@ -429,12 +451,13 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                                 context.read<SetoranBloc>().add(SetoranPost(
                                     SetoranFormModel(
                                         now.toString(),
+                                        transaksiPetugasIdList,
                                         totalSetoran,
                                         lokasiSetoran,
                                         base64Encode(
                                           File(image!.path).readAsBytesSync(),
                                         ),
-                                        keteranganController.value
+                                        keteranganController.value.text
                                             .toString())));
                               }
                             })

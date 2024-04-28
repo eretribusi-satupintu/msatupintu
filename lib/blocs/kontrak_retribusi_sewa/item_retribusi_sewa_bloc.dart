@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:satupintu_app/model/kontrak_item_retribusi_model.dart';
-import 'package:satupintu_app/services/item_retribusi_service.dart';
+import 'package:satupintu_app/services/item_retribusi_service_test.dart';
 
 part 'item_retribusi_sewa_event.dart';
 part 'item_retribusi_sewa_state.dart';

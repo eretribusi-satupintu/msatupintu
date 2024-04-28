@@ -69,155 +69,150 @@ class _MainPageState extends State<MainPage>
           }
         },
         child: Scaffold(
-          appBar: PreferredSize(
-              preferredSize: const Size(double.infinity, 100),
-              child: Stack(
-                children: [
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (BuildContext context, Widget? child) {
-                      return ClipPath(
-                        clipper: CustomClipPath(_controller.value),
-                        child: Container(
-                          height: 90,
-                          color: mainColor.withAlpha(80),
-                        ),
-                      );
-                    },
-                  ),
-                  ClipPath(
-                    clipper: CustomClipPath2(),
-                    child: Container(
-                      height: 90,
-                      color: mainColor.withAlpha(75),
+            appBar: PreferredSize(
+                preferredSize: const Size(double.infinity, 100),
+                child: Stack(
+                  children: [
+                    AnimatedBuilder(
+                      animation: _controller,
+                      builder: (BuildContext context, Widget? child) {
+                        return ClipPath(
+                          clipper: CustomClipPath(_controller.value),
+                          child: Container(
+                            height: 90,
+                            color: mainColor.withAlpha(80),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  ClipPath(
-                    clipper: CustomClipPath3(),
-                    child: Container(
-                      height: 90,
-                      color: mainColor.withAlpha(98),
+                    ClipPath(
+                      clipper: CustomClipPath2(),
+                      child: Container(
+                        height: 90,
+                        color: mainColor,
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 12),
-                    child: Row(
-                      children: [
-                        BlocBuilder<AuthBloc, AuthState>(
-                            builder: (context, state) {
-                          if (state is AuthSuccess) {
-                            if (selectedPage != 0) {
-                              return getTitlePage(
-                                  selectedPage, state.user.role!);
-                            } else {
-                              return getHomeProfile(
-                                  formattedDate, state.user.name!);
+                    ClipPath(
+                      clipper: CustomClipPath3(),
+                      child: Container(
+                        height: 90,
+                        color: mainColor.withAlpha(98),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 12),
+                      child: Row(
+                        children: [
+                          BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                            if (state is AuthSuccess) {
+                              if (selectedPage != 0) {
+                                return getTitlePage(
+                                    selectedPage, state.user.role!);
+                              } else {
+                                return getHomeProfile(
+                                    formattedDate, state.user.name!);
+                              }
                             }
-                          }
-                          return Text(
-                            '-',
-                            style: whiteRdTextStyle.copyWith(
-                                fontSize: 20, fontWeight: bold),
-                          );
-                        }),
-                        const Spacer(),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/wajib-retribusi-kontrak');
-                              },
-                              child: Image.asset(
-                                'assets/ic_kontrak.png',
-                                width: 24,
+                            return Text(
+                              '-',
+                              style: whiteRdTextStyle.copyWith(
+                                  fontSize: 20, fontWeight: bold),
+                            );
+                          }),
+                          const Spacer(),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/wajib-retribusi-kontrak');
+                                },
+                                child: Image.asset(
+                                  'assets/ic_kontrak.png',
+                                  width: 24,
+                                ),
                               ),
-                            ),
-                            const SizedBox(
-                              width: 17,
-                            ),
-                            Icon(
-                              Icons.notifications,
-                              color: whiteColor,
-                              size: 20,
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              )),
-          backgroundColor: lightWhite,
-          bottomNavigationBar: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthSuccess) {
-                return CurvedNavigationBar(
-                  height: 50,
-                  backgroundColor: Colors.transparent,
-                  animationDuration: const Duration(milliseconds: 300),
-                  index: selectedPage,
-                  items: getBottomBaritem(state.user.role!),
-                  onTap: (index) {
-                    if (state.user.role == 2 && index == 2) {
-                      Navigator.pushNamed(context, '/petugas-scan-qr-code');
-                    } else {
-                      setState(() {
-                        selectedPage = index;
-                      });
-                    }
-                  },
-                );
-              }
-
-              return const SizedBox();
-            },
-          ),
-          body: ListView(
-            children: [
-              BlocConsumer<AuthBloc, AuthState>(
-                listener: (context, state) {
-                  if (state is AuthFailed) {
-                    Center(
-                      child: Text('Tidak dapat terkoneksi ke server'),
-                    );
-                  }
-
-                  if (state is AuthInitial) {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/login', (route) => false);
-                  }
-                },
-                builder: (context, state) {
-                  if (state is AuthLoading) {
-                    Center(
-                      child: LoadingAnimationWidget.inkDrop(
-                          color: mainColor, size: 30),
-                    );
-                  }
-                  if (state is AuthSuccess) {
-                    if (state.user.role == 1) {
-                      return getSelectedPage(index: selectedPage);
-                    } else if (state.user.role == 2) {
-                      return getSelectedPagePetugas(
-                          selectedPage, state.user.roleId!);
-                    }
-                  }
-
-                  return Center(
-                    child: Text(
-                      'Tidak dapat mengidenifikasi pengguana',
-                      style: greyRdTextStyle.copyWith(fontWeight: bold),
-                    ),
+                              const SizedBox(
+                                width: 17,
+                              ),
+                              Icon(
+                                Icons.notifications,
+                                color: whiteColor,
+                                size: 20,
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                )),
+            backgroundColor: lightWhite,
+            bottomNavigationBar: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthSuccess) {
+                  return CurvedNavigationBar(
+                    height: 50,
+                    backgroundColor: Colors.transparent,
+                    animationDuration: const Duration(milliseconds: 300),
+                    index: selectedPage,
+                    items: getBottomBaritem(state.user.role!),
+                    onTap: (index) {
+                      if (state.user.role == 2 && index == 2) {
+                        Navigator.pushNamed(context, '/petugas-scan-qr-code');
+                      } else {
+                        setState(() {
+                          selectedPage = index;
+                        });
+                      }
+                    },
                   );
-                },
-              )
-            ],
-          ),
-        ),
+                }
+
+                return const SizedBox();
+              },
+            ),
+            body: BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthFailed) {
+                  Center(
+                    child: Text('Tidak dapat terkoneksi ke server'),
+                  );
+                }
+
+                if (state is AuthInitial) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/login', (route) => false);
+                }
+              },
+              builder: (context, state) {
+                if (state is AuthLoading) {
+                  Center(
+                    child: LoadingAnimationWidget.inkDrop(
+                        color: mainColor, size: 30),
+                  );
+                }
+                if (state is AuthSuccess) {
+                  if (state.user.role == 1) {
+                    return getSelectedPage(index: selectedPage);
+                  } else if (state.user.role == 2) {
+                    return getSelectedPagePetugas(
+                        selectedPage, state.user.roleId!);
+                  }
+                }
+
+                return Center(
+                  child: Text(
+                    'Tidak dapat mengidenifikasi pengguana',
+                    style: greyRdTextStyle.copyWith(fontWeight: bold),
+                  ),
+                );
+              },
+            )),
       ),
     );
     // );
@@ -485,9 +480,11 @@ class _MainPageState extends State<MainPage>
                 ],
               ),
               Text(
-                'Hai, $name',
+                'Hai, ${name.split(' ')[0]}',
                 style:
-                    whiteInTextStyle.copyWith(fontSize: 18, fontWeight: bold),
+                    whiteInTextStyle.copyWith(fontSize: 14, fontWeight: bold),
+                // maxLines: 1,
+                overflow: TextOverflow.clip,
               ),
             ],
           ),

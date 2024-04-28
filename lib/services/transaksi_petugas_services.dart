@@ -4,6 +4,7 @@ import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/model/transaksi_petugas_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
 import 'package:http/http.dart' as http;
+import 'package:satupintu_app/services/tagihan_local_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class TransaksiPetugas {
@@ -25,6 +26,9 @@ class TransaksiPetugas {
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)['message'];
       }
+
+      TagihanLocalServices().deleteTagihan(tagihanId);
+
       return TagihanModel.fromJson(jsonDecode(res.body)['data']);
     } catch (e) {
       rethrow;

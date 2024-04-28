@@ -28,59 +28,64 @@ class _PembayaranPetugasPageState extends State<PembayaranPetugasPage>
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 18,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                    color: whiteColor, borderRadius: BorderRadius.circular(5)),
-                child: Column(
-                  children: [
-                    TabBar(
-                      unselectedLabelColor: mainColor,
-                      labelColor: whiteColor,
-                      dividerHeight: 0,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicator: BoxDecoration(
-                          color: mainColor,
-                          borderRadius: BorderRadius.circular(5)),
-                      controller: tabController,
-                      labelStyle: TextStyle(fontSize: 12, fontWeight: bold),
-                      tabs: [
-                        Tab(
-                          text: 'Berhasil',
-                        ),
-                        Tab(
-                          text: 'Menunggu',
-                        ),
-                        // Tab(
-                        //   text: 'Batal',
-                        // )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: TabBarView(
-                controller: tabController,
-                children: const [
-                  PembayaranSuccessTab(),
-                  PembayaranWaitingTab(),
-                  // PembayaranCancelTab(),
-                ],
-              ))
-            ],
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      margin: const EdgeInsets.symmetric(horizontal: 18),
+      child: Column(
+        children: [
+          const SizedBox(
+            height: 10,
           ),
-        ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: whiteColor, borderRadius: BorderRadius.circular(5)),
+            child: Column(
+              children: [
+                Container(
+                  height: 45,
+                  decoration: BoxDecoration(
+                      color: mainColor,
+                      borderRadius: BorderRadius.circular(30)),
+                  child: TabBar(
+                    unselectedLabelColor: whiteColor,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    labelColor: mainColor,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(30)),
+                    dividerHeight: 0,
+                    controller: tabController,
+                    labelStyle: TextStyle(fontSize: 12, fontWeight: bold),
+                    labelPadding: EdgeInsets.zero,
+                    tabs: const [
+                      Tab(
+                        text: 'Berhasil',
+                      ),
+                      Tab(
+                        text: 'Menunggu',
+                      ),
+                      // Tab(
+                      //   text: 'Batal',
+                      // )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+              child: TabBarView(
+            controller: tabController,
+            children: const [
+              PembayaranSuccessTab(),
+              PembayaranWaitingTab(),
+              // PembayaranCancelTab(),
+            ],
+          ))
+        ],
       ),
     );
   }

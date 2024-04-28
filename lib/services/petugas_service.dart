@@ -1,15 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:satupintu_app/model/subwilayah_model.dart';
-import 'package:satupintu_app/model/tagihan_update_model.dart';
+import 'package:satupintu_app/model/bill_amount_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
 import 'package:http/http.dart' as http;
 import 'package:satupintu_app/services/subwilayah_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class PetugasService {
-  Future<int> getBillAmount() async {
+  Future<BillAmountModel> getBillAmount() async {
     try {
       final token = await AuthService().getToken();
       final petugasId = await AuthService().getRoleId();
@@ -24,7 +23,14 @@ class PetugasService {
         throw jsonDecode(res.body)['message'];
       }
       storeBillAmountToLocal(jsonDecode(res.body)['data']['total']);
-      return jsonDecode(res.body)['data']['total'];
+      // print(jsonDecode(res.body)['data']);
+      final transaksiPetugas = List<TransaksiPetugasModel>.from(
+          jsonDecode(res.body)['data']['transaksi_petugas'].map(
+              (transaksiPetugas) =>
+                  TransaksiPetugasModel.fromJson(transaksiPetugas))).toList();
+      return BillAmountModel(
+          transaksiPetugas: transaksiPetugas,
+          total: jsonDecode(res.body)['data']['total']);
     } catch (e) {
       rethrow;
     }

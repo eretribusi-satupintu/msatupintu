@@ -35,18 +35,20 @@ class SetoranDetailPage extends StatelessWidget {
             ),
           ),
           actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              SetoranEditPage(setoran: setoran)));
-                },
-                icon: Icon(
-                  Icons.mode_edit_outlined,
-                  color: greyColor,
-                ))
+            setoran.status != 'DITERIMA'
+                ? IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  SetoranEditPage(setoran: setoran)));
+                    },
+                    icon: Icon(
+                      Icons.mode_edit_outlined,
+                      color: greyColor,
+                    ))
+                : const SizedBox()
           ],
         ),
         body: ListView(
@@ -260,7 +262,8 @@ class SetoranDetailPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(width: 1, color: mainColor),
                     ),
-                    child: Image.network(setoran.buktiSetoran!),
+                    child: Image.network(
+                        'http://localhost:3000/${setoran.buktiSetoran!}'),
                   )
                 ],
               ),

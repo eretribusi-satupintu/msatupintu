@@ -7,7 +7,6 @@ import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/transaksi_petugas_success_page.dart';
-import 'package:satupintu_app/ui/pages/template_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
@@ -526,9 +525,6 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                 BlocProvider(
                   create: (context) => PetugasBloc(),
                 ),
-                BlocProvider(
-                  create: (context) => TagihanBloc(),
-                ),
               ],
               child: BlocConsumer<PetugasBloc, PetugasState>(
                 listener: (context, state) async {
@@ -538,7 +534,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                       MaterialPageRoute(
                         builder: (context) => const SuccessPage(
                           message:
-                              'Konfirmasi Pembayaran Tunai telah berhasdil dilakukan',
+                              'Konfirmasi pembayaran tunai telah berhasil dilakukan',
                         ),
                       ),
                     );
@@ -558,13 +554,35 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                   }
                 },
                 builder: (context, state) {
+                  if (state is PetugasLoading) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: whiteColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        children: [
+                          LoadingAnimationWidget.staggeredDotsWave(
+                              color: mainColor, size: 30),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            'Permintaan anda sedang diproses',
+                            style: darkRdBrownTextStyle,
+                            textAlign: TextAlign.center,
+                          )
+                        ],
+                      ),
+                    );
+                  }
                   return CustomFilledButton(
                       title: 'Lanjutkan',
                       onPressed: () {
                         context
                             .read<PetugasBloc>()
                             .add(PetugasBillPaid(tagihanId));
-                        Navigator.pop(context);
                       });
                 },
               ),
@@ -650,6 +668,30 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                   }
                 },
                 builder: (context, state) {
+                  if (state is PetugasLoading) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: whiteColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          LoadingAnimationWidget.staggeredDotsWave(
+                              color: mainColor, size: 30),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            'Permintaan anda sedang diproses',
+                            style: darkRdBrownTextStyle,
+                            textAlign: TextAlign.center,
+                          )
+                        ],
+                      ),
+                    );
+                  }
                   return CustomFilledButton(
                       title: 'Lanjutkan',
                       onPressed: () {

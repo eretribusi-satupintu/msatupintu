@@ -16,16 +16,16 @@ Color lightGreyColor = const Color(0xffD9D9D9);
 Color lightWhite = const Color(0xffF7F9F9);
 
 // readexPro
-TextStyle blackRdTextStyle = GoogleFonts.roboto(color: blackColor);
-TextStyle whiteRdTextStyle = GoogleFonts.roboto(color: whiteColor);
-TextStyle greyRdTextStyle = GoogleFonts.roboto(color: greyColor);
-TextStyle greenRdTextStyle = GoogleFonts.roboto(color: greenColor);
-TextStyle darkRdBrownTextStyle = GoogleFonts.roboto(color: darkBrownColor);
-TextStyle mainRdTextStyle = GoogleFonts.roboto(color: mainColor);
-TextStyle blueRdTextStyle = GoogleFonts.roboto(color: blueColor);
-TextStyle redRdTextStyle = GoogleFonts.roboto(color: redColor);
-TextStyle orangeRdTextStyle = GoogleFonts.roboto(color: orangeColor);
-TextStyle lightGreyRdTextStyle = GoogleFonts.roboto(color: lightGreyColor);
+TextStyle blackRdTextStyle = GoogleFonts.poppins(color: blackColor);
+TextStyle whiteRdTextStyle = GoogleFonts.poppins(color: whiteColor);
+TextStyle greyRdTextStyle = GoogleFonts.poppins(color: greyColor);
+TextStyle greenRdTextStyle = GoogleFonts.poppins(color: greenColor);
+TextStyle darkRdBrownTextStyle = GoogleFonts.poppins(color: darkBrownColor);
+TextStyle mainRdTextStyle = GoogleFonts.poppins(color: mainColor);
+TextStyle blueRdTextStyle = GoogleFonts.poppins(color: blueColor);
+TextStyle redRdTextStyle = GoogleFonts.poppins(color: redColor);
+TextStyle orangeRdTextStyle = GoogleFonts.poppins(color: orangeColor);
+TextStyle lightGreyRdTextStyle = GoogleFonts.poppins(color: lightGreyColor);
 
 // inter
 TextStyle blackInTextStyle = GoogleFonts.inter(color: blackColor);

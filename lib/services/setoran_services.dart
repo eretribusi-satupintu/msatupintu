@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:satupintu_app/model/setoran_form_model.dart';
@@ -40,24 +39,30 @@ class SetoranServices {
       final petugasId = await AuthService().getRoleId();
       final subwilayah =
           await SubWilayahService().getSubwilayahFromLocalStorage();
+
+      // late List<Map<String, dynamic>> transaksiPetugasJson;
+      // setoran.transaksiPetugasId!.map((item) => transaksiPetugasJson.).toList();
+
+      final transaksiPetugasIds =
+          setoran.transaksiPetugasId!.map((tp) => tp.id).toList();
       final body = {
+        "transaksi_petugas": transaksiPetugasIds,
         "waktu_penyetoran": setoran.waktuSetoran,
         "total": setoran.total,
         "lokasi_penyetoran": setoran.lokasiPenyetoran,
         "bukti_penyetoran": setoran.buktiPenyetoran,
         "keterangan": setoran.keterangan ?? ''
       };
+      print(body);
       final res = await http.post(
           Uri.parse(
               '$baseUrl/setoran/petugas/$petugasId/subwilayah/${subwilayah.id}'),
           headers: {'Content-Type': 'application/json', 'Authorization': token},
           body: jsonEncode(body));
-      print(body);
 
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)['message'];
       }
-      print(jsonDecode(res.body)['data']);
       return SetoranModel.fromJson(jsonDecode(res.body)['data']);
     } catch (e) {
       rethrow;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:satupintu_app/ui/pages/petugas/tagihan_sinkronisasi_page.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
@@ -17,7 +18,15 @@ class SplashPage extends StatelessWidget {
                   context, '/home', (route) => false);
             }
 
+            if (state is AuthPetugasFailed) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const TagihanSinkronisasiPage()));
+            }
+
             if (state is AuthFailed) {
+              print(state.e);
               Navigator.pushNamedAndRemoveUntil(
                   context, '/login', (route) => false);
             }

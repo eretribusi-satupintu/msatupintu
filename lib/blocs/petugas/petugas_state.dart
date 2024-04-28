@@ -28,9 +28,9 @@ final class PetugasSuccess extends PetugasState {
 }
 
 final class PetugasBillAmountSuccess extends PetugasState {
-  final int amount;
-  const PetugasBillAmountSuccess(this.amount);
+  final BillAmountModel data;
+  const PetugasBillAmountSuccess(this.data);
 
   @override
-  List<Object> get props => [amount];
+  List<Object> get props => [data];
 }

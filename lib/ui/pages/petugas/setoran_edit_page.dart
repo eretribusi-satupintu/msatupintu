@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/petugas/petugas_bloc.dart';
 import 'package:satupintu_app/blocs/setoran/setoran_bloc.dart';
+import 'package:satupintu_app/model/bill_amount_model.dart';
 import 'package:satupintu_app/model/setoran_form_model.dart';
 import 'package:satupintu_app/model/setoran_model.dart';
 import 'package:satupintu_app/shared/method.dart';
@@ -27,7 +28,8 @@ class SetoranEditPage extends StatefulWidget {
 class _SetoranEditPageState extends State<SetoranEditPage> {
   DateTime now = DateTime.now();
   late TextEditingController keteranganController;
-  int totalSetoran = 0;
+  // int totalSetoran = 0;
+  // List<TransaksiPetugasModel> transaksiPetugasIdList = [];
   String lokasiSetoran = '';
   XFile? image;
 
@@ -201,26 +203,33 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                             const SizedBox(
                               height: 4,
                             ),
-                            BlocConsumer<PetugasBloc, PetugasState>(
-                              listener: (context, state) {
-                                if (state is PetugasBillAmountSuccess) {
-                                  setState(() {
-                                    totalSetoran = state.amount;
-                                  });
-                                }
-                              },
-                              builder: (context, state) {
-                                if (state is PetugasLoading) {
-                                  return LoadingAnimationWidget.inkDrop(
-                                      color: mainColor, size: 30);
-                                }
-                                return Text(
-                                  formatCurrency(totalSetoran),
-                                  style: darkInBrownTextStyle.copyWith(
-                                      fontWeight: bold, fontSize: 18),
-                                );
-                              },
+                            Text(
+                              formatCurrency(widget.setoran.total!),
+                              style: darkInBrownTextStyle.copyWith(
+                                  fontWeight: bold, fontSize: 18),
                             ),
+                            // BlocConsumer<PetugasBloc, PetugasState>(
+                            //   listener: (context, state) {
+                            //     if (state is PetugasBillAmountSuccess) {
+                            //       setState(() {
+                            //         totalSetoran = state.data.total;
+                            //         transaksiPetugasIdList =
+                            //             state.data.transaksiPetugas;
+                            //       });
+                            //     }
+                            //   },
+                            //   builder: (context, state) {
+                            //     if (state is PetugasLoading) {
+                            //       return LoadingAnimationWidget.inkDrop(
+                            //           color: mainColor, size: 30);
+                            //     }
+                            //     return Text(
+                            //       formatCurrency(totalSetoran),
+                            //       style: darkInBrownTextStyle.copyWith(
+                            //           fontWeight: bold, fontSize: 18),
+                            //     );
+                            //   },
+                            // ),
                             const SizedBox(
                               height: 20,
                             ),
@@ -253,7 +262,7 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                                           alignment: Alignment.center,
                                           children: [
                                             Image.network(
-                                              widget.setoran.buktiSetoran!,
+                                              'http://localhost:3000/${widget.setoran.buktiSetoran!}',
                                               height: 450,
                                             ),
                                             Container(
@@ -441,7 +450,8 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                                     widget.setoran.id!,
                                     SetoranFormModel(
                                         now.toString(),
-                                        totalSetoran,
+                                        null,
+                                        widget.setoran.total,
                                         lokasiSetoran,
                                         image != null
                                             ? base64Encode(

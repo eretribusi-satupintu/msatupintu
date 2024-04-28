@@ -25,19 +25,19 @@ class _PembayaranPageState extends State<PembayaranPage>
 
   @override
   void initState() {
-    tabController = TabController(
-      length: 3,
-      vsync: this,
-    );
+    // tabController = TabController(
+    //   length: 3,
+    //   vsync: this,
+    // );
     pembayaranStatus = 'SUCCESS';
     super.initState();
   }
 
-  @override
-  void dispose() {
-    tabController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   tabController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {

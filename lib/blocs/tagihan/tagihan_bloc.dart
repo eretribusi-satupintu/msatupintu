@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:satupintu_app/blocs/tagihan_local/tagihan_local_bloc.dart';
 import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
+import 'package:satupintu_app/services/tagihan_local_services.dart';
 import 'package:satupintu_app/services/tagihan_services.dart';
 import 'package:satupintu_app/services/wajib_retribusi_services.dart';
 import 'package:satupintu_app/ui/pages/petugas/wajib_retribusi_petugas_page.dart';
@@ -55,7 +57,8 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
       if (event is TagihanWajibRetribusiGet) {
         try {
           emit(TagihanLoading());
-          final tagihan = await TagihanService().getTagihanWajibRetribusi(event.wajibRetribusiId);
+          final tagihan = await TagihanService()
+              .getTagihanWajibRetribusi(event.wajibRetribusiId);
           emit(TagihanSuccess(tagihan));
         } catch (e) {
           emit(TagihanFailed(e.toString()));
@@ -89,7 +92,8 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
           emit(TagihanLoading());
           final tagihan =
               await TagihanService().getPetugasPaidTagihan(event.status);
-          emit(TagihanSuccess(tagihan));
+          // emit(TagihanSuccess(tagihan));
+          TagihanLocalFailed(tagihan.toString());
         } catch (e) {
           emit(TagihanFailed(e.toString()));
         }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:satupintu_app/blocs/kontrak_%5Dretribusi_sewa/item_retribusi_sewa_bloc.dart';
+import 'package:satupintu_app/blocs/kontrak_retribusi_sewa/item_retribusi_sewa_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/kontrak_detail_page.dart';
 import 'package:satupintu_app/ui/pages/template_page.dart';

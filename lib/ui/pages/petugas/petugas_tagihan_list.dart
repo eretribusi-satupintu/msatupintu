@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
+import 'package:satupintu_app/blocs/tagihan_manual/tagihan_manual_bloc.dart';
 import 'package:satupintu_app/blocs/wajib_retribusi/wajib_retribusi_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
@@ -26,7 +27,7 @@ class WajibRetribusiTagihanListPage extends StatelessWidget {
           BlocProvider(
             create: (context) => WajibRetribusiBloc()
               ..add(WajibRetribusiGetDetail(wajibRetribusiId)),
-          ),
+          )
         ],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

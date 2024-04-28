@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:satupintu_app/model/user_auth_model.dart';
 import 'package:satupintu_app/model/user_model.dart';
+import 'package:satupintu_app/model/user_update_form_model.dart';
 import 'package:satupintu_app/services/user_services.dart';
 
 part 'user_event.dart';
@@ -19,9 +19,21 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           emit(UserFailed(e.toString()));
         }
       }
+
       if (event is UserCheckRequested) {
         try {
           await UserServices().getUser();
+        } catch (e) {
+          emit(UserFailed(e.toString()));
+        }
+      }
+
+      if (event is UserUpdate) {
+        try {
+          emit(UserLoading());
+          final user =
+              await UserServices().updateUser(event.userId, event.user);
+          emit(UserUpdateSuccess(user));
         } catch (e) {
           emit(UserFailed(e.toString()));
         }

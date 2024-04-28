@@ -27,6 +27,8 @@ final class AuthSuccess extends AuthState {
   List<Object> get props => [user];
 }
 
+final class AuthPetugasFailed extends AuthState {}
+
 // final class IsAuthenticated extends AuthState {
 //   final UserModel user;
 //   const IsAuthenticated(this.user);

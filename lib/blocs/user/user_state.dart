@@ -19,6 +19,14 @@ final class UserSuccess extends UserState {
   List<Object> get props => [data];
 }
 
+final class UserUpdateSuccess extends UserState {
+  final UserModel data;
+  const UserUpdateSuccess(this.data);
+
+  @override
+  List<Object> get props => [data];
+}
+
 final class UserFailed extends UserState {
   final String e;
   const UserFailed(this.e);

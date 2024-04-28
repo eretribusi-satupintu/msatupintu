@@ -37,6 +37,7 @@ class AuthService {
       await storage.write(key: 'email', value: user.email);
       await storage.write(key: 'password', value: user.password);
       await storage.write(key: 'token', value: user.token);
+      await storage.write(key: 'role', value: user.role.toString());
       await storage.write(key: 'role_id', value: user.roleId.toString());
       if (user.nik != null) {
         await storage.write(key: 'nik', value: user.nik.toString());
@@ -57,6 +58,7 @@ class AuthService {
         final LoginFormModel data = LoginFormModel(
           email: values['email'],
           password: values['password'],
+          role: int.parse(values['role']!),
         );
 
         return data;

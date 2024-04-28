@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:satupintu_app/shared/theme.dart';
 
 class QrCodePage extends StatelessWidget {
-  const QrCodePage({super.key});
+  const QrCodePage({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
