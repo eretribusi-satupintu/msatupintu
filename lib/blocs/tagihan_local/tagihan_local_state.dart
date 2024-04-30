@@ -27,7 +27,22 @@ final class TagihanLocalFetchSuccess extends TagihanLocalState {
   List<Object> get props => [data];
 }
 
+final class TagihanLocalFetchFailed extends TagihanLocalState {
+  final List<TagihanLocalModel> data;
+  const TagihanLocalFetchFailed(this.data);
+
+  @override
+  List<Object> get props => [data];
+}
+
 final class TagihanLocalDeleteSuccess extends TagihanLocalState {}
+
+final class TagihanLocalPaymentConfirmationSuccess extends TagihanLocalState {}
+
+final class TagihanBillAmountnSuccess extends TagihanLocalState {
+  final TagihanLocalAmountModel data;
+  const TagihanBillAmountnSuccess(this.data);
+}
 
 final class TagihanLocalDetailSuccess extends TagihanLocalState {
   final int data;

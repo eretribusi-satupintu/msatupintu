@@ -438,14 +438,21 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    CustomFilledButton(
-                                      title: 'Konfirmasi Pembayaran',
-                                      onPressed: () => _dialogBuilder(
-                                          context,
-                                          state.data.id!,
-                                          state.data.wajibRetribusiName!,
-                                          state.data.price!),
-                                    )
+                                    state.data.status == 'WAITING'
+                                        ? Text(
+                                            'Tagihan sedang mengunggu konfirmasi admin untuk pembatalan pembayaran',
+                                            style: orangeRdTextStyle.copyWith(
+                                                fontWeight: bold),
+                                            textAlign: TextAlign.center,
+                                          )
+                                        : CustomFilledButton(
+                                            title: 'Konfirmasi Pembayaran',
+                                            onPressed: () => _dialogBuilder(
+                                                context,
+                                                state.data.id!,
+                                                state.data.wajibRetribusiName!,
+                                                state.data.price!),
+                                          )
                                   ],
                                 ),
                               ),
@@ -545,6 +552,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                       SnackBar(
                         content: CustomSnackbar(
                           message: state.e.toString(),
+                          status: 'failed',
                         ),
                         behavior: SnackBarBehavior.fixed,
                         backgroundColor: Colors.transparent,
@@ -659,6 +667,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                       SnackBar(
                         content: CustomSnackbar(
                           message: state.e.toString(),
+                          status: 'failed',
                         ),
                         behavior: SnackBarBehavior.fixed,
                         backgroundColor: Colors.transparent,

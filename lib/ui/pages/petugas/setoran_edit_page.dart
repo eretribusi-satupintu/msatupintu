@@ -116,6 +116,7 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                   SnackBar(
                     content: CustomSnackbar(
                       message: state.e,
+                      status: 'failed',
                     ),
                     behavior: SnackBarBehavior.fixed,
                     backgroundColor: Colors.transparent,
@@ -439,6 +440,7 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                                     content: CustomSnackbar(
                                       message:
                                           'Pastikan ada telah mengunggah bukti bayar dan lokasi setoran ${lokasiSetoran}',
+                                      status: 'failed',
                                     ),
                                     behavior: SnackBarBehavior.fixed,
                                     backgroundColor: Colors.transparent,

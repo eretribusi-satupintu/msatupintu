@@ -32,7 +32,7 @@ class DatabaseProvider {
     await database.execute("CREATE TABLE $tagihanTable ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "petugas_id INTEGER, "
-        "tagihan_id INTEGER, "
+        "tagihan_id INTEGER UNIQUE , "
         "sub_wilayah_id INTEGER, "
         "tagihan_name TEXT, "
         "wajib_retribusi_name TEXT, "

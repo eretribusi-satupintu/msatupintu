@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                 SnackBar(
                   content: CustomSnackbar(
                     message: state.e.toString(),
+                    status: 'failed',
                   ),
                   behavior: SnackBarBehavior.fixed,
                   backgroundColor: Colors.transparent,
@@ -209,6 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                                         content: CustomSnackbar(
                                           message:
                                               'Anda harus memasukkan email dan password',
+                                          status: 'failed',
                                         ),
                                         behavior: SnackBarBehavior.fixed,
                                         backgroundColor: Colors.transparent,

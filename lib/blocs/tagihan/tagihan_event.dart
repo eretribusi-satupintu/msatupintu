@@ -40,5 +40,3 @@ class TagihanWajibRetribusiMasyarakatProgressGet extends TagihanEvent {
   final int kontrakId;
   const TagihanWajibRetribusiMasyarakatProgressGet(this.kontrakId);
 }
-
-

@@ -1,8 +1,11 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:satupintu_app/blocs/tagihan_local/tagihan_local_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/ui/widget/buttons.dart';
+import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/draggable_scrollable_modal.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
@@ -17,17 +20,13 @@ class TagihanSinkronisasiPage extends StatefulWidget {
 class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-  // bool isRefresh = false;
-  // Bloc tagihanLocalBloc = TagihanLocalBloc();
-
-  // void refreshTagihan() {
-  //   print("clicked");
-  // }
+  int billTotal = 0;
 
   @override
   void initState() {
     tabController = TabController(length: 2, vsync: this);
     context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+    context.read<TagihanLocalBloc>().add(TagihanBillAmount());
     super.initState();
   }
 
@@ -60,31 +59,75 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                   print(state.data);
                 }
 
+                if (state is TagihanLocalPaymentConfirmationSuccess) {
+                  context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+                  context.read<TagihanLocalBloc>().add(TagihanBillAmount());
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: CustomSnackbar(
+                        message: 'Konfirmasi pembayaran berhasil',
+                        status: 'success',
+                      ),
+                      behavior: SnackBarBehavior.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                  );
+                }
+
                 if (state is TagihanLocalFetchSuccess) {
                   context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+                  context.read<TagihanLocalBloc>().add(TagihanBillAmount());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: CustomSnackbar(
+                        message: 'Berhasil memperbarui tagihan',
+                        status: 'success',
+                      ),
+                      behavior: SnackBarBehavior.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                  );
+                }
+
+                if (state is TagihanLocalFetchFailed) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: CustomSnackbar(
+                        message: 'Tidak dapat memperbaharui tagihan',
+                        status: 'failed',
+                      ),
+                      behavior: SnackBarBehavior.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                  );
+
+                  context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+                }
+
+                if (state is TagihanBillAmountnSuccess) {
+                  context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+                  print({"total tagihan": state.data.tagihanLocalId});
+                  billTotal = state.data.amount!;
                 }
 
                 if (state is TagihanLocalDeleteSuccess) {
                   context.read<TagihanLocalBloc>().add(TagihanLocalGet());
 
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      backgroundColor: whiteColor,
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline_rounded,
-                            color: greenColor,
-                            size: 16,
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            'Tagihan berhasil dihapus',
-                            style: darkRdBrownTextStyle,
-                          ),
-                        ],
-                      )));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: CustomSnackbar(
+                        message: 'Tidak dapat memperbaharui tagihan',
+                        status: 'success',
+                      ),
+                      behavior: SnackBarBehavior.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                  );
                 }
               },
               builder: (context, state) {
@@ -116,7 +159,7 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                             style: greyRdTextStyle.copyWith(fontSize: 8),
                           ),
                           Text(
-                            'Rp 450.000',
+                            formatCurrency(billTotal),
                             style: darkRdBrownTextStyle.copyWith(
                                 fontSize: 16, fontWeight: bold),
                           ),
@@ -127,7 +170,7 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                         onTap: () {
                           context
                               .read<TagihanLocalBloc>()
-                              .add(TagihanLocalDeleteAll());
+                              .add(TagihanBillAmount());
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -190,7 +233,6 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                     child: BlocBuilder<TagihanLocalBloc, TagihanLocalState>(
                       builder: (context, state) {
                         if (state is TagihanLocalInitial) {
-                          // Dispatch the event to fetch local tagihan data
                           context
                               .read<TagihanLocalBloc>()
                               .add(TagihanLocalGet());
@@ -203,14 +245,18 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                           return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: state.data
-                                  .map((tagihan) => tagihanItem(
-                                      context,
-                                      tagihan.tagihanId!,
-                                      tagihan.tagihanName!,
-                                      tagihan.wajibRetribusiName!,
-                                      tagihan.subwilayah!,
-                                      tagihan.dueDate!,
-                                      tagihan.price!))
+                                  .map((tagihan) => tagihan.status == false
+                                      ? tagihanItem(
+                                          context,
+                                          tagihan.tagihanId!,
+                                          tagihan.tagihanName!,
+                                          tagihan.wajibRetribusiName!,
+                                          tagihan.subwilayah!,
+                                          tagihan.dueDate!,
+                                          tagihan.price!,
+                                          tagihan.status!,
+                                          false)
+                                      : const SizedBox())
                                   .toList());
                         }
 
@@ -220,51 +266,82 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                   ),
                 ),
                 Container(
-                  child: Text("2"),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: mainColor.withAlpha(18),
+                      borderRadius: BorderRadius.circular(12)),
+                  child: SingleChildScrollView(
+                    child: BlocBuilder<TagihanLocalBloc, TagihanLocalState>(
+                      builder: (context, state) {
+                        if (state is TagihanLocalInitial) {
+                          context
+                              .read<TagihanLocalBloc>()
+                              .add(TagihanLocalGet());
+                        }
+                        if (state is TagihanLocalLoading) {
+                          return const LoadingInfo();
+                        }
+
+                        if (state is TagihanLocalSuccess) {
+                          return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: state.data
+                                  .map((tagihan) => tagihan.status == true
+                                      ? tagihanItem(
+                                          context,
+                                          tagihan.tagihanId!,
+                                          tagihan.tagihanName!,
+                                          tagihan.wajibRetribusiName!,
+                                          tagihan.subwilayah!,
+                                          tagihan.dueDate!,
+                                          tagihan.price!,
+                                          tagihan.status!,
+                                          true)
+                                      : const SizedBox())
+                                  .toList());
+                        }
+
+                        return Container();
+                      },
+                    ),
+                  ),
                 ),
               ]),
             )
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            context.read<TagihanLocalBloc>().add(TagihanLocalFromServerStore());
-            // setState(() {
-            //   context.read<TagihanLocalBloc>().add(TagihanLocalGet());
-            // });
-            // setState(() {
-            // refreshTagihan();
-            // super.initState();
-            // });
-
-            // Then, dispatch TagihanLocalGet() after a delay (optional)
-            // Future.delayed(const Duration(milliseconds: 500), () {
-            //   BlocProvider.of<TagihanLocalBloc>(context).add(TagihanLocalGet());
-            // });
-            // BlocProvider.of<TagihanLocalBloc>(context)
-            //     .add(TagihanLocalFromServerStore());
-
-            // setState(() {
-            //   isRefresh = true;
-            // });
-          },
-          backgroundColor: whiteColor,
+          onPressed: () => _dialogBuilderConfirmationRefresh(context)
+          // context.read<TagihanLocalBloc>().add(TagihanLocalFromServerStore());
+          ,
+          backgroundColor: greenColor,
           elevation: 0,
           label: Text(
-            'Refresh',
-            style: mainRdTextStyle,
+            'Muat ulang tagihan',
+            style: whiteRdTextStyle,
           ),
           icon: Icon(
             Icons.refresh_outlined,
-            color: mainColor,
+            color: whiteColor,
+            size: 18,
           ),
         ),
       ),
     );
   }
 
-  Widget tagihanItem(BuildContext context, int tagihanId, String tagihanName,
-      String wajibRetribusiname, String subwilayah, String dueDate, int price) {
+  Widget tagihanItem(
+      BuildContext context,
+      int tagihanId,
+      String tagihanName,
+      String wajibRetribusiname,
+      String subwilayah,
+      String dueDate,
+      int price,
+      bool status,
+      bool isPaid) {
     return Stack(
       children: [
         Container(
@@ -295,7 +372,7 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                       Expanded(
                         flex: 32,
                         child: Text(
-                          tagihanName,
+                          '$tagihanName ${status == false ? 'Blom' : 'Sudah'}',
                           style:
                               darkRdBrownTextStyle.copyWith(fontWeight: bold),
                         ),
@@ -303,21 +380,194 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                       const Spacer(),
                       GestureDetector(
                         onTap: () {
-                          CustomModalBottomSheet.show(
-                            context,
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 30,
+                          // CustomModalBottomSheet.show(
+                          //   context,
+                          //   const Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       SizedBox(
+                          //         height: 30,
+                          //       ),
+                          //       SizedBox(
+                          //         height: 20,
+                          //       ),
+                          //     ],
+                          //   ),
+                          //   // },
+                          //   // ),
+                          // );
+                          showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                height: 400,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 18),
+                                decoration: const BoxDecoration(
+                                    // color: redColor,
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20))),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    Container(
+                                      height: 4,
+                                      width: 49,
+                                      color: mainColor,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          const SizedBox(
+                                            height: 30,
+                                          ),
+                                          Text(
+                                            tagihanName,
+                                            style: darkRdBrownTextStyle
+                                                .copyWith(fontWeight: medium),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          DottedLine(dashColor: greyColor),
+                                          const SizedBox(
+                                            height: 16,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Wajib retribusi : ',
+                                                style: greyRdTextStyle.copyWith(
+                                                    fontSize: 12),
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                wajibRetribusiname,
+                                                style: darkRdBrownTextStyle
+                                                    .copyWith(
+                                                        fontSize: 12,
+                                                        fontWeight: bold),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 4,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Wilayah : ',
+                                                style: greyRdTextStyle.copyWith(
+                                                    fontSize: 12),
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                subwilayah,
+                                                style: darkRdBrownTextStyle
+                                                    .copyWith(
+                                                        fontSize: 12,
+                                                        fontWeight: bold),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 4,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Batas pembayaran : ',
+                                                style: greyRdTextStyle.copyWith(
+                                                    fontSize: 12),
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                iso8601toDateTime(dueDate),
+                                                style: darkRdBrownTextStyle
+                                                    .copyWith(
+                                                        fontSize: 12,
+                                                        fontWeight: bold),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 18,
+                                          ),
+                                          Row(children: [
+                                            Text(
+                                              'Total : ',
+                                              style: greyRdTextStyle.copyWith(
+                                                  fontSize: 12),
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              formatCurrency(price),
+                                              style:
+                                                  darkRdBrownTextStyle.copyWith(
+                                                      fontWeight: bold,
+                                                      fontSize: 18),
+                                            )
+                                          ]),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          isPaid
+                                              ? Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .check_circle_outline_outlined,
+                                                      size: 18,
+                                                      color: mainColor,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 4,
+                                                    ),
+                                                    Text(
+                                                      'Tagihan telah dibayar',
+                                                      style: mainRdTextStyle
+                                                          .copyWith(
+                                                              fontWeight: bold),
+                                                    )
+                                                  ],
+                                                )
+                                              : const SizedBox(),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    CustomFilledButton(
+                                        title: !isPaid
+                                            ? 'Konfirmasi pembayaran'
+                                            : 'Batalkan Konfirmasi Pembayaran',
+                                        onPressed: () {
+                                          if (!isPaid) {
+                                            context.read<TagihanLocalBloc>().add(
+                                                TagihanLocalPaymentConfirmation(
+                                                    tagihanId, 1));
+                                          } else {
+                                            context.read<TagihanLocalBloc>().add(
+                                                TagihanLocalPaymentConfirmation(
+                                                    tagihanId, 0));
+                                          }
+                                          Navigator.of(context).pop();
+                                        }),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
-                            // },
-                            // ),
+                              );
+                            },
                           );
                         },
                         child: Icon(
@@ -391,56 +641,119 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
             ],
           ),
         ),
-        Align(
-          alignment: Alignment.topRight,
-          child: Container(
-            margin: const EdgeInsets.only(top: 45, right: 20),
-            width: MediaQuery.of(context).size.width / 2,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-                color: whiteColor,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(
-                    color: greyColor.withAlpha(70),
-                    blurRadius: 8,
-                  )
-                ]),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () {
+        // Align(
+        //   alignment: Alignment.topRight,
+        //   child: Container(
+        //     margin: const EdgeInsets.only(top: 45, right: 20),
+        //     width: MediaQuery.of(context).size.width / 2,
+        //     // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        //     decoration: BoxDecoration(
+        //         color: whiteColor,
+        //         borderRadius: BorderRadius.circular(6),
+        //         boxShadow: [
+        //           BoxShadow(
+        //             color: greyColor.withAlpha(70),
+        //             blurRadius: 8,
+        //           )
+        //         ]),
+        //     child: Column(
+        //       children: [
+        //         GestureDetector(
+        //           onTap: () {
+        //             context
+        //                 .read<TagihanLocalBloc>()
+        //                 .add(TagihanLocalDelete(tagihanId));
+        //           },
+        //           child: Container(
+        //               // padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        //               // color: whiteColor,
+        //               // child: Row(
+        //               //   children: [
+        //               //     Icon(
+        //               //       Icons.delete_outlined,
+        //               //       size: 14,
+        //               //       color: greyColor,
+        //               //     ),
+        //               //     const SizedBox(
+        //               //       width: 4,
+        //               //     ),
+        //               //     Text(
+        //               //       'Hapus Tagihan',
+        //               //       style: greyRdTextStyle.copyWith(fontSize: 12),
+        //               //     )
+        //               //   ],
+        //               // ),
+        //               ),
+        //         ),
+        //         const SizedBox(
+        //           height: 6,
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // )
+      ],
+    );
+  }
+
+  Future<void> _dialogBuilderConfirmationRefresh(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            // backgroundColor: whiteColor,
+            // title: Text(
+            //   'Apakah anda yakin?',
+            //   style:
+            //       darkRdBrownTextStyle.copyWith(fontSize: 18, fontWeight: bold),
+            // ),
+
+            content: SizedBox(
+              height: 130,
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: orangeColor,
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    'Apakah anda yakin?',
+                    style: darkRdBrownTextStyle.copyWith(
+                        fontSize: 18, fontWeight: bold),
+                  ),
+                  Text(
+                    'Segala progress pemungutan anda sebelumnya akan hilang apakah anda yakin ingin tetap melanjukan?',
+                    style:
+                        greyRdTextStyle.copyWith(fontStyle: FontStyle.italic),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              CustomFilledButton(
+                  title: 'Setuju dan Lanjutkan',
+                  onPressed: () {
                     context
                         .read<TagihanLocalBloc>()
-                        .add(TagihanLocalDelete(tagihanId));
-                  },
-                  child: SizedBox(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.delete_outlined,
-                          size: 14,
-                          color: greyColor,
-                        ),
-                        const SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          'Hapus Tagihan',
-                          style: greyRdTextStyle.copyWith(fontSize: 12),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 6,
-                ),
-              ],
-            ),
-          ),
-        )
-      ],
+                        .add(TagihanLocalFromServerStore());
+                    Navigator.of(context).pop();
+                  }),
+              const SizedBox(
+                height: 8,
+              ),
+              CustomOutlinedButton(
+                title: 'Batal',
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                color: darkBrownColor,
+              )
+            ]);
+      },
     );
   }
 }

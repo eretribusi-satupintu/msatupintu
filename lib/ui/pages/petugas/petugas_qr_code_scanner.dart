@@ -67,6 +67,7 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                 SnackBar(
                   content: CustomSnackbar(
                     message: state.e.toString(),
+                    status: 'failed',
                   ),
                   behavior: SnackBarBehavior.fixed,
                   backgroundColor: Colors.transparent,

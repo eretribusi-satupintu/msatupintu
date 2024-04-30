@@ -66,7 +66,6 @@ class TagihanLocalModel {
       );
 
   Map<String, dynamic> toDatabaseJson() => {
-        'id': id,
         'tagihan_id': tagihanId,
         'sub_wilayah_id': subWilayahId,
         'tagihan_name': tagihanName,
@@ -74,6 +73,6 @@ class TagihanLocalModel {
         'price': price,
         'subwilayah': subwilayah,
         'due_date': dueDate,
-        'status': status == 0 ? false : true,
+        'status': status == false ? 0 : 1,
       };
 }

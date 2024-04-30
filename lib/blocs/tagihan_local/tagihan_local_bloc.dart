@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:satupintu_app/model/tagihan_local_amount_model.dart';
 import 'package:satupintu_app/model/tagihan_local_model.dart';
 import 'package:satupintu_app/services/tagihan_local_services.dart';
 
@@ -46,7 +47,10 @@ class TagihanLocalBloc extends Bloc<TagihanLocalEvent, TagihanLocalState> {
 
           emit(TagihanLocalFetchSuccess(tagihan));
         } catch (e) {
-          emit(TagihanLocalFailed(e.toString()));
+          final res = await TagihanLocalServices().getTagihan();
+          // print({"local tagihan record becouse server error : ": res});
+          // emit(TagihanLocalSuccess(res));
+          emit(TagihanLocalFetchFailed(res));
         }
       }
       if (event is TagihanLocalDelete) {
@@ -56,6 +60,29 @@ class TagihanLocalBloc extends Bloc<TagihanLocalEvent, TagihanLocalState> {
           await TagihanLocalServices().deleteTagihan(event.id);
 
           emit(TagihanLocalDeleteSuccess());
+        } catch (e) {
+          emit(TagihanLocalFailed(e.toString()));
+        }
+      }
+      if (event is TagihanLocalPaymentConfirmation) {
+        try {
+          emit(TagihanLocalLoading());
+
+          await TagihanLocalServices()
+              .paymentConfirmationTagihan(event.id, event.status);
+
+          emit(TagihanLocalPaymentConfirmationSuccess());
+        } catch (e) {
+          emit(TagihanLocalFailed(e.toString()));
+        }
+      }
+      if (event is TagihanBillAmount) {
+        try {
+          emit(TagihanLocalLoading());
+
+          final amount = await TagihanLocalServices().getBillAmountTagihan();
+
+          emit(TagihanBillAmountnSuccess(amount));
         } catch (e) {
           emit(TagihanLocalFailed(e.toString()));
         }

@@ -254,6 +254,7 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
                                   content: CustomSnackbar(
                                     message:
                                         'Pastikan semua inputan telah terisi',
+                                    status: 'failed',
                                   ),
                                   behavior: SnackBarBehavior.fixed,
                                   backgroundColor: Colors.transparent,

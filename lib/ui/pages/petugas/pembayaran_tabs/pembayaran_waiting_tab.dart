@@ -16,7 +16,7 @@ class PembayaranWaitingTab extends StatelessWidget {
         body: SingleChildScrollView(
       child: BlocProvider(
         create: (context) =>
-            TagihanBloc()..add(const PetugasPaidTagihanGet('REQUEST')),
+            TagihanBloc()..add(const PetugasPaidTagihanGet('WAITING')),
         child: Column(
           children: [
             const SizedBox(

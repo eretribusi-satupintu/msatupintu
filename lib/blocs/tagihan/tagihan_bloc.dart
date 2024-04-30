@@ -92,8 +92,9 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
           emit(TagihanLoading());
           final tagihan =
               await TagihanService().getPetugasPaidTagihan(event.status);
-          // emit(TagihanSuccess(tagihan));
-          TagihanLocalFailed(tagihan.toString());
+          print(tagihan);
+          emit(TagihanSuccess(tagihan));
+          // TagihanLocalFailed(tagihan.toString());
         } catch (e) {
           emit(TagihanFailed(e.toString()));
         }

@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:satupintu_app/shared/theme.dart';
 
 class CustomSnackbar extends StatelessWidget {
+  final String status;
   final String message;
-  const CustomSnackbar({super.key, required this.message});
+  const CustomSnackbar(
+      {super.key, required this.message, required this.status});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
         decoration: BoxDecoration(
           color: whiteColor,
           borderRadius: const BorderRadius.all(
-            Radius.circular(10),
+            Radius.circular(20),
           ),
           boxShadow: [
             BoxShadow(
@@ -27,18 +29,24 @@ class CustomSnackbar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/ic_cross_circle.png',
+              status == 'failed'
+                  ? 'assets/ic_cross_circle.png'
+                  : status == 'success'
+                      ? 'assets/ic_success.png'
+                      : 'assets/ic_info.png',
               width: 40,
             ),
             const SizedBox(
-              height: 10,
+              height: 14,
             ),
             Text(
-              'Gagal Masuk',
-              style: redRdTextStyle.copyWith(fontSize: 20, fontWeight: bold),
-            ),
-            const SizedBox(
-              height: 8,
+              status == 'failed'
+                  ? 'Permintaan Gagal'
+                  : status == 'success'
+                      ? 'Permintaan Berhasil'
+                      : 'Info',
+              style: darkRdBrownTextStyle.copyWith(
+                  fontSize: 16, fontWeight: semiBold),
             ),
             Text(
               message.toString(),

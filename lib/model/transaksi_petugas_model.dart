@@ -12,5 +12,5 @@ class TransaksiPetugasModel {
           id: json["id"],
           petugasId: json['petugas_id'],
           tagihanId: json['tagihan_id'],
-        disetor: json['disetor']);
+          disetor: json['disetor']);
 }

@@ -8,8 +8,6 @@ import 'package:satupintu_app/services/subwilayah_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class TagihanService {
- 
-
   Future<List<TagihanModel>> getNewestTagihan() async {
     try {
       final token = await AuthService().getToken();
