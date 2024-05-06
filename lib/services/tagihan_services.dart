@@ -72,8 +72,40 @@ class TagihanService {
         throw jsonDecode(res.body)['message'];
       }
 
+      print(jsonDecode(res.body)['data']);
+
       return List<TagihanModel>.from(jsonDecode(res.body)['data']
           .map((tagihan) => TagihanModel.fromJson(tagihan))).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<TagihanModel>> getTagihanWajibRetribusiMasyarakatbyTagihanName(
+      String tagihanName) async {
+    try {
+      final token = await AuthService().getToken();
+      final wajibRetribusiId = await AuthService().getRoleId();
+      // print({"wr_id": wajibRetribusiId});
+      final res = await http.get(
+          Uri.parse('$baseUrl/tagihan/wajib-retribusi/$wajibRetribusiId'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      // print(jsonDecode(res.body)['data']);
+
+      return List<TagihanModel>.from(jsonDecode(res.body)['data']
+              .map((tagihan) => TagihanModel.fromJson(tagihan)))
+          .where((tagihan) => tagihan.tagihanName!
+              .toLowerCase()
+              .contains(tagihanName.toLowerCase()))
+          .toList();
     } catch (e) {
       rethrow;
     }

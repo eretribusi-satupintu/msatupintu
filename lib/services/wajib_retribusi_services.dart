@@ -7,14 +7,13 @@ import 'package:satupintu_app/services/subwilayah_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class WajibRetribusiService {
-  Future<List<WajibRetribusiModel>> getWajibRetribusi(int petugasId) async {
+  Future<List<WajibRetribusiModel>> getWajibRetribusi() async {
     try {
       final token = await AuthService().getToken();
       final subWilayah =
           await SubWilayahService().getSubwilayahFromLocalStorage();
       final res = await http.get(
-          Uri.parse(
-              '$baseUrl/petugas/$petugasId/wilayah/${subWilayah.id}/wajib-retribusi'),
+          Uri.parse('$baseUrl//wajib-retribusi/wilayah/${subWilayah.id}'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token
@@ -26,6 +25,33 @@ class WajibRetribusiService {
 
       return List<WajibRetribusiModel>.from(jsonDecode(res.body)['data'].map(
               (wajibRetribusi) => WajibRetribusiModel.fromJson(wajibRetribusi)))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<WajibRetribusiModel>> getWajibRetribusiByWrName(
+      String name) async {
+    try {
+      final token = await AuthService().getToken();
+      final subWilayah =
+          await SubWilayahService().getSubwilayahFromLocalStorage();
+      final res = await http.get(
+          Uri.parse('$baseUrl//wajib-retribusi/wilayah/${subWilayah.id}'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      return List<WajibRetribusiModel>.from(jsonDecode(res.body)['data'].map(
+              (wajibRetribusi) => WajibRetribusiModel.fromJson(wajibRetribusi)))
+          .where((wajibRetribusi) =>
+              wajibRetribusi.name!.toLowerCase().contains(name.toLowerCase()))
           .toList();
     } catch (e) {
       rethrow;

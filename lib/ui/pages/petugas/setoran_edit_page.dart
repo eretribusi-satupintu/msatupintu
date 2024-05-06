@@ -453,6 +453,7 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                                     SetoranFormModel(
                                         now.toString(),
                                         null,
+                                        null,
                                         widget.setoran.total,
                                         lokasiSetoran,
                                         image != null

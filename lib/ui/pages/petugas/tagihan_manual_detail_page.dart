@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-
+import 'package:flutter/services.dart';
 import 'package:satupintu_app/model/tagihan_manual_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
@@ -170,59 +173,50 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                                     const SizedBox(
                                       height: 18,
                                     ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Tagihan',
-                                          style: greyRdTextStyle.copyWith(
-                                              fontSize: 12),
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          'Sepeda Motor Roda Dua',
-                                          style: greyRdTextStyle.copyWith(
-                                              fontSize: 12,
-                                              fontWeight: semiBold),
-                                        ),
-                                      ],
-                                    ),
                                     const SizedBox(
                                       height: 12,
                                     ),
-                                    Row(
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Petugas',
                                           style: greyRdTextStyle.copyWith(
                                               fontSize: 12),
                                         ),
-                                        const Spacer(),
+                                        // const Spacer(),
                                         Text(
-                                          'Albert Butar - butar',
-                                          style: greyRdTextStyle.copyWith(
-                                              fontSize: 12,
-                                              fontWeight: semiBold),
+                                          widget.tagihanModel.petugas!,
+                                          style: darkRdBrownTextStyle.copyWith(
+                                              fontWeight: medium),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(
                                       height: 12,
                                     ),
-                                    Row(
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Wilayah',
                                           style: greyRdTextStyle.copyWith(
                                               fontSize: 12),
                                         ),
-                                        const Spacer(),
                                         Text(
-                                          'Laguboti pasar',
-                                          style: greyRdTextStyle.copyWith(
-                                              fontSize: 12,
-                                              fontWeight: semiBold),
+                                          widget.tagihanModel.subwilayah!,
+                                          style: darkRdBrownTextStyle.copyWith(
+                                              fontWeight: medium),
                                         ),
                                       ],
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    DottedLine(
+                                      dashColor: greyColor,
                                     ),
                                     const SizedBox(
                                       height: 20,
@@ -235,18 +229,13 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                                         ),
                                         const Spacer(),
                                         Text(
-                                          'Rp 5000',
+                                          formatCurrency(
+                                              widget.tagihanModel.price!),
                                           style: darkInBrownTextStyle.copyWith(
                                               fontSize: 16,
                                               fontWeight: semiBold),
                                         ),
                                       ],
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    DottedLine(
-                                      dashColor: greyColor,
                                     ),
                                   ],
                                 ))
@@ -470,6 +459,112 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                       },
                     ),
                   ],
+                ),
+                OutlinedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(mainColor),
+                  ),
+                  child: Text(
+                    'print receipt(esc)',
+                    style: whiteRdTextStyle.copyWith(fontWeight: bold),
+                  ),
+                  onPressed: _connected
+                      ? () async {
+                          Map<String, dynamic> config = Map();
+                          config['width'] = 40; // 标签宽度，单位mm
+                          config['height'] = 70; // 标签高度，单位mm
+                          config['gap'] = 2;
+
+                          List<LineText> list = [];
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: '-----------------------------',
+                              weight: 5, // Assuming 'weight: 1' means bold
+                              align: LineText.ALIGN_CENTER,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content:
+                                  '${widget.tagihanModel.itemRetribusi} ${widget.tagihanModel.detailTagihan}',
+                              weight: 5, // Assuming 'weight: 1' means bold
+                              align: LineText.ALIGN_CENTER,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: '-----------------------------',
+                              weight: 8, // Assuming 'weight: 1' means bold
+                              align: LineText.ALIGN_CENTER,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: stringToDateTime(
+                                  widget.tagihanModel.createdAt!,
+                                  'EEEE, dd MMMM  yyyy',
+                                  true), // Replace 'harga' with the actual price
+                              weight: 1,
+                              size: 4, // Bold
+                              align: LineText.ALIGN_CENTER,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: '-----------------------------',
+                              weight: 5, // Assuming 'weight: 1' means bold
+                              align: LineText.ALIGN_CENTER,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: 'Petugas :',
+                              align: LineText.ALIGN_LEFT,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: widget.tagihanModel.petugas,
+                              align: LineText.ALIGN_LEFT,
+                              linefeed: 1));
+
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: 'Wilayah :',
+                              align: LineText.ALIGN_LEFT,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: widget.tagihanModel.subwilayah,
+                              align: LineText.ALIGN_LEFT,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content: '-----------------------------',
+                              weight: 5, // Assuming 'weight: 1' means bold
+                              align: LineText.ALIGN_CENTER,
+                              linefeed: 1));
+                          list.add(LineText(
+                              type: LineText.TYPE_TEXT,
+                              content:
+                                  'Total: Rp. 500000', // Replace 'harga' with the actual price
+                              weight: 4, // Bold
+                              align: LineText.ALIGN_RIGHT,
+                              linefeed: 1));
+
+                          // List<LineText> list1 = [];
+                          // ByteData data =
+                          //     await rootBundle.load("assets/img_logo.png");
+                          // List<int> imageBytes = data.buffer.asUint8List(
+                          //     data.offsetInBytes, data.lengthInBytes);
+                          // String base64Image = base64Encode(imageBytes);
+                          // list1.add(LineText(
+                          //   type: LineText.TYPE_IMAGE,
+                          //   x: 10,
+                          //   y: 10,
+                          //   content: base64Image,
+                          // ));
+
+                          list.add(LineText(linefeed: 1));
+
+                          await bluetoothPrint.printReceipt(config, list);
+                          // await bluetoothPrint.printReceipt(config, list1);
+                        }
+                      : null,
                 ),
               ],
             ),

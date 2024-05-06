@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:satupintu_app/blocs/auth/auth_bloc.dart";
 import "package:satupintu_app/blocs/doku_payment/doku_payment_bloc.dart";
+import "package:satupintu_app/blocs/tagihan/tagihan_bloc.dart";
 import "package:satupintu_app/blocs/tagihan_local/tagihan_local_bloc.dart";
 import "package:satupintu_app/blocs/user/user_bloc.dart";
 import "package:satupintu_app/ui/pages/login_page.dart";
@@ -12,7 +13,6 @@ import "package:satupintu_app/ui/pages/petugas/select_wilayah_page.dart";
 import "package:satupintu_app/ui/pages/petugas/setoran_list_page.dart";
 import "package:satupintu_app/ui/pages/splash_page.dart";
 import "package:satupintu_app/ui/pages/timesout_page.dart";
-import "package:satupintu_app/ui/widget/custom_snackbar.dart";
 
 void main() async {
   runApp(const MainApp());
@@ -45,9 +45,10 @@ class _MainAppState extends State<MainApp> {
           create: (context) => DokuPaymentBloc(),
         ),
         BlocProvider<UserBloc>(
-          create: (context) => UserBloc()..add(UserCheckRequested()),
+          create: (context) => UserBloc()..add(UserGet()),
         ),
-        BlocProvider(create: (context) => TagihanLocalBloc())
+        BlocProvider(create: (context) => TagihanLocalBloc()),
+        BlocProvider(create: (context) => TagihanBloc())
 
         // ..add(TagihanLocalFromServerStore()))
       ],

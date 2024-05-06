@@ -72,7 +72,7 @@ class _SetoranListPageState extends State<SetoranListPage> {
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 18),
                       child: Text(
-                        'Daftar Tagihan',
+                        'Daftar Setoran',
                         style:
                             darkRdBrownTextStyle.copyWith(fontWeight: semiBold),
                       ),

@@ -98,6 +98,18 @@ class TagihanLocalBloc extends Bloc<TagihanLocalEvent, TagihanLocalState> {
           emit(TagihanLocalFailed(e.toString()));
         }
       }
+      if (event is TagihanLocalSynchronization) {
+        try {
+          emit(TagihanLocalLoading());
+          final sync = await TagihanLocalServices()
+              .synchronizationTagihanLocal(event.data);
+          print({"status sinkronisasi": sync});
+
+          emit(TagihanLocalSynchronizeSuccess(sync));
+        } catch (e) {
+          rethrow;
+        }
+      }
     });
   }
 }

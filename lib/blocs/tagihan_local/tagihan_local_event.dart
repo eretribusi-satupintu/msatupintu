@@ -26,6 +26,13 @@ class TagihanLocalUpdate extends TagihanLocalEvent {
   const TagihanLocalUpdate(this.id);
 }
 
+class TagihanLocalDeleteAll extends TagihanLocalEvent {}
+
+class TagihanLocalDelete extends TagihanLocalEvent {
+  final int id;
+  const TagihanLocalDelete(this.id);
+}
+
 class TagihanLocalPaymentConfirmation extends TagihanLocalEvent {
   final int id;
   final int status;
@@ -34,9 +41,7 @@ class TagihanLocalPaymentConfirmation extends TagihanLocalEvent {
 
 class TagihanBillAmount extends TagihanLocalEvent {}
 
-class TagihanLocalDeleteAll extends TagihanLocalEvent {}
-
-class TagihanLocalDelete extends TagihanLocalEvent {
-  final int id;
-  const TagihanLocalDelete(this.id);
+class TagihanLocalSynchronization extends TagihanLocalEvent {
+  final TagihanLocalAmountModel data;
+  const TagihanLocalSynchronization(this.data);
 }

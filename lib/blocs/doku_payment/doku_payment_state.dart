@@ -26,3 +26,11 @@ final class DokuPaymentSuccess extends DokuPaymentState {
   @override
   List<Object> get props => [data];
 }
+
+final class DokuPaymentListSuccess extends DokuPaymentState {
+  final List<DokuVaModel> data;
+
+  const DokuPaymentListSuccess(this.data);
+  @override
+  List<Object> get props => [data];
+}

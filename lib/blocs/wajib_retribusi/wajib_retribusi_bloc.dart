@@ -16,8 +16,13 @@ class WajibRetribusiBloc
       if (event is WajibRetribusiGet) {
         try {
           emit(WajibRetribusiLoading());
-          final wajibRetribusi =
-              await WajibRetribusiService().getWajibRetribusi(event.petugasId);
+          late List<WajibRetribusiModel> wajibRetribusi;
+          if (event.name == null) {
+            wajibRetribusi = await WajibRetribusiService().getWajibRetribusi();
+          } else {
+            wajibRetribusi = await WajibRetribusiService()
+                .getWajibRetribusiByWrName(event.name!);
+          }
           emit(WajibRetribusiSuccess(wajibRetribusi));
         } catch (e) {
           emit(WajibRetribusiFailed(e.toString()));
@@ -37,8 +42,8 @@ class WajibRetribusiBloc
         try {
           emit(WajibRetribusiLoading());
           final petugasId = await AuthService().getRoleId();
-          final wajibRetribusi = await WajibRetribusiService()
-              .getWajibRetribusi(int.parse(petugasId));
+          final wajibRetribusi =
+              await WajibRetribusiService().getWajibRetribusi();
 
           bool isPresent = false;
           int? wajibRetribusiId;

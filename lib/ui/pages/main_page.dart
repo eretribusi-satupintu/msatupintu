@@ -105,16 +105,20 @@ class _MainPageState extends State<MainPage>
                           horizontal: 18, vertical: 12),
                       child: Row(
                         children: [
-                          BlocBuilder<AuthBloc, AuthState>(
+                          BlocBuilder<UserBloc, UserState>(
                               builder: (context, state) {
-                            if (state is AuthSuccess) {
+                            if (state is UserSuccess) {
                               if (selectedPage != 0) {
+                                print({"role": state.data.role});
                                 return getTitlePage(
-                                    selectedPage, state.user.role!);
+                                    selectedPage, state.data.role!);
                               } else {
-                                return getHomeProfile(
-                                    formattedDate, state.user.name!);
+                                return getHomeProfile(formattedDate,
+                                    state.data.name!, state.data.photoProfile);
                               }
+                            }
+                            if (state is UserFailed) {
+                              return Text(state.e);
                             }
                             return Text(
                               '-',
@@ -122,30 +126,6 @@ class _MainPageState extends State<MainPage>
                                   fontSize: 20, fontWeight: bold),
                             );
                           }),
-                          const Spacer(),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/wajib-retribusi-kontrak');
-                                },
-                                child: Image.asset(
-                                  'assets/ic_kontrak.png',
-                                  width: 24,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 17,
-                              ),
-                              Icon(
-                                Icons.notifications,
-                                color: whiteColor,
-                                size: 20,
-                              )
-                            ],
-                          )
                         ],
                       ),
                     )
@@ -446,15 +426,28 @@ class _MainPageState extends State<MainPage>
   Widget getHomeProfile(
     String formattedDate,
     String name,
+    String? profilePhotoUrl,
   ) {
     return SizedBox(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Image.asset(
-            'assets/img_user.png',
-            width: 30,
-            height: 30,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: whiteColor,
+              borderRadius: BorderRadius.circular(100),
+              image: DecorationImage(
+                  image: profilePhotoUrl != null
+                      ? NetworkImage(
+                          'http://localhost:3000/$profilePhotoUrl',
+                        )
+                      : const AssetImage(
+                          'assets/img_user_guest.png',
+                        ) as ImageProvider,
+                  fit: BoxFit.cover),
+            ),
           ),
           const SizedBox(
             width: 10,

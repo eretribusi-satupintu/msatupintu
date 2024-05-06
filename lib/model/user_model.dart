@@ -1,5 +1,6 @@
 class UserModel {
   final int? id;
+  final int? role;
   final int? role_id;
   final String? name;
   final String? email;
@@ -10,6 +11,7 @@ class UserModel {
 
   const UserModel({
     this.id,
+    this.role,
     this.role_id,
     this.name,
     this.email,
@@ -21,6 +23,7 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         id: json['id'],
+        role: json['roles']['id'],
         role_id: json['role_id'],
         name: json['name'],
         email: json['email'],

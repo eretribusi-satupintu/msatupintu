@@ -4,7 +4,7 @@ class WajibRetribusiModel {
   final String? nik;
   final String? noTelepon;
   final String? photoProfil;
-  final int? jumlahKontrak;
+  final int? jumlahTagihan;
 
   const WajibRetribusiModel(
       {this.id,
@@ -12,7 +12,7 @@ class WajibRetribusiModel {
       this.nik,
       this.noTelepon,
       this.photoProfil,
-      this.jumlahKontrak});
+      this.jumlahTagihan});
 
   factory WajibRetribusiModel.fromJson(Map<String, dynamic> json) =>
       WajibRetribusiModel(
@@ -21,6 +21,6 @@ class WajibRetribusiModel {
         nik: json['nik'] ?? '-',
         noTelepon: json['no_telepon'] ?? '-',
         photoProfil: json['photo_profile'] ?? '-',
-        jumlahKontrak: json['jumlah_kontrak'],
+        jumlahTagihan: json['jumlah_tagihan'],
       );
 }

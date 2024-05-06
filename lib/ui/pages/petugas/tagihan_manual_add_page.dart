@@ -52,7 +52,7 @@ class _TagihanAddPageState extends State<TagihanAddPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tambah Tagihan Tidak Terdaftar',
+          'Tambah Tagihan Manual',
           style: mainRdTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
         ),
         leading: IconButton(

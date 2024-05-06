@@ -22,15 +22,23 @@ class PetugasService {
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)['message'];
       }
-      storeBillAmountToLocal(jsonDecode(res.body)['data']['total']);
+      // storeBillAmountToLocal(jsonDecode(res.body)['data']['total']);
       // print(jsonDecode(res.body)['data']);
       final transaksiPetugas = List<TransaksiPetugasModel>.from(
           jsonDecode(res.body)['data']['transaksi_petugas'].map(
               (transaksiPetugas) =>
                   TransaksiPetugasModel.fromJson(transaksiPetugas))).toList();
+
+      final tagihanManual = List<TagihanManualModel>.from(
+          jsonDecode(res.body)['data']['tagihan_manual']
+              .map((tagihan) => TagihanManualModel.fromJson(tagihan))).toList();
+
       return BillAmountModel(
           transaksiPetugas: transaksiPetugas,
-          total: jsonDecode(res.body)['data']['total']);
+          total: jsonDecode(res.body)['data']['total'],
+          tagihanManual: tagihanManual,
+          totalTagihanManual: jsonDecode(res.body)['data']
+              ['total_tagihan_manual']);
     } catch (e) {
       rethrow;
     }

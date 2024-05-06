@@ -15,3 +15,5 @@ class DokuVaGet extends DokuPaymentEvent {
   @override
   List<Object> get props => [data];
 }
+
+class DokuVaList extends DokuPaymentEvent {}

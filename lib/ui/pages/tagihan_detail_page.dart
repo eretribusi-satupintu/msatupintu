@@ -21,6 +21,8 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/draggable_scrollable_modal.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class TagihanDetailPage extends StatefulWidget {
   final int tagihanId;
@@ -36,7 +38,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
   String selectedBank = "";
   bool isBankSelected = false;
   String erm = "";
-  List<String> bankList = ['bri', 'bni', 'mandiri'];
+  List<String> bankList = ['bri', 'bca', 'mandiri'];
   late String isPaid;
 
   @override
@@ -80,10 +82,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
           child: BlocBuilder<TagihanBloc, TagihanState>(
             builder: (context, state) {
               if (state is TagihanLoading) {
-                return Center(
-                  child: LoadingAnimationWidget.inkDrop(
-                      color: mainColor, size: 30),
-                );
+                return const LoadingInfo();
               }
 
               if (state is TagihanDetailSuccess) {
@@ -110,6 +109,19 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                             children: [
                               const SizedBox(
                                 height: 27,
+                              ),
+                              Text(
+                                state.data.kedinasanName!,
+                                style:
+                                    darkRdBrownTextStyle.copyWith(fontSize: 14),
+                              ),
+                              Text(
+                                'Retribusi ${state.data.retribusiName!}',
+                                style:
+                                    darkRdBrownTextStyle.copyWith(fontSize: 14),
+                              ),
+                              const SizedBox(
+                                height: 20,
                               ),
                               Text(
                                 formatCurrency(
@@ -139,8 +151,25 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                 height: 15,
                               ),
                               tagihanInfo('Tagihan', state.data.tagihanName!),
-                              tagihanInfo('Pasar', 'Balige'),
-                              tagihanInfo('No unit', 'AIIK04'),
+                              tagihanInfo('Item Retribusi',
+                                  state.data.itemRetribusiName!),
+                              tagihanInfo(
+                                'Batas pembayaran',
+                                DateFormat('dd MMMM yyyy')
+                                    .format(DateTime.parse(state.data.dueDate!))
+                                    .toString(),
+                              ),
+                              DateTime.parse(state.data.dueDate!)
+                                      .isBefore(DateTime.now())
+                                  ? Text(
+                                      '( Anda telah melebihi batas akhir pembayaran )',
+                                      style: redRdTextStyle.copyWith(
+                                          fontSize: 10, fontWeight: bold),
+                                    )
+                                  : const SizedBox(),
+                              const SizedBox(
+                                height: 10,
+                              ),
                               DottedLine(
                                 dashLength: 8,
                                 lineThickness: 2.0,
@@ -193,7 +222,10 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                               fontSize: 12, fontWeight: bold),
                                         ),
                                       ],
-                                    )
+                                    ),
+                              const SizedBox(
+                                height: 20,
+                              ),
                             ],
                           ),
                         ),
@@ -894,12 +926,14 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
               }
 
               if (state is TagihanFailed) {
-                return Center(
-                  child: Text(state.e),
+                return ErrorInfo(
+                  e: state.e,
                 );
               }
 
-              return const Text('Terjadi kealahan');
+              return const ErrorInfo(
+                e: 'Terjadi Kesalahan',
+              );
             },
           ),
         ),

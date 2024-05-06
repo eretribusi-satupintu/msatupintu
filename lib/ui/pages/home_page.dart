@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
+import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
@@ -120,6 +121,7 @@ class HomePage extends StatelessWidget {
                               );
                             },
                             child: tagihanTerbaru(
+                              context,
                               tagihan.tagihanName!,
                               tagihan.price!,
                             ),
@@ -149,57 +151,46 @@ class HomePage extends StatelessWidget {
   }
 
   Widget tagihanTerbaru(
+    BuildContext context,
     String title,
     int totalHarga,
   ) {
     return Container(
-      width: double.infinity,
-      // height: 86,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: whiteColor,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(10),
-        ),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Image.asset(
+            'assets/img_invoice.png',
+            width: 30,
+          ),
+          const SizedBox(
+            width: 6,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                'assets/img_invoice.png',
-                width: 33,
+              Text(
+                title,
+                style: darkRdBrownTextStyle.copyWith(
+                    fontWeight: medium, fontSize: 12),
               ),
               const SizedBox(
-                width: 23,
+                height: 6,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+              Row(
                 children: [
                   Text(
-                    title.toString(),
-                    style: darkRdBrownTextStyle.copyWith(
-                        fontSize: 12, fontWeight: semiBold),
+                    formatCurrency(totalHarga),
+                    style: mainRdTextStyle.copyWith(fontSize: 10),
                   ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Bulanan',
-                    style: greyRdTextStyle.copyWith(fontSize: 10),
-                  )
                 ],
-              ),
+              )
             ],
-          ),
-          const Spacer(),
-          Align(
-            alignment: Alignment.topRight,
-            child: Text(
-              'Rp. $totalHarga',
-              style: mainRdTextStyle.copyWith(fontWeight: bold, fontSize: 16),
-            ),
           )
         ],
       ),

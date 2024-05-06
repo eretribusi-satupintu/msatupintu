@@ -76,13 +76,25 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
         }
       }
 
+      if (event is TagihanWajibRetribusiMasyarakatByTagihanNameGet) {
+        try {
+          emit(TagihanLoading());
+          final tagihan = await TagihanService()
+              .getTagihanWajibRetribusiMasyarakatbyTagihanName(
+                  event.tagihanName);
+          emit(TagihanSuccess(tagihan));
+        } catch (e) {
+          emit(TagihanFailed(e.toString()));
+        }
+      }
+
       if (event is TagihanWajibRetribusiMasyarakatProgressGet) {
         try {
           emit(TagihanLoading());
           final tagihan = await TagihanService()
               .getTagihanWajibRetribusiMasyarakatProgress(event.kontrakId);
           emit(TagihanSuccess(tagihan));
-        } catch (e) {
+          } catch (e) {
           emit(TagihanFailed(e.toString()));
         }
       }

@@ -40,3 +40,8 @@ class TagihanWajibRetribusiMasyarakatProgressGet extends TagihanEvent {
   final int kontrakId;
   const TagihanWajibRetribusiMasyarakatProgressGet(this.kontrakId);
 }
+
+class TagihanWajibRetribusiMasyarakatByTagihanNameGet extends TagihanEvent {
+  final String tagihanName;
+  const TagihanWajibRetribusiMasyarakatByTagihanNameGet(this.tagihanName);
+}

@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:satupintu_app/blocs/tagihan_local/tagihan_local_bloc.dart';
+import 'package:satupintu_app/db/database.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:satupintu_app/model/login_form_model.dart';
 import 'package:satupintu_app/model/user_auth_model.dart';
+import 'package:satupintu_app/services/tagihan_local_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class AuthService {
@@ -109,7 +112,8 @@ class AuthService {
       }
 
       await clearLocalStorage();
-      return jsonDecode(res.body)['messagea'];
+      await TagihanLocalServices().deleteAllTagihan();
+      return jsonDecode(res.body)['message'];
     } catch (e) {
       rethrow;
     }

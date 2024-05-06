@@ -9,6 +9,7 @@ class UserAuthModel {
   final String? token;
   final int? pin;
   final int? subWilayahId;
+  final String? profilePhotoUrl;
 
   UserAuthModel(
       {this.id,
@@ -20,20 +21,21 @@ class UserAuthModel {
       this.password,
       this.token,
       this.pin,
-      this.subWilayahId});
+      this.subWilayahId,
+      this.profilePhotoUrl});
 
   factory UserAuthModel.fromJson(Map<String, dynamic> json) => UserAuthModel(
-        id: json['id'],
-        role: json['role_id'],
-        roleId: json['role']['id'],
-        nik: json['nik'],
-        name: json['name'],
-        email: json['email'],
-        password: json['password'],
-        token: json['token'],
-        pin: json['pin'],
-        subWilayahId: json['role']['subwilayah_id'],
-      );
+      id: json['id'],
+      role: json['role_id'],
+      roleId: json['role']['id'],
+      nik: json['nik'],
+      name: json['name'],
+      email: json['email'],
+      password: json['password'],
+      token: json['token'],
+      pin: json['pin'],
+      subWilayahId: json['role']['subwilayah_id'],
+      profilePhotoUrl: json['profile_photo_url']);
 
   UserAuthModel copyWith({String? email, String? password, int? pin}) =>
       UserAuthModel(

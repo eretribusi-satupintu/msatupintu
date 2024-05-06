@@ -59,7 +59,7 @@ class TagihanLocalServices {
     try {
       final db = await dbProvider.database;
       db.delete(tagihanTable, where: 'tagihan_id = $id');
-      db.close();
+      // db.close();
     } catch (e) {
       rethrow;
     }
@@ -114,9 +114,10 @@ class TagihanLocalServices {
       final token = await AuthService().getToken();
       final subWilayah =
           await SubWilayahService().getSubwilayahFromLocalStorage();
-
+      final roleId = await AuthService().getRoleId();
       final res = await http.get(
-          Uri.parse('$baseUrl/tagihan/petugas/sub-wilayah/${subWilayah.id}'),
+          Uri.parse(
+              '$baseUrl/tagihan/petugas/$roleId/sub-wilayah/${subWilayah.id}'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token
@@ -126,18 +127,19 @@ class TagihanLocalServices {
         throw jsonDecode(res.body)['message'];
       }
 
-      List<TagihanLocalModel> paidTagihanLocal = await getTagihan();
-      if (paidTagihanLocal.isNotEmpty) {
-        List<int?> paidTagihanIDs = paidTagihanLocal
+      List<TagihanLocalModel> tagihanLocal = await getTagihan();
+
+      if (tagihanLocal.isNotEmpty) {
+        List<int?> paidTagihanIDs = tagihanLocal
             .where((tagihan) => tagihan.status == true)
             .map((tagihan) => tagihan.tagihanId)
             .toList();
 
-        List<int?> unpaidTagihanIDs = paidTagihanLocal
+        List<int?> unpaidTagihanIDs = tagihanLocal
             .where((tagihan) => tagihan.status == false)
             .map((tagihan) => tagihan.tagihanId)
             .toList();
-        print({"unpaid": unpaidTagihanIDs, "padi": paidTagihanIDs});
+        // print({"unpaid": unpaidTagihanIDs, "padi": paidTagihanIDs});
 
         List<TagihanLocalModel> tagihanFromServer =
             List<TagihanLocalModel>.from(jsonDecode(res.body)['data']
@@ -145,11 +147,15 @@ class TagihanLocalServices {
                 .where((tagihan) =>
                     !paidTagihanIDs.contains(tagihan.tagihanId))).toList();
 
+        for (var id in unpaidTagihanIDs) {
+          await deleteTagihan(id!);
+        }
+
         if (tagihanFromServer.isNotEmpty) {
           for (var item in tagihanFromServer) {
-            if (unpaidTagihanIDs.contains(item.tagihanId)) {
-              await updateTagihan(item);
-            } else {
+            if (!paidTagihanIDs.contains(item.tagihanId)) {
+              //   await updateTagihan(item);
+              // } else {
               await storeTagihan(item);
             }
           }
@@ -157,8 +163,6 @@ class TagihanLocalServices {
 
         return tagihanFromServer;
       }
-
-      // print({"current_id": unpaidTagihanIDs});
 
       List<TagihanLocalModel> tagihanFromServer = List<TagihanLocalModel>.from(
           jsonDecode(res.body)['data']
@@ -172,6 +176,36 @@ class TagihanLocalServices {
       }
 
       return tagihanFromServer;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> synchronizationTagihanLocal(
+      TagihanLocalAmountModel data) async {
+    try {
+      final token = await AuthService().getToken();
+      final petugasId = await AuthService().getRoleId();
+
+      final res = await http.post(
+          Uri.parse(
+              '$baseUrl/transaksi-petugas/synchronization/petugas/$petugasId'),
+          headers: {'Content-Type': 'application/json', 'Authorization': token},
+          body: jsonEncode(data));
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      // if (data.tagihanLocalId!.isNotEmpty) {
+      //   data.tagihanLocalId!.map((id) async => await deleteTagihan(id));
+      // }
+
+      for (var id in data.tagihanLocalId!) {
+        await deleteTagihan(id);
+      }
+
+      return jsonDecode(res.body)['data']['status'];
     } catch (e) {
       rethrow;
     }

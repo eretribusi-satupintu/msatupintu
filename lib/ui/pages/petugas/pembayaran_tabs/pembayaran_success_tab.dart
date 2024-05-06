@@ -6,6 +6,7 @@ import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_detail_petugas_page.dart';
 import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
+import 'package:satupintu_app/ui/widget/empty_data_info.dart';
 
 class PembayaranSuccessTab extends StatelessWidget {
   const PembayaranSuccessTab({super.key});
@@ -50,24 +51,31 @@ class PembayaranSuccessTab extends StatelessWidget {
                 }
 
                 if (state is TagihanSuccess) {
-                  return Column(
-                    children: state.data
-                        .map((tagihan) => GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TagihanDetailPetugas(
-                                      tagihanId: tagihan.id!,
+                  if (state.data.isNotEmpty) {
+                    return Column(
+                      children: state.data
+                          .map((tagihan) => GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TagihanDetailPetugas(
+                                        tagihanId: tagihan.id!,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                              child: pembayaranCard(tagihan.udpatedDate!,
-                                  tagihan.wajibRetribusiName!, tagihan.price!),
-                            ))
-                        .toList(),
-                  );
+                                  );
+                                },
+                                child: pembayaranCard(
+                                    tagihan.udpatedDate!,
+                                    tagihan.wajibRetribusiName!,
+                                    tagihan.price!),
+                              ))
+                          .toList(),
+                    );
+                  } else {
+                    return const EmptyData(message: 'Tidak ada pembayaran');
+                  }
                 }
 
                 if (state is TagihanFailed) {

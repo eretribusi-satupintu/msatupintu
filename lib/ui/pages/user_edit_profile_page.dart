@@ -160,8 +160,13 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
                                               BorderRadius.circular(100),
                                           image: DecorationImage(
                                               image: image == null
-                                                  ? NetworkImage(
-                                                      'http://localhost:3000/${state.data.photoProfile}')
+                                                  ? state.data.photoProfile ==
+                                                          null
+                                                      ? const AssetImage(
+                                                              'assets/img_user_guest.png')
+                                                          as ImageProvider
+                                                      : NetworkImage(
+                                                          'http://localhost:3000/${state.data.photoProfile}')
                                                   : FileImage(File(image!.path))
                                                       as ImageProvider,
                                               fit: BoxFit.cover),

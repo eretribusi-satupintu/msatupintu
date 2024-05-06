@@ -10,6 +10,8 @@ import 'package:satupintu_app/ui/pages/petugas/transaksi_petugas_success_page.da
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class TagihanDetailPetugas extends StatefulWidget {
   final int tagihanId;
@@ -40,13 +42,26 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
           style: whiteRdTextStyle.copyWith(fontSize: 16, fontWeight: bold),
         ),
         centerTitle: true,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: whiteColor,
+              size: 18,
+            )),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: BlocProvider(
           create: (context) =>
               TagihanBloc()..add(TagihanGetDetail(widget.tagihanId)),
           child: BlocBuilder<TagihanBloc, TagihanState>(
             builder: (context, state) {
+              if (state is TagihanLoading) {
+                return const LoadingInfo();
+              }
+
               if (state is TagihanDetailSuccess) {
                 return Column(
                   children: [
@@ -71,6 +86,19 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                             children: [
                               const SizedBox(
                                 height: 27,
+                              ),
+                              Text(
+                                state.data.kedinasanName!,
+                                style:
+                                    darkRdBrownTextStyle.copyWith(fontSize: 14),
+                              ),
+                              Text(
+                                'Retribusi ${state.data.retribusiName!}',
+                                style:
+                                    darkRdBrownTextStyle.copyWith(fontSize: 14),
+                              ),
+                              const SizedBox(
+                                height: 20,
                               ),
                               Text(
                                 formatCurrency(
@@ -100,8 +128,25 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                 height: 15,
                               ),
                               tagihanInfo('Tagihan', state.data.tagihanName!),
-                              tagihanInfo('Pasar', 'Balige'),
-                              tagihanInfo('No unit', 'AIIK04'),
+                              tagihanInfo('Item Retribusi',
+                                  state.data.itemRetribusiName!),
+                              tagihanInfo(
+                                'Batas pembayaran',
+                                DateFormat('dd MMMM yyyy')
+                                    .format(DateTime.parse(state.data.dueDate!))
+                                    .toString(),
+                              ),
+                              DateTime.parse(state.data.dueDate!)
+                                      .isBefore(DateTime.now())
+                                  ? Text(
+                                      '( Anda telah melebihi batas akhir pembayaran )',
+                                      style: redRdTextStyle.copyWith(
+                                          fontSize: 10, fontWeight: bold),
+                                    )
+                                  : const SizedBox(),
+                              const SizedBox(
+                                height: 15,
+                              ),
                               DottedLine(
                                 dashLength: 8,
                                 lineThickness: 2.0,
@@ -456,17 +501,24 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                   ],
                                 ),
                               ),
+                    const SizedBox(
+                      height: 20,
+                    ),
                   ],
                 );
               }
 
               if (state is TagihanFailed) {
                 return Center(
-                  child: Text(state.e),
+                  child: ErrorInfo(
+                    e: state.e,
+                  ),
                 );
               }
 
-              return Text('Terjadi kealahan');
+              return const ErrorInfo(
+                e: "Terjadi Kesalahan",
+              );
             },
           ),
         ),

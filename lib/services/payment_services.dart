@@ -82,4 +82,28 @@ class PaymentServices {
       rethrow;
     }
   }
+
+  Future<List<DokuVaModel>> getAllVaPayment() async {
+    try {
+      final token = await AuthService().getToken();
+      final roleId = await AuthService().getRoleId();
+
+      final res = await http.get(
+          Uri.parse(
+              '$baseUrl/payments/virtual-account/wajib-retribusi/$roleId/status/WAITING'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      return List<DokuVaModel>.from(jsonDecode(res.body)['data']
+          .map((va) => DokuVaModel.fromJson(va))).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

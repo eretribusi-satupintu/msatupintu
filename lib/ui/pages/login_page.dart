@@ -173,21 +173,21 @@ class _LoginPageState extends State<LoginPage> {
                                 obscure: true,
                                 controller: passswordController,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      'Lupa password',
-                                      style: mainRdTextStyle.copyWith(
-                                        fontSize: 12,
-                                        fontWeight: light,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.end,
+                              //   children: [
+                              //     TextButton(
+                              //       onPressed: () {},
+                              //       child: Text(
+                              //         'Lupa password',
+                              //         style: mainRdTextStyle.copyWith(
+                              //           fontSize: 12,
+                              //           fontWeight: light,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
                               const SizedBox(
                                 height: 10,
                               ),

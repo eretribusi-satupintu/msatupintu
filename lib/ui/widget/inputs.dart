@@ -7,15 +7,16 @@ class CustomInput extends StatelessWidget {
   final bool obscure;
   final String? errorText;
   final bool error;
+  final Function(String)? onFieldSubmitted;
 
-  const CustomInput({
-    super.key,
-    required this.hintText,
-    this.obscure = false,
-    this.error = false,
-    this.errorText,
-    this.controller,
-  });
+  const CustomInput(
+      {super.key,
+      required this.hintText,
+      this.obscure = false,
+      this.error = false,
+      this.errorText,
+      this.controller,
+      this.onFieldSubmitted});
 
   @override
   Widget build(BuildContext context) {
@@ -26,27 +27,27 @@ class CustomInput extends StatelessWidget {
         SizedBox(
           height: 48,
           child: TextFormField(
-            controller: controller,
-            obscureText: obscure,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor:
-                  !error ? blueColor.withAlpha(20) : redColor.withAlpha(20),
-              suffixStyle: TextStyle(color: !error ? mainColor : redColor),
-              hintText: hintText,
-              hintStyle: TextStyle(
-                fontSize: 12,
-                color:
-                    !error ? blueColor.withAlpha(90) : redColor.withAlpha(90),
+              controller: controller,
+              obscureText: obscure,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor:
+                    !error ? blueColor.withAlpha(20) : redColor.withAlpha(20),
+                suffixStyle: TextStyle(color: !error ? mainColor : redColor),
+                hintText: hintText,
+                hintStyle: TextStyle(
+                  fontSize: 12,
+                  color:
+                      !error ? blueColor.withAlpha(90) : redColor.withAlpha(90),
+                ),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
               ),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
-            ),
-            style: !error
-                ? blueRdTextStyle.copyWith(fontSize: 14)
-                : redRdTextStyle.copyWith(fontSize: 14),
-          ),
+              style: !error
+                  ? blueRdTextStyle.copyWith(fontSize: 14)
+                  : redRdTextStyle.copyWith(fontSize: 14),
+              onFieldSubmitted: onFieldSubmitted),
         ),
         const SizedBox(
           height: 8,

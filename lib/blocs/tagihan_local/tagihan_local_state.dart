@@ -59,3 +59,11 @@ final class TagihanLocalFailed extends TagihanLocalState {
   @override
   List<Object> get props => [e];
 }
+
+final class TagihanLocalSynchronizeSuccess extends TagihanLocalState {
+  final String status;
+  const TagihanLocalSynchronizeSuccess(this.status);
+
+  @override
+  List<Object> get props => [status];
+}

@@ -27,6 +27,7 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
   final keteranganController = TextEditingController(text: '');
   int totalSetoran = 0;
   List<TransaksiPetugasModel> transaksiPetugasIdList = [];
+  List<TagihanManualModel> tagihanManualIdList = [];
   String lokasiSetoran = '';
   bool totalSetoranisNull = false;
   XFile? image;
@@ -205,9 +206,12 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                               listener: (context, state) {
                                 if (state is PetugasBillAmountSuccess) {
                                   setState(() {
-                                    totalSetoran = state.data.total;
+                                    totalSetoran = state.data.total +
+                                        state.data.totalTagihanManual;
                                     transaksiPetugasIdList =
                                         state.data.transaksiPetugas;
+                                    tagihanManualIdList =
+                                        state.data.tagihanManual;
                                   });
                                 }
                               },
@@ -424,7 +428,7 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                             ),
                             const Spacer(),
                             Text(
-                              formatCurrency(15000),
+                              formatCurrency(totalSetoran),
                               style: darkRdBrownTextStyle.copyWith(
                                   fontWeight: bold),
                             )
@@ -454,6 +458,7 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                                     SetoranFormModel(
                                         now.toString(),
                                         transaksiPetugasIdList,
+                                        tagihanManualIdList,
                                         totalSetoran,
                                         lokasiSetoran,
                                         base64Encode(

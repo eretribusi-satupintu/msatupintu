@@ -9,6 +9,10 @@ import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/petugas_tagihan_list.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_manual_detail_page.dart';
+import 'package:satupintu_app/ui/widget/empty_data_info.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
+import 'package:satupintu_app/ui/widget/inputs.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class TagihanPetugasPage extends StatefulWidget {
   final int petugasId;
@@ -21,6 +25,7 @@ class TagihanPetugasPage extends StatefulWidget {
 class _TagihanPetugasPageState extends State<TagihanPetugasPage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
+  final searchController = TextEditingController(text: '');
 
   @override
   void initState() {
@@ -39,8 +44,7 @@ class _TagihanPetugasPageState extends State<TagihanPetugasPage>
     return MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                WajibRetribusiBloc()..add(WajibRetribusiGet(widget.petugasId)),
+            create: (context) => WajibRetribusiBloc()..add(WajibRetribusiGet()),
           ),
           BlocProvider(
               create: (context) => TagihanManualBloc()..add(TagihanManualGet()))
@@ -88,74 +92,73 @@ class _TagihanPetugasPageState extends State<TagihanPetugasPage>
                 child: TabBarView(
                   controller: tabController,
                   children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 18),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 11),
-                          decoration: BoxDecoration(
-                            color: blueColor.withAlpha(25),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(10),
+                    BlocConsumer<WajibRetribusiBloc, WajibRetribusiState>(
+                      listener: (context, state) {
+                        // TODO: implement listener
+                      },
+                      builder: (context, state) {
+                        return Column(
+                          children: [
+                            const SizedBox(
+                              height: 12,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                "Cari wajib retribusi...",
-                                style: greyRdTextStyle.copyWith(
-                                  fontSize: 10,
-                                  fontStyle: FontStyle.italic,
-                                ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 18),
+                              child: CustomInput(
+                                hintText: 'Carai wajib retribusi',
+                                controller: searchController,
+                                onFieldSubmitted: (value) {
+                                  context
+                                      .read<WajibRetribusiBloc>()
+                                      .add(WajibRetribusiGet(name: value));
+                                },
                               ),
-                              const Spacer(),
-                              Icon(
-                                Icons.search,
-                                size: 20,
-                                color: mainColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 18,
-                        ),
-                        BlocBuilder<WajibRetribusiBloc, WajibRetribusiState>(
-                          builder: (context, state) {
-                            if (state is WajibRetribusiSuccess) {
-                              return SingleChildScrollView(
-                                child: Column(
-                                  children: state.data
-                                      .map((wajibRetribusi) => GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        WajibRetribusiTagihanListPage(
-                                                          wajibRetribusiId:
-                                                              wajibRetribusi
-                                                                  .id!,
-                                                        )),
-                                              );
-                                            },
-                                            child: wajibRetribusiCardItem(
-                                                wajibRetribusi.name!,
-                                                wajibRetribusi.jumlahKontrak!),
-                                          ))
-                                      .toList(),
-                                ),
-                              );
-                            }
+                            ),
+                            const SizedBox(
+                              height: 18,
+                            ),
+                            BlocBuilder<WajibRetribusiBloc,
+                                WajibRetribusiState>(
+                              builder: (context, state) {
+                                if (state is WajibRetribusiLoading) {
+                                  return const LoadingInfo();
+                                }
 
-                            return Text('Terjadi kesalahan');
-                          },
-                        )
-                      ],
+                                if (state is WajibRetribusiSuccess) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      children: state.data
+                                          .map((wajibRetribusi) =>
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            WajibRetribusiTagihanListPage(
+                                                              wajibRetribusiId:
+                                                                  wajibRetribusi
+                                                                      .id!,
+                                                            )),
+                                                  );
+                                                },
+                                                child: wajibRetribusiCardItem(
+                                                    wajibRetribusi.name!,
+                                                    wajibRetribusi
+                                                        .jumlahTagihan!),
+                                              ))
+                                          .toList(),
+                                    ),
+                                  );
+                                }
+
+                                return ErrorInfo(e: 'Terjadi Kesalahan');
+                              },
+                            )
+                          ],
+                        );
+                      },
                     ),
                     BlocBuilder<TagihanManualBloc, TagihanManualState>(
                       builder: (context, state) {
@@ -167,33 +170,38 @@ class _TagihanPetugasPageState extends State<TagihanPetugasPage>
                         }
 
                         if (state is TagihanManualSuccess) {
-                          return SingleChildScrollView(
-                            child: Column(
-                                children: state.data
-                                    .map((tagihanManual) => GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        TagihanManualDetailPage(
-                                                            tagihanModel:
-                                                                tagihanManual)));
-                                          },
-                                          child: tagihanManualCardItem(
-                                              '${tagihanManual.itemRetribusi!} ${tagihanManual.detailTagihan!}',
-                                              tagihanManual.createdAt!,
-                                              tagihanManual.price!),
-                                        ))
-                                    .toList()),
-                          );
+                          if (state.data.isNotEmpty) {
+                            return SingleChildScrollView(
+                              child: Column(
+                                  children: state.data
+                                      .map((tagihanManual) => GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          TagihanManualDetailPage(
+                                                              tagihanModel:
+                                                                  tagihanManual)));
+                                            },
+                                            child: tagihanManualCardItem(
+                                                '${tagihanManual.itemRetribusi!} ${tagihanManual.detailTagihan!}',
+                                                tagihanManual.createdAt!,
+                                                tagihanManual.price!),
+                                          ))
+                                      .toList()),
+                            );
+                          } else {
+                            return const EmptyData(
+                                message: 'Belum ada Tagihan');
+                          }
                         }
 
                         if (state is TagihanManualFailed) {
-                          return Text(state.e);
+                          return ErrorInfo(e: state.e);
                         }
 
-                        return Text("Terjadi kesalahan");
+                        return const ErrorInfo(e: 'Terjadi kesalahan');
                       },
                     ),
                   ],
@@ -231,7 +239,7 @@ class _TagihanPetugasPageState extends State<TagihanPetugasPage>
           ),
           const Spacer(),
           Text(
-            '$billTotal Kontrak',
+            '$billTotal Tagihan',
             style: greenRdTextStyle.copyWith(fontWeight: bold),
           )
         ],

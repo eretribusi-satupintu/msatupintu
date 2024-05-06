@@ -16,7 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         try {
           emit(AuthLoading());
           final user = await AuthService().login(event.data);
-
+          print({"photo": user.profilePhotoUrl});
           emit(AuthSuccess(user));
         } catch (e) {
           emit(AuthFailed(e.toString()));

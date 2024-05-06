@@ -45,8 +45,11 @@ class SetoranServices {
 
       final transaksiPetugasIds =
           setoran.transaksiPetugasId!.map((tp) => tp.id).toList();
+      final tagihanManualIds =
+          setoran.tagihanManualId!.map((tp) => tp.id).toList();
       final body = {
         "transaksi_petugas": transaksiPetugasIds,
+        "tagihan_manual": tagihanManualIds,
         "waktu_penyetoran": setoran.waktuSetoran,
         "total": setoran.total,
         "lokasi_penyetoran": setoran.lokasiPenyetoran,
