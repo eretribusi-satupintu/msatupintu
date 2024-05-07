@@ -73,5 +73,4 @@ class TagihanModel {
         retribusiName: retribusiName,
         kedinasanName: kedinasanName,
       );
-
 }

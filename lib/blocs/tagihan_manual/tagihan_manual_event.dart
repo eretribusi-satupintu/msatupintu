@@ -9,6 +9,8 @@ sealed class TagihanManualEvent extends Equatable {
 
 class TagihanManualGet extends TagihanManualEvent {}
 
+class TagihanManualPaidGet extends TagihanManualEvent {}
+
 class TagihanManualPost extends TagihanManualEvent {
   final TagihanManualFormModel tagihanManual;
   const TagihanManualPost(this.tagihanManual);

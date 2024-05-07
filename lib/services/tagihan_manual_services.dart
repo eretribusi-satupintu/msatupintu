@@ -34,6 +34,32 @@ class TagihanManualServices {
     }
   }
 
+  Future<List<TagihanManualModel>> getPaidTagihanManual() async {
+    try {
+      final token = await AuthService().getToken();
+      final roleId = await AuthService().getRoleId();
+      final subWilayah =
+          await SubWilayahService().getSubwilayahFromLocalStorage();
+
+      final res = await http.get(
+          Uri.parse(
+              '$baseUrl/tagihan-manual/petugas/$roleId/subwilayah/${subWilayah.id}/paid'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      return List<TagihanManualModel>.from(jsonDecode(res.body)['data']
+          .map((tagihan) => TagihanManualModel.fromJson(tagihan))).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<TagihanManualModel> postTagihanManual(
       TagihanManualFormModel tagihanManual) async {
     try {

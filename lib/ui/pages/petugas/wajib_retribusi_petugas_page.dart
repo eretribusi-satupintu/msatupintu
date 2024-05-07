@@ -77,10 +77,10 @@ class _TagihanPetugasPageState extends State<TagihanPetugasPage>
                   labelPadding: EdgeInsets.zero,
                   tabs: const [
                     Tab(
-                      text: 'Terdaftar',
+                      text: 'Kontrak',
                     ),
                     Tab(
-                      text: 'Tidak Terdaftar',
+                      text: 'Manual',
                     ),
                   ],
                 ),

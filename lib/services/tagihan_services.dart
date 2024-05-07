@@ -187,6 +187,32 @@ class TagihanService {
     }
   }
 
+  Future<List<TagihanModel>> getPetugasAllPaidTagihan() async {
+    try {
+      final token = await AuthService().getToken();
+      final roleId = await AuthService().getRoleId();
+      final subWilayah =
+          await SubWilayahService().getSubwilayahFromLocalStorage();
+
+      final res = await http.get(
+          Uri.parse(
+              '$baseUrl/tagihan/petugas/$roleId/sub-wilayah/${subWilayah.id}/all'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['data'];
+      }
+
+      return List<TagihanModel>.from(jsonDecode(res.body)['data']
+          .map((tagihan) => TagihanModel.fromJson(tagihan))).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<TagihanModel> getTagihanDetail(int tagihanId) async {
     try {
       final token = await AuthService().getToken();

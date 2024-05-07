@@ -39,7 +39,7 @@ class TagihanLocalServices {
 
   Future<void> updateTagihan(TagihanLocalModel tagihan) async {
     try {
-      final petugasId = AuthService().getRoleId();
+      // final petugasId = AuthService().getRoleId();
       final db = await dbProvider.database;
       final updateTagihan = await db.update(
         tagihanTable,
@@ -48,7 +48,7 @@ class TagihanLocalServices {
         whereArgs: [tagihan.tagihanId],
       );
 
-      print({"paid": updateTagihan});
+      // print({"paid": updateTagihan});
     } catch (e) {
       print({"updated_error": e.toString()});
       rethrow;
@@ -112,16 +112,15 @@ class TagihanLocalServices {
   Future<List<TagihanLocalModel>> storeTagihanFromServer() async {
     try {
       final token = await AuthService().getToken();
-      final subWilayah =
-          await SubWilayahService().getSubwilayahFromLocalStorage();
+
       final roleId = await AuthService().getRoleId();
-      final res = await http.get(
-          Uri.parse(
-              '$baseUrl/tagihan/petugas/$roleId/sub-wilayah/${subWilayah.id}'),
+      final res = await http.get(Uri.parse('$baseUrl/tagihan/petugas/$roleId'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token
           });
+
+      // print({"tagihan_from_Server": jsonDecode(res.body)['data']});
 
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)['message'];
@@ -139,7 +138,6 @@ class TagihanLocalServices {
             .where((tagihan) => tagihan.status == false)
             .map((tagihan) => tagihan.tagihanId)
             .toList();
-        // print({"unpaid": unpaidTagihanIDs, "padi": paidTagihanIDs});
 
         List<TagihanLocalModel> tagihanFromServer =
             List<TagihanLocalModel>.from(jsonDecode(res.body)['data']
@@ -154,8 +152,6 @@ class TagihanLocalServices {
         if (tagihanFromServer.isNotEmpty) {
           for (var item in tagihanFromServer) {
             if (!paidTagihanIDs.contains(item.tagihanId)) {
-              //   await updateTagihan(item);
-              // } else {
               await storeTagihan(item);
             }
           }
@@ -168,6 +164,8 @@ class TagihanLocalServices {
           jsonDecode(res.body)['data']
               .map((tagihan) => TagihanLocalModel.fromJson(tagihan))).toList();
 
+      print({"tagihan_from_Server": tagihanFromServer});
+
       if (tagihanFromServer.isNotEmpty) {
         deleteAllTagihan();
         final storeDb =
@@ -177,6 +175,7 @@ class TagihanLocalServices {
 
       return tagihanFromServer;
     } catch (e) {
+      print({"tagihan_from_Server": e.toString()});
       rethrow;
     }
   }

@@ -67,7 +67,7 @@ class PembayaranSuccessTab extends StatelessWidget {
                                   );
                                 },
                                 child: pembayaranCard(
-                                    tagihan.udpatedDate!,
+                                    tagihan.paymentTime!,
                                     tagihan.wajibRetribusiName!,
                                     tagihan.price!),
                               ))

@@ -7,7 +7,7 @@ import 'package:satupintu_app/blocs/petugas/petugas_bloc.dart';
 import 'package:satupintu_app/blocs/subwilayah/subwilayah_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
-import 'package:satupintu_app/ui/pages/petugas/bukti_bayar_print.dart';
+import 'package:satupintu_app/ui/pages/petugas/rekapitulasi_pembayaran_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_manual_add_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_sinkronisasi_page.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
@@ -272,10 +272,11 @@ class HomePetugasPage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => BuktiBayarPrintPage()));
+                                builder: (context) =>
+                                    const RekapitulasiPembayaranPage()));
                       },
                       child: homeMenuItem(
-                          'Cetak Bukti Bayar', 'assets/ic_print.png')),
+                          'Rekapitulasi', 'assets/img_rekapitulasi.png')),
                   GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/setoran');

@@ -413,7 +413,7 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                       Expanded(
                         flex: 32,
                         child: Text(
-                          '$tagihanName ${status == false ? 'Blom' : 'Sudah'}',
+                          tagihanName,
                           style:
                               darkRdBrownTextStyle.copyWith(fontWeight: bold),
                         ),

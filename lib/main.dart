@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:satupintu_app/blocs/auth/auth_bloc.dart";
 import "package:satupintu_app/blocs/doku_payment/doku_payment_bloc.dart";
+import "package:satupintu_app/blocs/rekapitulasi/rekapitulasi_bloc.dart";
 import "package:satupintu_app/blocs/tagihan/tagihan_bloc.dart";
 import "package:satupintu_app/blocs/tagihan_local/tagihan_local_bloc.dart";
 import "package:satupintu_app/blocs/user/user_bloc.dart";
@@ -48,7 +49,8 @@ class _MainAppState extends State<MainApp> {
           create: (context) => UserBloc()..add(UserGet()),
         ),
         BlocProvider(create: (context) => TagihanLocalBloc()),
-        BlocProvider(create: (context) => TagihanBloc())
+        BlocProvider(create: (context) => TagihanBloc()),
+        BlocProvider(create: (context) => RekapitulasiBloc())
         // ..add(TagihanLocalFromServerStore()))
       ],
       child: BlocListener<TagihanLocalBloc, TagihanLocalState>(

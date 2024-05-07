@@ -21,6 +21,18 @@ class TagihanManualBloc extends Bloc<TagihanManualEvent, TagihanManualState> {
           emit(TagihanManualFailed(e.toString()));
         }
       }
+      if (event is TagihanManualPaidGet) {
+        try {
+          emit(TagihanManualLoading());
+          final tagihanManual =
+              await TagihanManualServices().getPaidTagihanManual();
+
+          emit(TagihanManualSuccess(tagihanManual));
+        } catch (e) {
+          emit(TagihanManualFailed(e.toString()));
+        }
+      }
+
       if (event is TagihanManualPost) {
         try {
           emit(TagihanManualLoading());

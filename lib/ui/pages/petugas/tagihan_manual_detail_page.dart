@@ -569,7 +569,7 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           )
         ],
