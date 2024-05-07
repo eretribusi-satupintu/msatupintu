@@ -67,7 +67,7 @@ class QrCodePage extends StatelessWidget {
                     QrImageView(
                       gapless: false,
                       backgroundColor: whiteColor,
-                      data: state.data.nik!,
+                      data: 'wajib_retribusi-${state.data.nik!}',
                       version: QrVersions.auto,
                       size: 220.0,
                       padding: const EdgeInsets.all(20),

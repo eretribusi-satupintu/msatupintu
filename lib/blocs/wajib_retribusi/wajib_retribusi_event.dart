@@ -23,3 +23,11 @@ class WajibRetribusiGetDetailFromScan extends WajibRetribusiEvent {
 
   const WajibRetribusiGetDetailFromScan(this.nik);
 }
+
+class WajibRetribusiGetDetailTagihanFromScan extends WajibRetribusiEvent {
+  final int tagihanId;
+
+  const WajibRetribusiGetDetailTagihanFromScan(this.tagihanId);
+}
+
+class ScanUndefined extends WajibRetribusiEvent {}

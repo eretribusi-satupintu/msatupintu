@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:satupintu_app/model/tagihan_model.dart';
 import 'package:satupintu_app/model/wajib_retribusi_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
+import 'package:satupintu_app/services/tagihan_services.dart';
 import 'package:satupintu_app/services/wajib_retribusi_services.dart';
 
 part 'wajib_retribusi_event.dart';
@@ -58,11 +60,31 @@ class WajibRetribusiBloc
           if (isPresent) {
             emit(WajibRetribusiPresent(wajibRetribusiId!));
           } else {
-            emit(const WajibRetribusiFailed('Waji Retribusi tidak terdaftar'));
+            emit(const WajibRetribusiFailed('Wajib Retribusi tidak terdaftar'));
           }
         } catch (e) {
           emit(WajibRetribusiFailed(e.toString()));
         }
+      }
+
+      if (event is WajibRetribusiGetDetailTagihanFromScan) {
+        try {
+          emit(WajibRetribusiLoading());
+          final tagihan =
+              await TagihanService().getTagihanDetail(event.tagihanId);
+
+          if (tagihan.status == 'NEW') {
+            emit(WajibRetribusiTagihanPresent(tagihan.id!));
+          } else {
+            emit(const WajibRetribusiFailed('Tagihan tidak tersedia'));
+          }
+        } catch (e) {
+          emit(WajibRetribusiFailed(e.toString()));
+        }
+      }
+
+      if (event is ScanUndefined) {
+        emit(const WajibRetribusiFailed('Tidak dapat mengenali kode'));
       }
     });
   }

@@ -14,6 +14,8 @@ import 'package:satupintu_app/ui/pages/petugas/wajib_retribusi_petugas_page.dart
 import 'package:satupintu_app/ui/pages/qr_code_page.dart';
 import 'package:satupintu_app/ui/pages/tagihan_list_page.dart';
 import 'package:satupintu_app/ui/pages/user_page.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -158,15 +160,12 @@ class _MainPageState extends State<MainPage>
             ),
             body: BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
-                if (state is AuthFailed) {
-                  Center(
-                    child: Text('Tidak dapat terkoneksi ke server'),
-                  );
+                if (state is AuthLoading) {
+                  const LoadingInfo();
                 }
 
-                if (state is AuthInitial) {
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, '/login', (route) => false);
+                if (state is AuthFailed) {
+                  const ErrorInfo(e: 'Tidak dapat mengidentifikasi pengguna');
                 }
               },
               builder: (context, state) {
@@ -185,12 +184,8 @@ class _MainPageState extends State<MainPage>
                   }
                 }
 
-                return Center(
-                  child: Text(
-                    'Tidak dapat mengidenifikasi pengguana',
-                    style: greyRdTextStyle.copyWith(fontWeight: bold),
-                  ),
-                );
+                return const ErrorInfo(
+                    e: 'Tidak dapat mengidentifikasi pengguna');
               },
             )),
       ),
@@ -263,7 +258,7 @@ class _MainPageState extends State<MainPage>
               color: greenColor,
             ),
             Text(
-              'Transaksi',
+              'Pembayaran',
               style: greenRdTextStyle.copyWith(fontSize: 8),
             )
           ],
@@ -498,7 +493,7 @@ class _MainPageState extends State<MainPage>
           title = 'QR Code';
           break;
         case 3:
-          title = 'Aktivitas';
+          title = 'Pembayaran';
           break;
         case 4:
           title = 'User';

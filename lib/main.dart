@@ -49,7 +49,6 @@ class _MainAppState extends State<MainApp> {
         ),
         BlocProvider(create: (context) => TagihanLocalBloc()),
         BlocProvider(create: (context) => TagihanBloc())
-
         // ..add(TagihanLocalFromServerStore()))
       ],
       child: BlocListener<TagihanLocalBloc, TagihanLocalState>(

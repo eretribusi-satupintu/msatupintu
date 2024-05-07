@@ -785,7 +785,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                                         height: 6,
                                                       ),
                                                       Text(
-                                                        'Perlihatkan kode anda dibawah ini kepada petugas untuk menyelesaikan pembayaran',
+                                                        'Perlihatkan kode anda dibawah ini kepada petugas untuk menyelesaikan pembayaran detail-${widget.tagihanId}-${state.user.nik!}',
                                                         style: greyRdTextStyle
                                                             .copyWith(
                                                                 fontSize: 10),
@@ -821,7 +821,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                                             backgroundColor:
                                                                 whiteColor,
                                                             data:
-                                                                state.user.nik!,
+                                                                'detail-${widget.tagihanId}-${state.user.nik!}',
                                                             version:
                                                                 QrVersions.auto,
                                                             size: 300.0,

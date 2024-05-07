@@ -44,3 +44,11 @@ final class WajibRetribusiPresent extends WajibRetribusiState {
   @override
   List<Object> get props => [wajibRetribusiId];
 }
+
+final class WajibRetribusiTagihanPresent extends WajibRetribusiState {
+  final int tagihanId;
+  const WajibRetribusiTagihanPresent(this.tagihanId);
+
+  @override
+  List<Object> get props => [tagihanId];
+}

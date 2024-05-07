@@ -541,7 +541,7 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                           list.add(LineText(
                               type: LineText.TYPE_TEXT,
                               content:
-                                  'Total: Rp. 500000', // Replace 'harga' with the actual price
+                                  'Total: ${formatCurrency(widget.tagihanModel.price!)}', // Replace 'harga' with the actual price
                               weight: 4, // Bold
                               align: LineText.ALIGN_RIGHT,
                               linefeed: 1));

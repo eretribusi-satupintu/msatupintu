@@ -9,6 +9,7 @@ import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
 import 'package:satupintu_app/ui/widget/empty_data_info.dart';
 import 'package:satupintu_app/ui/widget/failed_info.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class PembayaranPage extends StatefulWidget {
   const PembayaranPage({super.key});
@@ -40,10 +41,7 @@ class _PembayaranPageState extends State<PembayaranPage>
           child: BlocBuilder<PembayaranBloc, PembayaranState>(
             builder: (context, state) {
               if (state is PembayaranLoading) {
-                return Center(
-                  child: LoadingAnimationWidget.inkDrop(
-                      color: mainColor, size: 30),
-                );
+                return const LoadingInfo();
               }
 
               if (state is PembayaranSuccess) {

@@ -218,13 +218,43 @@ class UserPage extends StatelessWidget {
                   'Ubah password anda untuk menjaga keamanan akun',
                   () {},
                 ),
-                profileMenu(
-                  'assets/ic_logout.png',
-                  'Keluar',
-                  'Anda akan keluar dari akun anda saat ini',
-                  () {
-                    context.read<AuthBloc>().add(AuthLogout());
-                  },
+                BlocProvider(
+                  create: (context) => AuthBloc(),
+                  child: BlocConsumer<AuthBloc, AuthState>(
+                    listener: (context, state) {
+                      if (state is AuthInitial) {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/login', (route) => false);
+                      }
+
+                      if (state is AuthFailed) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: CustomSnackbar(
+                              message: 'Terjadi kesalahan',
+                              status: 'failed',
+                            ),
+                            behavior: SnackBarBehavior.fixed,
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                          ),
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is AuthLoading) {
+                        return const LoadingInfo();
+                      }
+                      return profileMenu(
+                        'assets/ic_logout.png',
+                        'Keluar',
+                        'Anda akan keluar dari akun anda saat ini',
+                        () {
+                          context.read<AuthBloc>().add(AuthLogout());
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

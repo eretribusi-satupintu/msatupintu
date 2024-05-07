@@ -7,6 +7,7 @@ import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/blocs/wajib_retribusi/wajib_retribusi_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/petugas_tagihan_list.dart';
+import 'package:satupintu_app/ui/pages/petugas/tagihan_detail_petugas_page.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 
 class PetugasScanQrCodePage extends StatefulWidget {
@@ -63,6 +64,7 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
         child: BlocConsumer<WajibRetribusiBloc, WajibRetribusiState>(
           listener: (context, state) {
             if (state is WajibRetribusiFailed) {
+              Navigator.pushNamed(context, '/home');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: CustomSnackbar(
@@ -74,8 +76,6 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                   elevation: 0,
                 ),
               );
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/home');
             }
 
             if (state is WajibRetribusiPresent) {
@@ -86,6 +86,16 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                   MaterialPageRoute(
                       builder: (context) => WajibRetribusiTagihanListPage(
                           wajibRetribusiId: state.wajibRetribusiId)));
+            }
+
+            if (state is WajibRetribusiTagihanPresent) {
+              Navigator.pop(context);
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          TagihanDetailPetugas(tagihanId: state.tagihanId)));
             }
           },
           builder: (context, state) {
@@ -102,18 +112,21 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                         setState(() {
                           result = scanData;
                         });
-                        print(result!.code!);
-                        context.read<WajibRetribusiBloc>().add(
-                            WajibRetribusiGetDetailFromScan(result!.code!));
-                        // final splittedCode = result!.code!.split('-');
-                        // if (splittedCode[0] == 'list') {
-                        //   context.read<WajibRetribusiBloc>().add(
-                        //       WajibRetribusiGetDetailFromScan(splittedCode[1]));
-                        // } else if (splittedCode[0] == 'detail') {
-                        //   context.read<WajibRetribusiBloc>().add(
-                        //       WajibRetribusiGetDetailFromScan(splittedCode[1]));
-                        // } else {}
-                        // print(splittedCode[0]);
+                        // print(result!.code!);
+                        List<String> qrText = result!.code!.split('-');
+                        if (qrText[0] == 'tagihan') {
+                          context.read<WajibRetribusiBloc>().add(
+                              WajibRetribusiGetDetailTagihanFromScan(
+                                  int.parse(qrText[1])));
+                        } else if (qrText[0] == 'wajib_retribusi') {
+                          context
+                              .read<WajibRetribusiBloc>()
+                              .add(WajibRetribusiGetDetailFromScan(qrText[1]));
+                        } else {
+                          context
+                              .read<WajibRetribusiBloc>()
+                              .add(ScanUndefined());
+                        }
                       });
                     },
                     overlay: QrScannerOverlayShape(
