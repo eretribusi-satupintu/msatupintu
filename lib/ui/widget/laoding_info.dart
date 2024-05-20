@@ -3,7 +3,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/shared/theme.dart';
 
 class LoadingInfo extends StatelessWidget {
-  const LoadingInfo({super.key});
+  final String? message;
+  const LoadingInfo({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class LoadingInfo extends StatelessWidget {
               height: 4,
             ),
             Text(
-              'Loading...',
+              message ?? 'Loading...',
               style: darkRdBrownTextStyle,
             )
           ],

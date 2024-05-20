@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:satupintu_app/blocs/payment_instruction/payment_instruction_bloc.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/model/doku_va_model.dart';
 import 'package:satupintu_app/shared/method.dart';
@@ -9,6 +12,7 @@ import 'package:satupintu_app/ui/pages/tagihan_detail_page.dart';
 import 'package:satupintu_app/ui/pages/template_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
+import 'package:satupintu_app/ui/widget/failed_info.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
@@ -30,9 +34,6 @@ class _DokuPaymentVaPageState extends State<DokuPaymentVaPage> {
     duration = DateTime.parse(
             stringToDateTime(dateString, 'yyyy-MM-dd HH:mm:ss', false))
         .difference(DateTime.now().toLocal());
-    // print(
-    //     '${stringToDateTime(dateString, 'yyyy-MM-dd HH:mm:ss', false)}   ${DateTime.now().toLocal()}');
-    // print(duration.inSeconds);
 
     super.initState();
   }
@@ -101,11 +102,9 @@ class _DokuPaymentVaPageState extends State<DokuPaymentVaPage> {
                               : Countdown(
                                   seconds: duration.inSeconds.ceil(),
                                   build: (BuildContext context, double time) {
-                                    // Calculate minutes and seconds from the remaining time
                                     int minutes = (time / 60).floor();
                                     int seconds = (time % 60).floor();
 
-                                    // Format the remaining time as mm:ss
                                     String minutesStr =
                                         minutes.toString().padLeft(2, '0');
                                     String secondsStr =
@@ -115,8 +114,7 @@ class _DokuPaymentVaPageState extends State<DokuPaymentVaPage> {
                                         style: orangeRdTextStyle.copyWith(
                                             fontSize: 24, fontWeight: bold));
                                   },
-                                  interval: const Duration(
-                                      seconds: 1), // Update every second
+                                  interval: const Duration(seconds: 1),
                                   onFinished: () {
                                     setState(() {
                                       _isExpired = true;
@@ -311,12 +309,97 @@ class _DokuPaymentVaPageState extends State<DokuPaymentVaPage> {
                                       fontSize: 10,
                                     ),
                                     textAlign: TextAlign.justify,
-                                  )
+                                  ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
+                      ),
+                      Text(
+                        'Petunjuk pembayaran',
+                        style: darkRdBrownTextStyle.copyWith(fontWeight: bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      BlocProvider(
+                        create: (context) => PaymentInstructionBloc()
+                          ..add(PaymentInstructionGet(
+                              widget.virtualAccount.howToPayApi!)),
+                        child: BlocConsumer<PaymentInstructionBloc,
+                            PaymentInstructionState>(
+                          listener: (context, state) {
+                            if (state is PaymentInstructionSuccess) {
+                              print(state.data);
+                            }
+                          },
+                          builder: (context, state) {
+                            if (state is PaymentInstructionLoading) {
+                              return const LoadingInfo();
+                            }
+
+                            if (state is PaymentInstructionSuccess) {
+                              return Column(
+                                  children: state.data
+                                      .map(
+                                        (instruction) => Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                width: 0.5,
+                                                color: lightBlueColor),
+                                          ),
+                                          child: ExpansionTile(
+                                              shape: const Border(),
+                                              tilePadding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
+                                              title: Text(
+                                                instruction.channel!,
+                                                style: mainRdTextStyle.copyWith(
+                                                    fontWeight: bold,
+                                                    fontSize: 14),
+                                              ),
+                                              children: instruction.steps!
+                                                  .map(
+                                                    (steps) => ListTile(
+                                                      // contentPadding: EdgeInsets.zero,
+                                                      minLeadingWidth: 6,
+                                                      leading: const Icon(
+                                                        Icons.circle,
+                                                        size: 6,
+                                                      ),
+                                                      title: Text(
+                                                        steps,
+                                                        style:
+                                                            darkRdBrownTextStyle
+                                                                .copyWith(
+                                                                    fontSize:
+                                                                        12),
+                                                        textAlign:
+                                                            TextAlign.justify,
+                                                      ),
+                                                    ),
+                                                  )
+                                                  .toList()),
+                                        ),
+                                      )
+                                      .toList());
+                            }
+
+                            if (state is PaymentInstructionFailed) {
+                              print(state.e);
+                              return ErrorInfo(e: "Terjadi Kesalahan");
+                            }
+
+                            return ErrorInfo(e: "Terjadi Kesalahan");
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
                       ),
                     ],
                   ),
@@ -355,7 +438,7 @@ class _DokuPaymentVaPageState extends State<DokuPaymentVaPage> {
                   },
                   builder: (context, state) {
                     if (state is TagihanLoading) {
-                      return LoadingInfo();
+                      return const LoadingInfo();
                     }
 
                     return CustomFilledButton(

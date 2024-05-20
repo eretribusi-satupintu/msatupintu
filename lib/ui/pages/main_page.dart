@@ -14,6 +14,7 @@ import 'package:satupintu_app/ui/pages/petugas/wajib_retribusi_petugas_page.dart
 import 'package:satupintu_app/ui/pages/qr_code_page.dart';
 import 'package:satupintu_app/ui/pages/tagihan_list_page.dart';
 import 'package:satupintu_app/ui/pages/user_page.dart';
+import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:satupintu_app/ui/widget/failed_info.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
@@ -165,7 +166,9 @@ class _MainPageState extends State<MainPage>
                 }
 
                 if (state is AuthFailed) {
-                  const ErrorInfo(e: 'Tidak dapat mengidentifikasi pengguna');
+                  // const ErrorInfo(e: 'Tidak dapat mengidentifikasi pengguna');
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/login', (route) => false);
                 }
               },
               builder: (context, state) {
@@ -184,8 +187,21 @@ class _MainPageState extends State<MainPage>
                   }
                 }
 
-                return const ErrorInfo(
-                    e: 'Tidak dapat mengidentifikasi pengguna');
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Column(
+                    children: [
+                      const ErrorInfo(
+                          e: 'Tidak dapat mengidentifikasi pengguna'),
+                      CustomFilledButton(
+                          title: "Muat ulang",
+                          onPressed: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/login', (route) => false);
+                          })
+                    ],
+                  ),
+                );
               },
             )),
       ),

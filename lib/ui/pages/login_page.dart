@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
 import 'package:satupintu_app/model/login_form_model.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/ui/pages/forgot_password_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/inputs.dart';
@@ -173,21 +174,27 @@ class _LoginPageState extends State<LoginPage> {
                                 obscure: true,
                                 controller: passswordController,
                               ),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.end,
-                              //   children: [
-                              //     TextButton(
-                              //       onPressed: () {},
-                              //       child: Text(
-                              //         'Lupa password',
-                              //         style: mainRdTextStyle.copyWith(
-                              //           fontSize: 12,
-                              //           fontWeight: light,
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ForgotPasswordPage()));
+                                    },
+                                    child: Text(
+                                      'Lupa password',
+                                      style: mainRdTextStyle.copyWith(
+                                        fontSize: 12,
+                                        fontWeight: light,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               const SizedBox(
                                 height: 10,
                               ),

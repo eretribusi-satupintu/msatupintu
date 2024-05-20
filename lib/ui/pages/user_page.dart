@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:satupintu_app/blocs/user/user_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/doku_payment_va_page.dart';
+import 'package:satupintu_app/ui/pages/update_password_page.dart';
 import 'package:satupintu_app/ui/pages/user_edit_profile_page.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/failed_info.dart';
@@ -187,6 +189,7 @@ class UserPage extends StatelessWidget {
                     if (state is UserSuccess) {
                       if (state.data.role_id == 1) {
                         return profileMenu(
+                          context,
                           'assets/img_kontrak.png',
                           'Kontrak Saya',
                           'Daftar email dan progres tagihan',
@@ -202,6 +205,7 @@ class UserPage extends StatelessWidget {
                   },
                 ),
                 profileMenu(
+                  context,
                   'assets/ic_user_profile.png',
                   'Ubah Profile',
                   'Ubah Email dan No Handphone anda',
@@ -213,10 +217,18 @@ class UserPage extends StatelessWidget {
                   },
                 ),
                 profileMenu(
+                  context,
                   'assets/ic_key.png',
                   'Ganti Password',
-                  'Ubah password anda untuk menjaga keamanan akun',
-                  () {},
+                  'Perbarui password akun anda',
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const UpdatePasswordPage(),
+                      ),
+                    );
+                  },
                 ),
                 BlocProvider(
                   create: (context) => AuthBloc(),
@@ -246,9 +258,10 @@ class UserPage extends StatelessWidget {
                         return const LoadingInfo();
                       }
                       return profileMenu(
+                        context,
                         'assets/ic_logout.png',
-                        'Keluar',
-                        'Anda akan keluar dari akun anda saat ini',
+                        'Logout',
+                        'Keluar dari akun anda saat ini',
                         () {
                           context.read<AuthBloc>().add(AuthLogout());
                         },
@@ -263,6 +276,7 @@ class UserPage extends StatelessWidget {
   }
 
   Widget profileMenu(
+    BuildContext context,
     String icon,
     String title,
     String description,
@@ -271,6 +285,7 @@ class UserPage extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
         margin: const EdgeInsets.only(bottom: 21),
         decoration: BoxDecoration(
@@ -284,31 +299,35 @@ class UserPage extends StatelessWidget {
             )
           ],
         ),
-        child: Row(children: [
-          Image.asset(
-            icon,
-            width: 20,
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: darkRdBrownTextStyle.copyWith(fontWeight: semiBold),
+        child: Container(
+          child: Row(children: [
+            Image.asset(
+              icon,
+              width: 20,
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: darkRdBrownTextStyle.copyWith(fontWeight: semiBold),
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  Text(
+                    description,
+                    style: greyRdTextStyle.copyWith(fontSize: 10),
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 4,
-              ),
-              Text(
-                description,
-                style: greyRdTextStyle.copyWith(fontSize: 10),
-              ),
-            ],
-          )
-        ]),
+            ),
+          ]),
+        ),
       ),
     );
   }

@@ -16,3 +16,25 @@ class UserUpdate extends UserEvent {
   final UserUpdateFormModel user;
   const UserUpdate(this.user, this.userId);
 }
+
+class UserPasswordUpdate extends UserEvent {
+  final String oldPassword;
+  final String newPassword;
+  final String confirmationPassword;
+  const UserPasswordUpdate(
+    this.oldPassword,
+    this.newPassword,
+    this.confirmationPassword,
+  );
+}
+
+class UserForgotPasswordUpdate extends UserEvent {
+  final String phoneNumber;
+  final String newPassword;
+  final String confirmationPassword;
+  const UserForgotPasswordUpdate(
+    this.phoneNumber,
+    this.newPassword,
+    this.confirmationPassword,
+  );
+}

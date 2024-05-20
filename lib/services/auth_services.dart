@@ -56,7 +56,7 @@ class AuthService {
       Map<String, String> values = await storage.readAll();
 
       if (values['email'] == null || values['password'] == null) {
-        throw 'authenticated';
+        throw "Terjadi kesalahan";
       } else {
         final LoginFormModel data = LoginFormModel(
           email: values['email'],

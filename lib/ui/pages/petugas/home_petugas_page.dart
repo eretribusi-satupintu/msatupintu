@@ -51,7 +51,7 @@ class HomePetugasPage extends StatelessWidget {
                   BlocBuilder<SubwilayahBloc, SubwilayahState>(
                     builder: (context, state) {
                       if (state is SubwilayahLoading) {
-                        return LoadingInfo();
+                        return const LoadingInfo();
                       }
                       if (state is SubwilayahFailed) {
                         return Text(

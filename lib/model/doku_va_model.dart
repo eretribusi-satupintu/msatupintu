@@ -8,6 +8,7 @@ class DokuVaModel {
   final String? expiredDate;
   final String? howToPayPage;
   final String? howToPayApi;
+  final String? fcmToken;
 
   DokuVaModel({
     this.id,
@@ -19,6 +20,7 @@ class DokuVaModel {
     this.howToPayApi,
     this.createdDate,
     this.expiredDate,
+    this.fcmToken,
   });
 
   factory DokuVaModel.fromJson(Map<String, dynamic> json) => DokuVaModel(
@@ -31,6 +33,7 @@ class DokuVaModel {
         howToPayApi: json['how_to_pay_api'],
         createdDate: json['created_date'],
         expiredDate: json['expired_date'],
+        fcmToken: json['fcm_token'],
       );
 
   // DokuVaModel copyWith() => DokuVaModel(

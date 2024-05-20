@@ -557,7 +557,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                                                                   amount: double.parse(state.data.price.toString()),
                                                                                   expiredTime: 60,
                                                                                   reusableStatus: false,
-                                                                                  info1: 'Satu Pintu Retribusi',
+                                                                                  info1: '',
                                                                                   name: state.data.tagihanName,
                                                                                   email: state.data.email,
                                                                                 ),

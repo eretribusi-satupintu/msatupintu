@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "877717055442",
+    "project_id": "satupintu-otp",
+    "storage_bucket": "satupintu-otp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:877717055442:android:d7224829dd9b2a9c314a0b",
+        "android_client_info": {
+          "package_name": "com.example.satupintu_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjGcvZ8j5IdJbK69xcfxxMiktgfxcbYoY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

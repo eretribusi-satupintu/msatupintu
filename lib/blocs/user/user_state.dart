@@ -27,6 +27,8 @@ final class UserUpdateSuccess extends UserState {
   List<Object> get props => [data];
 }
 
+final class UserUpdatePasswordSuccess extends UserState {}
+
 final class UserFailed extends UserState {
   final String e;
   const UserFailed(this.e);

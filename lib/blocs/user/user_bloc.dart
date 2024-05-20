@@ -38,6 +38,29 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           emit(UserFailed(e.toString()));
         }
       }
+      if (event is UserPasswordUpdate) {
+        try {
+          emit(UserLoading());
+          await UserServices().updatePassword(
+              event.oldPassword, event.newPassword, event.confirmationPassword);
+
+          emit(UserUpdatePasswordSuccess());
+        } catch (e) {
+          emit(UserFailed(e.toString()));
+        }
+      }
+
+      if (event is UserForgotPasswordUpdate) {
+        try {
+          emit(UserLoading());
+          await UserServices().updateForgotPassword(
+              event.phoneNumber, event.newPassword, event.confirmationPassword);
+
+          emit(UserUpdatePasswordSuccess());
+        } catch (e) {
+          emit(UserFailed(e.toString()));
+        }
+      }
     });
 
     // on<UserCheckRequested>((event, emit) async {

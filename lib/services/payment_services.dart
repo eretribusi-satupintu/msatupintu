@@ -6,6 +6,7 @@ import 'package:satupintu_app/model/payment_qris_model.dart';
 import 'package:satupintu_app/model/payment_va_model.dart';
 import 'package:satupintu_app/services/auth_services.dart';
 import 'package:http/http.dart' as http;
+import 'package:satupintu_app/services/firebase_notification_services.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/values.dart';
 
@@ -13,6 +14,9 @@ class PaymentServices {
   Future<DokuVaModel> getVaPayment(int tagihanId, PaymentVaModel data) async {
     try {
       final token = await AuthService().getToken();
+      final notificationToken =
+          await FirebaseNotificationServices().initNotification();
+
       final body = jsonEncode(
         {
           "tagihan_id": tagihanId,
@@ -27,13 +31,13 @@ class PaymentServices {
             "virtual_account_info": {
               "expired_time": data.expiredTime,
               "reusable_status": data.reusableStatus,
-              "info1": data.info1.toString()
             },
             "customer": {
               "name": data.name.toString(),
               "email": data.email.toString()
-            }
-          }
+            },
+          },
+          "fcm_token": notificationToken
         },
       );
 

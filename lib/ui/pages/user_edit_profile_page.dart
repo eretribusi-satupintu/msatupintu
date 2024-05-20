@@ -73,9 +73,6 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
   @override
   void initState() {
     super.initState();
-    // emailController.text = widget.user.email!;
-    // addressController.text = widget.user.address!;
-    // noteleponController.text = widget.user.phoneNumber!;
   }
 
   @override
