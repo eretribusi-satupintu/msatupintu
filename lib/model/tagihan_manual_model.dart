@@ -5,6 +5,8 @@ class TagihanManualModel {
   final String? petugas;
   final String? subwilayah;
   final int? price;
+  final String? paymentMethod;
+  final String? paymentImage;
   final String? status;
   final String? paidAt;
   final String? createdAt;
@@ -16,6 +18,8 @@ class TagihanManualModel {
       this.petugas,
       this.subwilayah,
       this.price,
+      this.paymentMethod,
+      this.paymentImage,
       this.status,
       this.paidAt,
       this.createdAt});
@@ -28,6 +32,8 @@ class TagihanManualModel {
         petugas: json['petugas']['users']['name'],
         subwilayah: json['subwilayah']['nama'],
         price: json['total_harga'],
+        paymentMethod: json['metode_pembayaran'],
+        paymentImage: json['bukti_bayar'],
         status: json['status'],
         paidAt: json['paid_at'],
         createdAt: json['created_at'],

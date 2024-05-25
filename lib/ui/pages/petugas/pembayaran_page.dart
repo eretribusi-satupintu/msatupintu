@@ -67,9 +67,6 @@ class _PembayaranPetugasPageState extends State<PembayaranPetugasPage>
                       Tab(
                         text: 'Menunggu',
                       ),
-                      // Tab(
-                      //   text: 'Batal',
-                      // )
                     ],
                   ),
                 ),

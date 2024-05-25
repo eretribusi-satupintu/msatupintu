@@ -1,15 +1,22 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/services.dart';
+import 'package:satupintu_app/blocs/tagihan_manual/tagihan_manual_bloc.dart';
 import 'package:satupintu_app/model/tagihan_manual_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/ui/widget/buttons.dart';
+import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 import 'package:ticket_widget/ticket_widget.dart';
 import 'package:bluetooth_enable_fork/bluetooth_enable_fork.dart';
 
@@ -25,6 +32,8 @@ class TagihanManualDetailPage extends StatefulWidget {
 class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
   bool isSwitch = false;
   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+  XFile? image;
+  String paymentImage = "";
 
   bool _connected = false;
   BluetoothDevice? _device;
@@ -40,10 +49,40 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
     }
   }
 
+  Future getImage(String media) async {
+    final ImagePicker picker = ImagePicker();
+
+    switch (media) {
+      case 'galery':
+        final XFile? imagePicker =
+            await picker.pickImage(source: ImageSource.gallery);
+        setImage(imagePicker!);
+
+        break;
+      case 'camera':
+        final XFile? imagePicker = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 50,
+          maxWidth: 300,
+          maxHeight: 500,
+        );
+        setImage(imagePicker!);
+      default:
+        return;
+    }
+  }
+
+  void setImage(XFile file) {
+    setState(() {
+      Navigator.pop(context, 'refresh');
+      image = file;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-
+    paymentImage = widget.tagihanModel.paymentImage ?? "";
     WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
   }
 
@@ -121,9 +160,16 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                           children: [
                             Row(
                               children: [
-                                Image.asset(
-                                  'assets/img_logo_with_background.png',
-                                  width: 80,
+                                // Image.asset(
+                                //   'assets/img_logo_with_background.png',
+                                //   width: 80,
+                                // ),
+                                Text(
+                                  widget.tagihanModel.paymentMethod!,
+                                  style: mainRdTextStyle.copyWith(
+                                    fontWeight: bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                                 const Spacer(),
                                 Column(
@@ -248,332 +294,613 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
               ),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 18),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            decoration: BoxDecoration(
-                color: whiteColor, borderRadius: BorderRadius.circular(10)),
-            child: Column(
-              children: [
-                isSwitch == true
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                            Row(
+          widget.tagihanModel.paymentMethod == "QRIS"
+              ? Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 18),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: whiteColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: paymentImage != ""
+                      ? GestureDetector(
+                          onTap: () {
+                            paymentImageDialog(context, paymentImage);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  tips,
-                                  style: darkRdBrownTextStyle.copyWith(
-                                      fontSize: 10),
+                                Icon(
+                                  Icons.image,
+                                  color: mainColor,
                                 ),
-                                const Spacer(),
-                                SizedBox(
-                                  child: StreamBuilder<bool>(
-                                    stream: bluetoothPrint.isScanning,
-                                    initialData: false,
-                                    builder: (c, snapshot) {
-                                      if (snapshot.data == true) {
-                                        return TextButton(
-                                          style: ButtonStyle(
-                                              padding:
-                                                  const MaterialStatePropertyAll(
-                                                      EdgeInsets.zero),
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll(
-                                                      redColor)),
-                                          onPressed: () =>
-                                              bluetoothPrint.stopScan(),
-                                          child: Icon(
-                                            Icons.stop,
-                                            color: whiteColor,
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  'Tampilkan bukti bayar',
+                                  style: greyRdTextStyle,
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            mediaChooseDialog(context);
+                          },
+                          child: Column(
+                            children: [
+                              Text(
+                                'Upload bukti bayar',
+                                style: darkRdBrownTextStyle.copyWith(
+                                  fontWeight: bold,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 30),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 2,
+                                      color: mainColor.withAlpha(90),
+                                    ),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10))),
+                                child: image == null
+                                    ? Center(
+                                        child: Column(
+                                        children: [
+                                          Image.asset(
+                                            'assets/ic_image_upload.png',
+                                            width: 70,
+                                          ),
+                                          Text(
+                                            'Pilih File',
+                                            style: mainRdTextStyle,
+                                          )
+                                        ],
+                                      ))
+                                    : Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.file(
+                                            File(image!.path),
+                                            height: 450,
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 14, vertical: 6),
+                                            decoration: BoxDecoration(
+                                                color: mainColor.withAlpha(50),
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            child: Text(
+                                              'Ketuk untuk mengganti file',
+                                              style: mainRdTextStyle.copyWith(
+                                                  fontWeight: bold),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              BlocProvider(
+                                create: (context) => TagihanManualBloc(),
+                                child: Center(
+                                  child: BlocConsumer<TagihanManualBloc,
+                                      TagihanManualState>(
+                                    listener: (context, state) {
+                                      if (state
+                                          is TagihanManualUploadImageSuccess) {
+                                        print(state.image);
+                                        setState(() {
+                                          paymentImage = state.image;
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: CustomSnackbar(
+                                              message:
+                                                  "Berhasil menggunggah bukti bayar",
+                                              status: 'success',
+                                            ),
+                                            behavior: SnackBarBehavior.fixed,
+                                            backgroundColor: Colors.transparent,
+                                            elevation: 0,
                                           ),
                                         );
-                                      } else {
-                                        return TextButton(
-                                            style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll(
-                                                      mainColor.withAlpha(30)),
-                                              padding:
-                                                  const MaterialStatePropertyAll(
-                                                EdgeInsets.symmetric(
-                                                    horizontal: 4, vertical: 0),
-                                              ),
-                                            ),
-                                            onPressed: () =>
-                                                bluetoothPrint.startScan(
-                                                    timeout: const Duration(
-                                                        seconds: 4)),
-                                            child: Icon(
-                                              Icons.search,
-                                              color: mainColor,
-                                            ));
                                       }
+
+                                      if (state is TagihanManualFailed) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: CustomSnackbar(
+                                              message: state.e.toString(),
+                                              status: 'failed',
+                                            ),
+                                            behavior: SnackBarBehavior.fixed,
+                                            backgroundColor: Colors.transparent,
+                                            elevation: 0,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    builder: (context, state) {
+                                      if (state is TagihanManualLoading) {
+                                        return LoadingInfo();
+                                      }
+                                      return CustomFilledButton(
+                                          title: "Upload bukti bayar",
+                                          onPressed: () {
+                                            context
+                                                .read<TagihanManualBloc>()
+                                                .add(TagihanManualImagePost(
+                                                  widget.tagihanModel.id!,
+                                                  base64Encode(
+                                                    File(image!.path)
+                                                        .readAsBytesSync(),
+                                                  ),
+                                                ));
+                                          });
                                     },
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  'Perangkat yang tersedia',
-                                  style: greyRdTextStyle.copyWith(fontSize: 12),
-                                ),
-                                const Spacer(),
-                                LoadingAnimationWidget.staggeredDotsWave(
-                                    color: mainColor, size: 14)
-                              ],
-                            ),
-                            SizedBox(
-                              height: 150,
-                              child: SingleChildScrollView(
-                                child: StreamBuilder<List<BluetoothDevice>>(
-                                  stream: bluetoothPrint.scanResults,
-                                  initialData: [],
-                                  builder: (c, snapshot) => Column(
-                                    children: snapshot.data!
-                                        .map((d) => ListTile(
-                                              contentPadding: EdgeInsets.zero,
-                                              title: Text(
-                                                d.name ?? '',
-                                                style: darkRdBrownTextStyle
-                                                    .copyWith(fontSize: 12),
-                                              ),
-                                              subtitle: Text(d.address ?? '',
-                                                  style: darkRdBrownTextStyle
-                                                      .copyWith(fontSize: 10)),
-                                              onTap: () async {
-                                                setState(() {
-                                                  _device = d;
-                                                });
-                                              },
-                                              trailing: _device != null &&
-                                                      _device!.address ==
-                                                          d.address
-                                                  ? const Icon(
-                                                      Icons.check,
-                                                      color: Colors.green,
-                                                    )
-                                                  : null,
-                                            ))
-                                        .toList(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                OutlinedButton(
-                                  child: Text('connect'),
-                                  onPressed: _connected
-                                      ? null
-                                      : () async {
-                                          if (_device != null &&
-                                              _device!.address != null) {
-                                            setState(() {
-                                              tips = 'connecting...';
-                                            });
-                                            await bluetoothPrint
-                                                .connect(_device!);
-                                          } else {
-                                            setState(() {
-                                              tips = 'please select device';
-                                            });
-                                            print('please select device');
-                                          }
-                                        },
-                                ),
-                                const SizedBox(width: 10.0),
-                                OutlinedButton(
-                                  child: Text('disconnect'),
-                                  onPressed: _connected
-                                      ? () async {
-                                          setState(() {
-                                            tips = 'disconnecting...';
-                                          });
-                                          await bluetoothPrint.disconnect();
-                                        }
-                                      : null,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            DottedLine(
-                              dashColor: mainColor,
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ])
-                    : const SizedBox(),
-                Row(
-                  children: [
-                    Text(
-                      'Bluetooth',
-                      style: darkRdBrownTextStyle.copyWith(fontWeight: bold),
-                    ),
-                    const Spacer(),
-                    isSwitch == true
-                        ? Row(
-                            children: [
-                              Icon(
-                                Icons.check_circle_outline_outlined,
-                                color: greenColor,
-                                size: 15,
-                              ),
-                              const SizedBox(
-                                width: 2,
-                              ),
-                              Text(
-                                'Bluetooth aktif',
-                                style: darkRdBrownTextStyle.copyWith(
-                                    fontSize: 10, fontWeight: bold),
                               )
                             ],
-                          )
-                        : const SizedBox(),
-                    Switch(
-                      focusColor: mainColor,
-                      activeTrackColor: mainColor,
-                      inactiveThumbColor: mainColor,
-                      inactiveTrackColor: mainColor.withAlpha(40),
-                      trackOutlineColor: MaterialStatePropertyAll(whiteColor),
-                      value: isSwitch,
-                      onChanged: (value) {
-                        setState(() {
-                          isSwitch = value;
-                        });
-                        if (value = true) {
-                          enableBT();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                OutlinedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(mainColor),
+                          ),
+                        ),
+                )
+              : Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 18),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  decoration: BoxDecoration(
+                      color: whiteColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    children: [
+                      isSwitch == true
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        tips,
+                                        style: darkRdBrownTextStyle.copyWith(
+                                            fontSize: 10),
+                                      ),
+                                      const Spacer(),
+                                      SizedBox(
+                                        child: StreamBuilder<bool>(
+                                          stream: bluetoothPrint.isScanning,
+                                          initialData: false,
+                                          builder: (c, snapshot) {
+                                            if (snapshot.data == true) {
+                                              return TextButton(
+                                                style: ButtonStyle(
+                                                    padding:
+                                                        const MaterialStatePropertyAll(
+                                                            EdgeInsets.zero),
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll(
+                                                            redColor)),
+                                                onPressed: () =>
+                                                    bluetoothPrint.stopScan(),
+                                                child: Icon(
+                                                  Icons.stop,
+                                                  color: whiteColor,
+                                                ),
+                                              );
+                                            } else {
+                                              return TextButton(
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll(
+                                                            mainColor
+                                                                .withAlpha(30)),
+                                                    padding:
+                                                        const MaterialStatePropertyAll(
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 4,
+                                                          vertical: 0),
+                                                    ),
+                                                  ),
+                                                  onPressed: () =>
+                                                      bluetoothPrint.startScan(
+                                                          timeout:
+                                                              const Duration(
+                                                                  seconds: 4)),
+                                                  child: Icon(
+                                                    Icons.search,
+                                                    color: mainColor,
+                                                  ));
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Perangkat yang tersedia',
+                                        style: greyRdTextStyle.copyWith(
+                                            fontSize: 12),
+                                      ),
+                                      const Spacer(),
+                                      LoadingAnimationWidget.staggeredDotsWave(
+                                          color: mainColor, size: 14)
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 150,
+                                    child: SingleChildScrollView(
+                                      child:
+                                          StreamBuilder<List<BluetoothDevice>>(
+                                        stream: bluetoothPrint.scanResults,
+                                        initialData: [],
+                                        builder: (c, snapshot) => Column(
+                                          children: snapshot.data!
+                                              .map((d) => ListTile(
+                                                    contentPadding:
+                                                        EdgeInsets.zero,
+                                                    title: Text(
+                                                      d.name ?? '',
+                                                      style:
+                                                          darkRdBrownTextStyle
+                                                              .copyWith(
+                                                                  fontSize: 12),
+                                                    ),
+                                                    subtitle: Text(
+                                                        d.address ?? '',
+                                                        style:
+                                                            darkRdBrownTextStyle
+                                                                .copyWith(
+                                                                    fontSize:
+                                                                        10)),
+                                                    onTap: () async {
+                                                      setState(() {
+                                                        _device = d;
+                                                      });
+                                                    },
+                                                    trailing: _device != null &&
+                                                            _device!.address ==
+                                                                d.address
+                                                        ? const Icon(
+                                                            Icons.check,
+                                                            color: Colors.green,
+                                                          )
+                                                        : null,
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      OutlinedButton(
+                                        child: Text('connect'),
+                                        onPressed: _connected
+                                            ? null
+                                            : () async {
+                                                if (_device != null &&
+                                                    _device!.address != null) {
+                                                  setState(() {
+                                                    tips = 'connecting...';
+                                                  });
+                                                  await bluetoothPrint
+                                                      .connect(_device!);
+                                                } else {
+                                                  setState(() {
+                                                    tips =
+                                                        'please select device';
+                                                  });
+                                                  print('please select device');
+                                                }
+                                              },
+                                      ),
+                                      const SizedBox(width: 10.0),
+                                      OutlinedButton(
+                                        child: Text('disconnect'),
+                                        onPressed: _connected
+                                            ? () async {
+                                                setState(() {
+                                                  tips = 'disconnecting...';
+                                                });
+                                                await bluetoothPrint
+                                                    .disconnect();
+                                              }
+                                            : null,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  DottedLine(
+                                    dashColor: mainColor,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ])
+                          : const SizedBox(),
+                      Row(
+                        children: [
+                          Text(
+                            'Pengaturan\nBluetooth',
+                            style:
+                                darkRdBrownTextStyle.copyWith(fontWeight: bold),
+                          ),
+                          const Spacer(),
+                          isSwitch == true
+                              ? Row(
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline_outlined,
+                                      color: greenColor,
+                                      size: 15,
+                                    ),
+                                    const SizedBox(
+                                      width: 2,
+                                    ),
+                                    Text(
+                                      'Bluetooth aktif',
+                                      style: darkRdBrownTextStyle.copyWith(
+                                          fontSize: 10, fontWeight: bold),
+                                    )
+                                  ],
+                                )
+                              : const SizedBox(),
+                          Switch(
+                            focusColor: mainColor,
+                            activeTrackColor: mainColor,
+                            inactiveThumbColor: mainColor,
+                            inactiveTrackColor: mainColor.withAlpha(40),
+                            trackOutlineColor:
+                                MaterialStatePropertyAll(whiteColor),
+                            value: isSwitch,
+                            onChanged: (value) {
+                              setState(() {
+                                isSwitch = value;
+                              });
+                              if (value = true) {
+                                enableBT();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      OutlinedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(mainColor),
+                        ),
+                        child: Text(
+                          'Cetak Bukti Bayar',
+                          style: whiteRdTextStyle.copyWith(fontWeight: bold),
+                        ),
+                        onPressed: _connected
+                            ? () async {
+                                Map<String, dynamic> config = Map();
+                                config['width'] = 40;
+                                config['height'] = 70;
+                                config['gap'] = 2;
+
+                                List<LineText> list = [];
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: '-----------------------------',
+                                    weight: 5,
+                                    align: LineText.ALIGN_CENTER,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content:
+                                        '${widget.tagihanModel.itemRetribusi} ${widget.tagihanModel.detailTagihan}',
+                                    weight: 5,
+                                    align: LineText.ALIGN_CENTER,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: '-----------------------------',
+                                    weight: 8,
+                                    align: LineText.ALIGN_CENTER,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: stringToDateTime(
+                                        widget.tagihanModel.createdAt!,
+                                        'EEEE, dd MMMM  yyyy',
+                                        true),
+                                    weight: 1,
+                                    size: 4,
+                                    align: LineText.ALIGN_CENTER,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: '-----------------------------',
+                                    weight: 5,
+                                    align: LineText.ALIGN_CENTER,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: 'Petugas :',
+                                    align: LineText.ALIGN_LEFT,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: widget.tagihanModel.petugas,
+                                    align: LineText.ALIGN_LEFT,
+                                    linefeed: 1));
+
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: 'Wilayah :',
+                                    align: LineText.ALIGN_LEFT,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: widget.tagihanModel.subwilayah,
+                                    align: LineText.ALIGN_LEFT,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: '-----------------------------',
+                                    weight: 5,
+                                    align: LineText.ALIGN_CENTER,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content:
+                                        'Total: ${formatCurrency(widget.tagihanModel.price!)}',
+                                    weight: 4, // Bold
+                                    align: LineText.ALIGN_RIGHT,
+                                    linefeed: 1));
+
+                                list.add(LineText(linefeed: 1));
+
+                                await bluetoothPrint.printReceipt(config, list);
+                              }
+                            : null,
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    'print receipt(esc)',
-                    style: whiteRdTextStyle.copyWith(fontWeight: bold),
-                  ),
-                  onPressed: _connected
-                      ? () async {
-                          Map<String, dynamic> config = Map();
-                          config['width'] = 40; // 标签宽度，单位mm
-                          config['height'] = 70; // 标签高度，单位mm
-                          config['gap'] = 2;
-
-                          List<LineText> list = [];
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: '-----------------------------',
-                              weight: 5, // Assuming 'weight: 1' means bold
-                              align: LineText.ALIGN_CENTER,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content:
-                                  '${widget.tagihanModel.itemRetribusi} ${widget.tagihanModel.detailTagihan}',
-                              weight: 5, // Assuming 'weight: 1' means bold
-                              align: LineText.ALIGN_CENTER,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: '-----------------------------',
-                              weight: 8, // Assuming 'weight: 1' means bold
-                              align: LineText.ALIGN_CENTER,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: stringToDateTime(
-                                  widget.tagihanModel.createdAt!,
-                                  'EEEE, dd MMMM  yyyy',
-                                  true), // Replace 'harga' with the actual price
-                              weight: 1,
-                              size: 4, // Bold
-                              align: LineText.ALIGN_CENTER,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: '-----------------------------',
-                              weight: 5, // Assuming 'weight: 1' means bold
-                              align: LineText.ALIGN_CENTER,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: 'Petugas :',
-                              align: LineText.ALIGN_LEFT,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: widget.tagihanModel.petugas,
-                              align: LineText.ALIGN_LEFT,
-                              linefeed: 1));
-
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: 'Wilayah :',
-                              align: LineText.ALIGN_LEFT,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: widget.tagihanModel.subwilayah,
-                              align: LineText.ALIGN_LEFT,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content: '-----------------------------',
-                              weight: 5, // Assuming 'weight: 1' means bold
-                              align: LineText.ALIGN_CENTER,
-                              linefeed: 1));
-                          list.add(LineText(
-                              type: LineText.TYPE_TEXT,
-                              content:
-                                  'Total: ${formatCurrency(widget.tagihanModel.price!)}', // Replace 'harga' with the actual price
-                              weight: 4, // Bold
-                              align: LineText.ALIGN_RIGHT,
-                              linefeed: 1));
-
-                          // List<LineText> list1 = [];
-                          // ByteData data =
-                          //     await rootBundle.load("assets/img_logo.png");
-                          // List<int> imageBytes = data.buffer.asUint8List(
-                          //     data.offsetInBytes, data.lengthInBytes);
-                          // String base64Image = base64Encode(imageBytes);
-                          // list1.add(LineText(
-                          //   type: LineText.TYPE_IMAGE,
-                          //   x: 10,
-                          //   y: 10,
-                          //   content: base64Image,
-                          // ));
-
-                          list.add(LineText(linefeed: 1));
-
-                          await bluetoothPrint.printReceipt(config, list);
-                          // await bluetoothPrint.printReceipt(config, list1);
-                        }
-                      : null,
                 ),
-              ],
-            ),
-          ),
           const SizedBox(
             height: 20,
           )
         ],
       ),
+    );
+  }
+
+  Future<void> mediaChooseDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: whiteColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          title: Text(
+            'Pilih Media',
+            style: mainRdTextStyle.copyWith(fontSize: 14, fontWeight: bold),
+            textAlign: TextAlign.center,
+          ),
+          content: Row(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  await getImage('camera');
+                },
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      width: 2,
+                      color: mainColor.withAlpha(80),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/ic_camera.png',
+                        width: 45,
+                        height: 45,
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        'Kamera',
+                        style: darkRdBrownTextStyle.copyWith(
+                            fontSize: 12, fontWeight: semiBold),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () async {
+                  await getImage('galery');
+                },
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      width: 2,
+                      color: mainColor.withAlpha(80),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/ic_galery.png',
+                        width: 45,
+                        height: 45,
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        'Galery',
+                        style: darkRdBrownTextStyle.copyWith(
+                            fontSize: 12, fontWeight: semiBold),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> paymentImageDialog(BuildContext context, String image) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: whiteColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: SizedBox(
+            child: Image.network(
+              "http://localhost:3000/$image",
+            ),
+          ),
+        );
+      },
     );
   }
 }

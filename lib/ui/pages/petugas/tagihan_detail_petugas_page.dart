@@ -18,10 +18,12 @@ import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class TagihanDetailPetugas extends StatefulWidget {
   final int tagihanId;
+  final bool? isStored;
 
   const TagihanDetailPetugas({
     super.key,
     required this.tagihanId,
+    this.isStored,
   });
 
   @override
@@ -193,7 +195,11 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                     .toString(),
                               ),
                               DateTime.parse(state.data.dueDate!)
-                                      .isBefore(DateTime.now())
+                                          .isBefore(DateTime.now()) &&
+                                      DateTime.parse(state.data.dueDate!)
+                                              .difference(DateTime.now())
+                                              .inDays !=
+                                          0
                                   ? Text(
                                       '( Anda telah melebihi batas akhir pembayaran )',
                                       style: redRdTextStyle.copyWith(
@@ -337,79 +343,47 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                 const SizedBox(
                                   height: 15,
                                 ),
-                                // Container(
-                                //   padding:
-                                //       const EdgeInsets.symmetric(horizontal: 8),
-                                //   margin: const EdgeInsets.symmetric(
-                                //       horizontal: 36),
-                                //   decoration: BoxDecoration(
-                                //       borderRadius: BorderRadius.circular(10),
-                                //       border: Border.all(
-                                //           width: 2, color: mainColor)),
-                                //   child: TextButton(
-                                //     child: Row(
-                                //       mainAxisAlignment:
-                                //           MainAxisAlignment.center,
-                                //       children: [
-                                //         Icon(
-                                //           Icons.share,
-                                //           size: 20,
-                                //           color: mainColor,
-                                //         ),
-                                //         const SizedBox(
-                                //           width: 8,
-                                //         ),
-                                //         Text(
-                                //           'Bagikan Bukti Pembayaran',
-                                //           style: mainRdTextStyle.copyWith(
-                                //               fontWeight: medium),
-                                //         )
-                                //       ],
-                                //     ),
-                                //     onPressed: () {},
-                                //   ),
-                                // ),
-                                // const SizedBox(
-                                //   height: 10,
-                                // ),
-                                Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 36),
-                                  decoration: BoxDecoration(
-                                    color: redColor.withAlpha(40),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: TextButton(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.cancel_outlined,
-                                          size: 20,
-                                          color: redColor,
+                                widget.isStored != true
+                                    ? Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 36),
+                                        decoration: BoxDecoration(
+                                          color: redColor.withAlpha(40),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
-                                        const SizedBox(
-                                          width: 8,
+                                        child: TextButton(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.cancel_outlined,
+                                                size: 20,
+                                                color: redColor,
+                                              ),
+                                              const SizedBox(
+                                                width: 8,
+                                              ),
+                                              Text(
+                                                'Batalkan Pembayaran',
+                                                style: redRdTextStyle.copyWith(
+                                                    fontWeight: medium),
+                                              )
+                                            ],
+                                          ),
+                                          onPressed: () =>
+                                              _dialogBuilderCancelPayment(
+                                                  context,
+                                                  state.data.id!,
+                                                  state
+                                                      .data.wajibRetribusiName!,
+                                                  state.data.price!),
                                         ),
-                                        Text(
-                                          'Batalkan Pembayaran',
-                                          style: redRdTextStyle.copyWith(
-                                              fontWeight: medium),
-                                        )
-                                      ],
-                                    ),
-                                    onPressed: () =>
-                                        _dialogBuilderCancelPayment(
-                                            context,
-                                            state.data.id!,
-                                            state.data.wajibRetribusiName!,
-                                            state.data.price!),
-                                  ),
-                                ),
-
+                                      )
+                                    : const SizedBox(),
                                 Container(
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 18),
@@ -631,9 +605,11 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                       Row(
                                         children: [
                                           Text(
-                                            'Bluetooth',
-                                            style: darkRdBrownTextStyle
-                                                .copyWith(fontWeight: bold),
+                                            'Pengaturan\nbluetooth ',
+                                            style:
+                                                darkRdBrownTextStyle.copyWith(
+                                                    fontWeight: bold,
+                                                    fontSize: 12),
                                           ),
                                           const Spacer(),
                                           isSwitch == true
@@ -696,10 +672,8 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                             ? () async {
                                                 Map<String, dynamic> config =
                                                     Map();
-                                                config['width'] =
-                                                    40; // 标签宽度，单位mm
-                                                config['height'] =
-                                                    70; // 标签高度，单位mm
+                                                config['width'] = 40;
+                                                config['height'] = 70;
                                                 config['gap'] = 2;
 
                                                 List<LineText> list = [];
@@ -707,8 +681,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                     type: LineText.TYPE_TEXT,
                                                     content:
                                                         '-----------------------------',
-                                                    weight:
-                                                        5, // Assuming 'weight: 1' means bold
+                                                    weight: 5,
                                                     align:
                                                         LineText.ALIGN_CENTER,
                                                     linefeed: 1));
@@ -716,8 +689,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                     type: LineText.TYPE_TEXT,
                                                     content:
                                                         'Kedinasan ${state.data.kedinasanName} ',
-                                                    weight:
-                                                        5, // Assuming 'weight: 1' means bold
+                                                    weight: 5,
                                                     align:
                                                         LineText.ALIGN_CENTER,
                                                     linefeed: 1));
@@ -725,8 +697,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                     type: LineText.TYPE_TEXT,
                                                     content:
                                                         '-----------------------------',
-                                                    weight:
-                                                        8, // Assuming 'weight: 1' means bold
+                                                    weight: 8,
                                                     align:
                                                         LineText.ALIGN_CENTER,
                                                     linefeed: 1));
@@ -734,8 +705,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                     type: LineText.TYPE_TEXT,
                                                     content:
                                                         'Retribusi ${state.data.retribusiName} ',
-                                                    weight:
-                                                        5, // Assuming 'weight: 1' means bold
+                                                    weight: 5,
                                                     align:
                                                         LineText.ALIGN_CENTER,
                                                     linefeed: 1));
@@ -751,8 +721,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                     type: LineText.TYPE_TEXT,
                                                     content:
                                                         '-----------------------------',
-                                                    weight:
-                                                        8, // Assuming 'weight: 1' means bold
+                                                    weight: 8,
                                                     align:
                                                         LineText.ALIGN_CENTER,
                                                     linefeed: 1));
@@ -785,15 +754,15 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                 list.add(LineText(
                                                     type: LineText.TYPE_TEXT,
                                                     content:
-                                                        'Batas Pembayaran :',
+                                                        'Waktu Pembayaran :',
                                                     align: LineText.ALIGN_LEFT,
                                                     linefeed: 1));
                                                 list.add(LineText(
                                                     type: LineText.TYPE_TEXT,
                                                     content: stringToDateTime(
                                                         state.data.paymentTime!,
-                                                        'EEEE dd mm yyyy hh:mm WIB',
-                                                        false),
+                                                        'EEEE dd MMMM yyyy HH:mm WIB',
+                                                        true),
                                                     align: LineText.ALIGN_LEFT,
                                                     linefeed: 1));
 
@@ -801,15 +770,14 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                     type: LineText.TYPE_TEXT,
                                                     content:
                                                         '-----------------------------',
-                                                    weight:
-                                                        5, // Assuming 'weight: 1' means bold
+                                                    weight: 5,
                                                     align:
                                                         LineText.ALIGN_CENTER,
                                                     linefeed: 1));
                                                 list.add(LineText(
                                                     type: LineText.TYPE_TEXT,
                                                     content:
-                                                        'Total: ${formatCurrency(state.data.price!)}', // Replace 'harga' with the actual price
+                                                        'Total: ${formatCurrency(state.data.price!)}',
                                                     weight: 4, // Bold
                                                     align: LineText.ALIGN_RIGHT,
                                                     linefeed: 1));

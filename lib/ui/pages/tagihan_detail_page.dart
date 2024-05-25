@@ -27,8 +27,11 @@ import 'package:satupintu_app/ui/widget/laoding_info.dart';
 class TagihanDetailPage extends StatefulWidget {
   final int tagihanId;
   final String status;
-  const TagihanDetailPage(
-      {super.key, required this.tagihanId, required this.status});
+  const TagihanDetailPage({
+    super.key,
+    required this.tagihanId,
+    required this.status,
+  });
 
   @override
   State<TagihanDetailPage> createState() => _TagihanDetailPageState();
@@ -39,12 +42,12 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
   bool isBankSelected = false;
   String erm = "";
   List<String> bankList = ['bri', 'bca', 'mandiri'];
-  late String isPaid;
+  // late String isPaid;
 
   @override
   void initState() {
     super.initState();
-    isPaid = widget.status;
+    // isPaid = widget.status;
   }
 
   @override
@@ -160,7 +163,11 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                     .toString(),
                               ),
                               DateTime.parse(state.data.dueDate!)
-                                      .isBefore(DateTime.now())
+                                          .isBefore(DateTime.now()) &&
+                                      DateTime.parse(state.data.dueDate!)
+                                              .difference(DateTime.now())
+                                              .inDays !=
+                                          0
                                   ? Text(
                                       '( Anda telah melebihi batas akhir pembayaran )',
                                       style: redRdTextStyle.copyWith(
@@ -178,7 +185,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                               const SizedBox(
                                 height: 15,
                               ),
-                              isPaid == 'VERIFIED'
+                              state == 'VERIFIED'
                                   ? Column(
                                       children: [
                                         const SizedBox(
@@ -229,7 +236,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                             ],
                           ),
                         ),
-                        isPaid == 'VERIFIED'
+                        widget.status == 'VERIFIED'
                             ? Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -245,7 +252,7 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                   color: whiteColor,
                                 ),
                               )
-                            : isPaid == 'REQUEST'
+                            : widget.status == 'REQUEST'
                                 ? Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
@@ -289,10 +296,13 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                             Radius.circular(10),
                           ),
                         ),
-                        child: isPaid == 'VERIFIED'
-                            ? const Center(
-                                child:
-                                    Text('Pembayaran telah berhasil dilakukan'),
+                        child: widget.status == 'VERIFIED'
+                            ? Center(
+                                child: Text(
+                                  'Pembayaran telah berhasil dilakukan',
+                                  style: mainRdTextStyle.copyWith(
+                                      fontWeight: semiBold),
+                                ),
                               )
                             : Column(
                                 children: [
@@ -706,19 +716,20 @@ class _TagihanDetailPageState extends State<TagihanDetailPage> {
                                                                     state.data
                                                                         .id!,
                                                                     PaymentQrisModel(
-                                                                        requestId: state
-                                                                            .data
-                                                                            .requestId!,
-                                                                        amount: state
-                                                                            .data
-                                                                            .price,
-                                                                        invoiceNumber: state
-                                                                            .data
-                                                                            .invoiceNumber,
-                                                                        paymentDueDate:
-                                                                            60,
-                                                                        paymentMethodTypes:
-                                                                            'EMONEY_DANA'),
+                                                                      requestId: state
+                                                                          .data
+                                                                          .requestId!,
+                                                                      amount: state
+                                                                          .data
+                                                                          .price,
+                                                                      invoiceNumber: state
+                                                                          .data
+                                                                          .invoiceNumber,
+                                                                      paymentDueDate:
+                                                                          60,
+                                                                      paymentMethodTypes:
+                                                                          "QRIS",
+                                                                    ),
                                                                   ),
                                                                 );
                                                           },

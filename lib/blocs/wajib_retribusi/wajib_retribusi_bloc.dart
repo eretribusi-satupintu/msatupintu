@@ -43,7 +43,6 @@ class WajibRetribusiBloc
       if (event is WajibRetribusiGetDetailFromScan) {
         try {
           emit(WajibRetribusiLoading());
-          final petugasId = await AuthService().getRoleId();
           final wajibRetribusi =
               await WajibRetribusiService().getWajibRetribusi();
 

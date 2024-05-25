@@ -34,3 +34,11 @@ final class TagihanManualSuccess extends TagihanManualState {
   @override
   List<Object> get props => [data];
 }
+
+final class TagihanManualUploadImageSuccess extends TagihanManualState {
+  final String image;
+  const TagihanManualUploadImageSuccess(this.image);
+
+  @override
+  List<Object> get props => [image];
+}

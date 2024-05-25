@@ -21,6 +21,7 @@ class PetugasScanQrCodePage extends StatefulWidget {
 class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
   Barcode? result;
   QRViewController? controller;
+  late String errorMessage;
 
   @override
   void reassemble() {
@@ -30,6 +31,12 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
     } else if (Platform.isIOS) {
       controller!.resumeCamera();
     }
+  }
+
+  @override
+  void initState() {
+    errorMessage = '';
+    super.initState();
   }
 
   @override
@@ -64,18 +71,9 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
         child: BlocConsumer<WajibRetribusiBloc, WajibRetribusiState>(
           listener: (context, state) {
             if (state is WajibRetribusiFailed) {
-              Navigator.pushNamed(context, '/home');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: CustomSnackbar(
-                    message: state.e.toString(),
-                    status: 'failed',
-                  ),
-                  behavior: SnackBarBehavior.fixed,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                ),
-              );
+              setState(() {
+                errorMessage = "Kode tidak dikenali atau tidak terdaftar";
+              });
             }
 
             if (state is WajibRetribusiPresent) {
@@ -112,9 +110,9 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                         setState(() {
                           result = scanData;
                         });
-                        // print(result!.code!);
+                        print(result!.code!);
                         List<String> qrText = result!.code!.split('-');
-                        if (qrText[0] == 'tagihan') {
+                        if (qrText[0] == 'detail') {
                           context.read<WajibRetribusiBloc>().add(
                               WajibRetribusiGetDetailTagihanFromScan(
                                   int.parse(qrText[1])));
@@ -123,9 +121,9 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                               .read<WajibRetribusiBloc>()
                               .add(WajibRetribusiGetDetailFromScan(qrText[1]));
                         } else {
-                          context
-                              .read<WajibRetribusiBloc>()
-                              .add(ScanUndefined());
+                          setState(() {
+                            errorMessage = "Tidak dapat mengenali kode";
+                          });
                         }
                       });
                     },
@@ -137,6 +135,17 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
                     ),
                   ),
                 ),
+                errorMessage != ''
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 18),
+                        child: Text(
+                          errorMessage,
+                          style: redRdTextStyle.copyWith(fontWeight: bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : const SizedBox(),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 20, horizontal: 18),

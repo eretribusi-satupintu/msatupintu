@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/user/user_bloc.dart';
-import 'package:satupintu_app/model/user_model.dart';
 import 'package:satupintu_app/model/user_update_form_model.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
@@ -15,7 +14,6 @@ import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/inputs.dart';
 
 class UserEditProfilePage extends StatefulWidget {
-  // final UserModel user;
   const UserEditProfilePage({
     super.key,
   });
@@ -29,6 +27,7 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
   final addressController = TextEditingController();
   final noteleponController = TextEditingController();
   XFile? image;
+  String? errorMessage;
 
   bool validate() {
     if (emailController.text == '' ||
@@ -36,8 +35,20 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
         noteleponController.text == '') {
       return false;
     }
+    RegExp nonDigitRegex = RegExp(r'[^0-9]');
+    bool containsNonNumeric = nonDigitRegex.hasMatch(noteleponController.text);
 
-    return true;
+    if (containsNonNumeric) {
+      setState(() {
+        errorMessage = "No telepon tidak valid";
+      });
+      return false;
+    } else {
+      setState(() {
+        errorMessage = "Pastikan semua inputan terisi";
+      });
+      return true;
+    }
   }
 
   Future getImage(String media) async {
@@ -88,11 +99,7 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
           onPressed: () {
             Navigator.of(context).pop('refresh');
           },
-          icon: Icon(
-            Icons.chevron_left_rounded,
-            size: 30,
-            color: mainColor,
-          ),
+          icon: Icon(Icons.chevron_left_rounded, size: 30, color: mainColor),
         ),
       ),
       body: BlocProvider(
@@ -133,97 +140,100 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 30,
-                            ),
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 18),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      mediaChooseDialog(context);
-                                    },
-                                    child: Container(
-                                        width: 90,
-                                        height: 90,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          image: DecorationImage(
-                                              image: image == null
-                                                  ? state.data.photoProfile ==
-                                                          null
-                                                      ? const AssetImage(
-                                                              'assets/img_user_guest.png')
-                                                          as ImageProvider
-                                                      : NetworkImage(
-                                                          'http://localhost:3000/${state.data.photoProfile}')
-                                                  : FileImage(File(image!.path))
-                                                      as ImageProvider,
-                                              fit: BoxFit.cover),
-                                        ),
-                                        child: Align(
-                                          alignment: Alignment.bottomLeft,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: whiteColor,
-                                              border: Border.all(
-                                                  width: 2,
-                                                  color: Colors.transparent),
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                            ),
-                                            child: Icon(
-                                              Icons.edit,
-                                              size: 16,
-                                              color: mainColor,
-                                            ),
-                                          ),
-                                        )),
-                                  ),
-                                  const SizedBox(
-                                    height: 14,
-                                  ),
-                                  Text(
-                                    state.data.name!,
-                                    style: darkRdBrownTextStyle.copyWith(
-                                        fontSize: 16, fontWeight: semiBold),
-                                    textAlign: TextAlign.justify,
-                                  ),
-                                  Text(
-                                    state.data.nik!,
-                                    style: greyRdTextStyle,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 30,
                               ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(),
-                            userInputForm(
-                                'Email', 'Masukkan email', emailController),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            userInputForm(
-                                'Alamat', 'Masukkan Alamat', addressController),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            userInputForm('No Telepon', 'Masukkan No Telepon',
-                                noteleponController)
-                          ],
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 18),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        mediaChooseDialog(context);
+                                      },
+                                      child: Container(
+                                          width: 90,
+                                          height: 90,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            image: DecorationImage(
+                                                image: image == null
+                                                    ? state.data.photoProfile ==
+                                                            null
+                                                        ? const AssetImage(
+                                                                'assets/img_user_guest.png')
+                                                            as ImageProvider
+                                                        : NetworkImage(
+                                                            'http://localhost:3000/${state.data.photoProfile}')
+                                                    : FileImage(
+                                                            File(image!.path))
+                                                        as ImageProvider,
+                                                fit: BoxFit.cover),
+                                          ),
+                                          child: Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: whiteColor,
+                                                border: Border.all(
+                                                    width: 2,
+                                                    color: Colors.transparent),
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                              ),
+                                              child: Icon(
+                                                Icons.edit,
+                                                size: 16,
+                                                color: mainColor,
+                                              ),
+                                            ),
+                                          )),
+                                    ),
+                                    const SizedBox(
+                                      height: 14,
+                                    ),
+                                    Text(
+                                      state.data.name!,
+                                      style: darkRdBrownTextStyle.copyWith(
+                                          fontSize: 16, fontWeight: semiBold),
+                                      textAlign: TextAlign.justify,
+                                    ),
+                                    Text(
+                                      state.data.nik!,
+                                      style: greyRdTextStyle,
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Container(),
+                              userInputForm(
+                                  'Email', 'Masukkan email', emailController),
+                              const SizedBox(
+                                height: 6,
+                              ),
+                              userInputForm('Alamat', 'Masukkan Alamat',
+                                  addressController),
+                              const SizedBox(
+                                height: 6,
+                              ),
+                              userInputForm('No Telepon', 'Masukkan No Telepon',
+                                  noteleponController)
+                            ],
+                          ),
                         ),
                       ),
                       Container(
@@ -252,10 +262,9 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
                                   );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: CustomSnackbar(
-                                    message:
-                                        'Pastikan semua inputan telah terisi',
+                                    message: errorMessage!,
                                     status: 'failed',
                                   ),
                                   behavior: SnackBarBehavior.fixed,

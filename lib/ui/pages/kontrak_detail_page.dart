@@ -356,16 +356,15 @@ class _KontrakDetailPageState extends State<KontrakDetailPage> {
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      'assets/img_invoice.png',
-                      width: 24,
-                    ),
-                    const SizedBox(
-                      width: 11,
-                    ),
-                    Text(
-                      name,
-                      style: blackInTextStyle.copyWith(fontWeight: medium),
+                    Expanded(
+                      flex: 100,
+                      child: Text(
+                        name,
+                        style: blackInTextStyle.copyWith(
+                          fontWeight: bold,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                     const Spacer(),
                     Icon(

@@ -51,11 +51,14 @@ class _PembayaranPageState extends State<PembayaranPage>
                         .map((pembayaran) => GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (contex) => TagihanDetailPage(
-                                            tagihanId: pembayaran.tagihanId!,
-                                            status: 'VERIFIED')));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (contex) => TagihanDetailPage(
+                                      tagihanId: pembayaran.tagihanId!,
+                                      status: 'VERIFIED',
+                                    ),
+                                  ),
+                                );
                               },
                               child: paymentCard(
                                   pembayaran.name!,

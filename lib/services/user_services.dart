@@ -57,7 +57,7 @@ class UserServices {
       const storage = FlutterSecureStorage();
       await storage.write(key: 'email', value: user.email);
 
-      return UserModel.fromJson(jsonDecode(res.body)['data']);
+      return UserModel.fromJson(jsonDecode(res.body)['data']['data']);
     } catch (e) {
       rethrow;
     }

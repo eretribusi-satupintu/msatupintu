@@ -39,11 +39,6 @@ class HomePetugasPage extends StatelessWidget {
                           style: darkRdBrownTextStyle.copyWith(
                               fontSize: 24, fontWeight: bold),
                         ),
-                        Text(
-                          'Retribusi Sampah dan Daerah',
-                          style: greyRdTextStyle.copyWith(
-                              fontSize: 12, fontWeight: bold),
-                        ),
                       ],
                     ),
                   ),
@@ -78,7 +73,7 @@ class HomePetugasPage extends StatelessWidget {
                               children: [
                                 Icon(
                                   Icons.pin_drop_outlined,
-                                  size: 12,
+                                  size: 16,
                                   color: greenColor,
                                 ),
                                 const SizedBox(
@@ -87,7 +82,7 @@ class HomePetugasPage extends StatelessWidget {
                                 Text(
                                   state.data.name!,
                                   style: darkInBrownTextStyle.copyWith(
-                                      fontSize: 10, fontWeight: medium),
+                                      fontSize: 12, fontWeight: medium),
                                 )
                               ],
                             ),

@@ -43,6 +43,17 @@ class TagihanManualBloc extends Bloc<TagihanManualEvent, TagihanManualState> {
           emit(TagihanManualFailed(e.toString()));
         }
       }
+
+      if (event is TagihanManualImagePost) {
+        try {
+          emit(TagihanManualLoading());
+          final tagihanManual = await TagihanManualServices()
+              .postPaymentImage(event.tagihanManualId, event.image);
+          emit(TagihanManualUploadImageSuccess(tagihanManual));
+        } catch (e) {
+          emit(TagihanManualFailed(e.toString()));
+        }
+      }
     });
   }
 }

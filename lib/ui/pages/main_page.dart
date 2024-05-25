@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,12 +60,7 @@ class _MainPageState extends State<MainPage>
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy MMMM dd').format(now);
 
-    return
-        // BlocProvider(
-        //   create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
-        //   child:
-
-        SafeArea(
+    return SafeArea(
       child: BlocListener<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserFailed) {
@@ -108,27 +105,36 @@ class _MainPageState extends State<MainPage>
                           horizontal: 18, vertical: 12),
                       child: Row(
                         children: [
-                          BlocBuilder<UserBloc, UserState>(
-                              builder: (context, state) {
-                            if (state is UserSuccess) {
-                              if (selectedPage != 0) {
-                                print({"role": state.data.role});
-                                return getTitlePage(
-                                    selectedPage, state.data.role!);
-                              } else {
-                                return getHomeProfile(formattedDate,
-                                    state.data.name!, state.data.photoProfile);
+                          BlocProvider(
+                            create: (context) => UserBloc()..add(UserGet()),
+                            child: BlocBuilder<UserBloc, UserState>(
+                                builder: (context, state) {
+                              if (state is UserSuccess) {
+                                if (selectedPage != 0) {
+                                  print({"role": state.data.role});
+                                  return getTitlePage(
+                                      selectedPage, state.data.role!);
+                                } else {
+                                  return getHomeProfile(
+                                      formattedDate,
+                                      state.data.name!,
+                                      state.data.photoProfile);
+                                }
                               }
-                            }
-                            if (state is UserFailed) {
-                              return Text(state.e);
-                            }
-                            return Text(
-                              '-',
-                              style: whiteRdTextStyle.copyWith(
-                                  fontSize: 20, fontWeight: bold),
-                            );
-                          }),
+                              if (state is UserFailed) {
+                                print(state.e);
+                                return Text(
+                                  state.e,
+                                  style: whiteRdTextStyle,
+                                );
+                              }
+                              return Text(
+                                '-',
+                                style: whiteRdTextStyle.copyWith(
+                                    fontSize: 20, fontWeight: bold),
+                              );
+                            }),
+                          ),
                         ],
                       ),
                     )
@@ -439,60 +445,78 @@ class _MainPageState extends State<MainPage>
     String name,
     String? profilePhotoUrl,
   ) {
-    return SizedBox(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: whiteColor,
-              borderRadius: BorderRadius.circular(100),
-              image: DecorationImage(
-                  image: profilePhotoUrl != null
-                      ? NetworkImage(
-                          'http://localhost:3000/$profilePhotoUrl',
-                        )
-                      : const AssetImage(
-                          'assets/img_user_guest.png',
-                        ) as ImageProvider,
-                  fit: BoxFit.cover),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
+    return BlocProvider(
+      create: (context) => UserBloc()..add(UserGet()),
+      child: BlocBuilder<UserBloc, UserState>(
+        builder: (context, state) {
+          if (state is UserLoading) {
+            return Text(
+              "Memuat...",
+              style: whiteRdTextStyle,
+            );
+          }
+
+          if (state is UserSuccess) {
+            return SizedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.sunny,
-                    size: 9,
-                    color: whiteColor,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: whiteColor,
+                      borderRadius: BorderRadius.circular(100),
+                      image: DecorationImage(
+                          image: state.data.photoProfile != null
+                              ? NetworkImage(
+                                  'http://localhost:3000/${state.data.photoProfile}',
+                                )
+                              : const AssetImage(
+                                  'assets/img_user_guest.png',
+                                ) as ImageProvider,
+                          fit: BoxFit.cover),
+                    ),
                   ),
                   const SizedBox(
-                    width: 5,
+                    width: 10,
                   ),
-                  Text(
-                    formattedDate,
-                    style: whiteInTextStyle.copyWith(fontSize: 10),
-                  )
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.sunny,
+                            size: 9,
+                            color: whiteColor,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            formattedDate,
+                            style: whiteInTextStyle.copyWith(fontSize: 10),
+                          )
+                        ],
+                      ),
+                      Text(
+                        'Hai, ${name.split(' ')[0]}',
+                        style: whiteInTextStyle.copyWith(
+                            fontSize: 14, fontWeight: bold),
+                        // maxLines: 1,
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              Text(
-                'Hai, ${name.split(' ')[0]}',
-                style:
-                    whiteInTextStyle.copyWith(fontSize: 14, fontWeight: bold),
-                // maxLines: 1,
-                overflow: TextOverflow.clip,
-              ),
-            ],
-          ),
-        ],
+            );
+          }
+
+          return const Text("-");
+        },
       ),
     );
   }

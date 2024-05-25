@@ -273,13 +273,16 @@ class _RekapitulasiPembayaranPageState
                                           (tagihanKontrak) => GestureDetector(
                                             onTap: () {
                                               Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          TagihanDetailPetugas(
-                                                              tagihanId:
-                                                                  tagihanKontrak
-                                                                      .id!)));
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TagihanDetailPetugas(
+                                                    tagihanId:
+                                                        tagihanKontrak.id!,
+                                                    isStored: true,
+                                                  ),
+                                                ),
+                                              );
                                             },
                                             child: tagihanCard(
                                                 tagihanKontrak

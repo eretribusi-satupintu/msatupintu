@@ -17,8 +17,6 @@ import "package:satupintu_app/ui/pages/petugas/setoran_list_page.dart";
 import "package:satupintu_app/ui/pages/splash_page.dart";
 import "package:satupintu_app/ui/pages/timesout_page.dart";
 import 'package:firebase_core/firebase_core.dart';
-import "package:satupintu_app/ui/widget/buttons.dart";
-import 'firebase_options.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -165,19 +163,4 @@ class _MainAppState extends State<MainApp> {
       ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('Test Notifications'),
-  //     ),
-  //     body: Center(
-  //       child: CustomFilledButton(
-  //         title: 'Show Notification',
-  //         onPressed: showNotification,
-  //       ),
-  //     ),
-  //   );
-  // }
 }

@@ -217,18 +217,29 @@ class _TagihanListPageState extends State<TagihanListPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //  ${DateTime.parse(dueDate).difference(DateTime.now()).inDays}
                   Row(
                     children: [
                       Text(
-                        'Batas pembayaran ',
+                        'Batas pembayaran',
                         style: greyRdTextStyle.copyWith(fontSize: 10),
                       ),
                       DateTime.parse(dueDate).isBefore(DateTime.now())
-                          ? Text(
-                              '( Terlambat )',
-                              style: redRdTextStyle.copyWith(
-                                  fontSize: 10, fontWeight: bold),
-                            )
+                          ? DateTime.parse(dueDate)
+                                      .toLocal()
+                                      .difference(DateTime.now().toLocal())
+                                      .inDays ==
+                                  0
+                              ? Text(
+                                  '( Batas kahir pembayaran )',
+                                  style: orangeRdTextStyle.copyWith(
+                                      fontSize: 10, fontWeight: bold),
+                                )
+                              : Text(
+                                  '( Terlambat )',
+                                  style: redRdTextStyle.copyWith(
+                                      fontSize: 10, fontWeight: bold),
+                                )
                           : const SizedBox()
                     ],
                   ),
@@ -238,8 +249,14 @@ class _TagihanListPageState extends State<TagihanListPage> {
                   Text(
                     stringToDateTime(dueDate, 'EEEE, dd MMMM  yyyy', false),
                     style: DateTime.parse(dueDate).isBefore(DateTime.now())
-                        ? redRdTextStyle.copyWith(
-                            fontSize: 12, fontWeight: medium)
+                        ? DateTime.parse(dueDate)
+                                    .difference(DateTime.now())
+                                    .inDays ==
+                                0
+                            ? orangeRdTextStyle.copyWith(
+                                fontSize: 12, fontWeight: medium)
+                            : redRdTextStyle.copyWith(
+                                fontSize: 12, fontWeight: medium)
                         : mainRdTextStyle.copyWith(
                             fontSize: 12, fontWeight: medium),
                   )

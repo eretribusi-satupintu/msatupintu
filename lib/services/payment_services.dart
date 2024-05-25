@@ -67,7 +67,10 @@ class PaymentServices {
         "order": {"amount": data.amount, "invoice_number": data.invoiceNumber},
         "payment": {
           "payment_due_date": data.paymentDueDate,
-          "payment_method_types": [data.paymentMethodTypes]
+          "payment_method_types": [
+            data.paymentMethodTypes,
+            "EMONEY_OVO",
+          ]
         }
       });
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/item_retribusi/item_retribusi_bloc.dart';
@@ -11,6 +12,7 @@ import 'package:satupintu_app/model/tagihan_manual_form_model.dart';
 import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_manual_detail_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
+import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 
 class TagihanAddPage extends StatefulWidget {
   const TagihanAddPage({super.key});
@@ -24,16 +26,10 @@ class _TagihanAddPageState extends State<TagihanAddPage> {
   int? price;
   final keteranganController = TextEditingController(text: '');
   bool invalidData = false;
+  String? paymentMeyhod;
 
   bool validate() {
-    if (categoryId == null ||
-        price == null ||
-        keteranganController.value.text.length < 8) {
-      print({
-        "kat": categoryId,
-        "har": price,
-        "ket": keteranganController.value.text
-      });
+    if (categoryId == null || price == null || paymentMeyhod == "") {
       invalidData = true;
       return false;
     } else {
@@ -79,14 +75,24 @@ class _TagihanAddPageState extends State<TagihanAddPage> {
           listener: (context, state) {
             if (state is TagihanManualDetailSuccess) {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          TagihanManualDetailPage(tagihanModel: state.data)));
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      TagihanManualDetailPage(tagihanModel: state.data),
+                ),
+              );
             }
 
             if (state is TagihanManualFailed) {
               print(state.e);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: CustomSnackbar(message: state.e, status: "failed"),
+                  behavior: SnackBarBehavior.fixed,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
+              );
             }
           },
           builder: (context, state) {
@@ -270,6 +276,116 @@ class _TagihanAddPageState extends State<TagihanAddPage> {
                                 ],
                               ),
                             ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 18),
+                              child: Text(
+                                'Metode pembayaran',
+                                style: darkRdBrownTextStyle.copyWith(
+                                    fontWeight: semiBold),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 4,
+                            ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 18),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (paymentMeyhod == "cash") {
+                                        setState(() {
+                                          paymentMeyhod = "";
+                                        });
+                                      } else {
+                                        setState(() {
+                                          paymentMeyhod = "cash";
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          border: paymentMeyhod == "cash"
+                                              ? Border.all(
+                                                  color: mainColor, width: 2)
+                                              : Border.all(
+                                                  color: lightGreyColor,
+                                                  width: 1),
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.payments_outlined,
+                                            color: mainColor,
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                            'Bayar Tunai',
+                                            style: darkRdBrownTextStyle
+                                                .copyWith(fontWeight: medium),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (paymentMeyhod == "qris") {
+                                        setState(() {
+                                          paymentMeyhod = "";
+                                        });
+                                      } else {
+                                        setState(() {
+                                          paymentMeyhod = "qris";
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          border: paymentMeyhod == "qris"
+                                              ? Border.all(
+                                                  color: mainColor, width: 2)
+                                              : Border.all(
+                                                  color: lightGreyColor,
+                                                  width: 1),
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.qr_code,
+                                            color: mainColor,
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                            'QRIS Statis',
+                                            style: darkRdBrownTextStyle
+                                                .copyWith(fontWeight: medium),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 4,
+                            ),
                             const SizedBox(
                               height: 20,
                             ),
@@ -332,6 +448,10 @@ class _TagihanAddPageState extends State<TagihanAddPage> {
                                             style: redRdTextStyle.copyWith(
                                                 fontSize: 10)),
                                         Text(
+                                            ' * Pastikan anda telah memilih metode pembayaran',
+                                            style: redRdTextStyle.copyWith(
+                                                fontSize: 10)),
+                                        Text(
                                             ' * Pastikan harga telah tergenerate',
                                             style: redRdTextStyle.copyWith(
                                                 fontSize: 10)),
@@ -360,7 +480,8 @@ class _TagihanAddPageState extends State<TagihanAddPage> {
                                           detailTagihan:
                                               keteranganController.value.text,
                                           itemRetribusiId: categoryId,
-                                          price: price)));
+                                          price: price,
+                                          paymentMethod: paymentMeyhod)));
                                 } else {
                                   setState(() {
                                     invalidData = true;

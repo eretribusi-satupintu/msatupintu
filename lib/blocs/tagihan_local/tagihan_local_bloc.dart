@@ -107,7 +107,8 @@ class TagihanLocalBloc extends Bloc<TagihanLocalEvent, TagihanLocalState> {
 
           emit(TagihanLocalSynchronizeSuccess(sync));
         } catch (e) {
-          rethrow;
+          final res = await TagihanLocalServices().getTagihan();
+          emit(TagihanLocalFetchFailed(res));
         }
       }
     });

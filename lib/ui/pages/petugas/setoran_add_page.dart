@@ -442,10 +442,10 @@ class _SetoranAddPageState extends State<SetoranAddPage> {
                             onPressed: () {
                               if (validate() == false) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                     content: CustomSnackbar(
                                       message:
-                                          'Pastikan ada telah mengunggah bukti bayar dan lokasi setoran ${lokasiSetoran}',
+                                          'Pastikan ada telah mengunggah bukti bayar dan lokasi setoran atau pastikan anda memiliki tagihan',
                                       status: 'failed',
                                     ),
                                     behavior: SnackBarBehavior.fixed,

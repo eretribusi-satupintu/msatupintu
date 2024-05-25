@@ -23,7 +23,6 @@ class UpdateForgotPasswordPage extends StatefulWidget {
 class _UpdateForgotPasswordPageState extends State<UpdateForgotPasswordPage> {
   final newPasswordController = TextEditingController();
   final confirmationPasswordController = TextEditingController();
-  XFile? image;
 
   bool validate() {
     if (newPasswordController.text == '' ||

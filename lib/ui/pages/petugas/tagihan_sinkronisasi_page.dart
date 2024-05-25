@@ -28,7 +28,7 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
   @override
   void initState() {
     tabController = TabController(length: 2, vsync: this);
-    context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+    // context.read<TagihanLocalBloc>().add(TagihanLocalGet());
     context.read<TagihanLocalBloc>().add(TagihanBillAmount());
     super.initState();
   }
@@ -127,13 +127,27 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                     tagihanLocalIds = state.data.tagihanLocalId!;
                   }
 
-                  if (state is TagihanLocalDeleteSuccess) {
-                    context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+                  // if (state is TagihanLocalDeleteSuccess) {
+                  //   context.read<TagihanLocalBloc>().add(TagihanLocalGet());
 
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(
+                  //       content: CustomSnackbar(
+                  //         message: 'Tidak dapat memperbaharui tagihan',
+                  //         status: 'success',
+                  //       ),
+                  //       behavior: SnackBarBehavior.fixed,
+                  //       backgroundColor: Colors.transparent,
+                  //       elevation: 0,
+                  //     ),
+                  //   );
+                  // }
+
+                  if (state is TagihanLocalSynchronizeSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: CustomSnackbar(
-                          message: 'Tidak dapat memperbaharui tagihan',
+                          message: 'Berhasil mensinkronkan tagihan',
                           status: 'success',
                         ),
                         behavior: SnackBarBehavior.fixed,
@@ -141,24 +155,9 @@ class _TagihanSinkronisasiPageState extends State<TagihanSinkronisasiPage>
                         elevation: 0,
                       ),
                     );
-                  }
 
-                  if (state is TagihanLocalSynchronizeSuccess) {
-                    Navigator.of(context).pop();
-                    // context.read<TagihanLocalBloc>().add(TagihanLocalGet());
-                    // context.read<TagihanLocalBloc>().add(TagihanBillAmount());
-
-                    // ScaffoldMessenger.of(context).showSnackBar(
-                    //   const SnackBar(
-                    //     content: CustomSnackbar(
-                    //       message: 'Konfirmasi pembayaran berhasil',
-                    //       status: 'success',
-                    //     ),
-                    //     behavior: SnackBarBehavior.fixed,
-                    //     backgroundColor: Colors.transparent,
-                    //     elevation: 0,
-                    //   ),
-                    // );
+                    context.read<TagihanLocalBloc>().add(TagihanLocalGet());
+                    context.read<TagihanLocalBloc>().add(TagihanBillAmount());
                   }
                 },
                 builder: (context, state) {

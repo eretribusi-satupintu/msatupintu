@@ -94,7 +94,7 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
           final tagihan = await TagihanService()
               .getTagihanWajibRetribusiMasyarakatProgress(event.kontrakId);
           emit(TagihanSuccess(tagihan));
-          } catch (e) {
+        } catch (e) {
           emit(TagihanFailed(e.toString()));
         }
       }
@@ -106,8 +106,8 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
               await TagihanService().getPetugasPaidTagihan(event.status);
           print(tagihan);
           emit(TagihanSuccess(tagihan));
-          // TagihanLocalFailed(tagihan.toString());
         } catch (e) {
+          print({"error": e});
           emit(TagihanFailed(e.toString()));
         }
       }

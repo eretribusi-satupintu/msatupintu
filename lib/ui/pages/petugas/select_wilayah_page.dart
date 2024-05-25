@@ -74,11 +74,12 @@ class _SelectSubWilayahPageState extends State<SelectSubWilayahPage> {
                               title: 'Lanjutkan ${selectedSubWilayah?.name}',
                               onPressed: () {
                                 BlocProvider.of<SubwilayahBloc>(context).add(
-                                    SelectPetugasSubWilayah(
-                                        selectedSubWilayah!));
-
-                                Navigator.pushNamedAndRemoveUntil(
-                                    context, '/home', (route) => false);
+                                  SelectPetugasSubWilayah(selectedSubWilayah!),
+                                );
+                                Future.delayed(Duration(seconds: 2), () {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/home', (route) => false);
+                                });
                               }),
                         ),
                   const SizedBox(

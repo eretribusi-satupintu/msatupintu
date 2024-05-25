@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:satupintu_app/blocs/tagihan_local/tagihan_local_bloc.dart';
 import 'package:satupintu_app/db/database.dart';
@@ -29,6 +30,9 @@ class AuthService {
       } else {
         throw jsonDecode(res.body)['message'];
       }
+    } on SocketException catch (e) {
+      print(e);
+      throw "Tidak dapat terhubung ke server";
     } catch (e) {
       rethrow;
     }

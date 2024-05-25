@@ -54,23 +54,22 @@ class PembayaranWaitingTab extends StatelessWidget {
                   if (state.data.isNotEmpty) {
                     return Column(
                       children: state.data
-                          .map((tagihan) => GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          TagihanDetailPetugas(
-                                        tagihanId: tagihan.id!,
-                                      ),
+                          .map(
+                            (tagihan) => GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TagihanDetailPetugas(
+                                      tagihanId: tagihan.id!,
                                     ),
-                                  );
-                                },
-                                child: pembayaranCard(
-                                    tagihan.udpatedDate!,
-                                    tagihan.wajibRetribusiName!,
-                                    tagihan.price!),
-                              ))
+                                  ),
+                                );
+                              },
+                              child: pembayaranCard(tagihan.paymentTime!,
+                                  tagihan.wajibRetribusiName!, tagihan.price!),
+                            ),
+                          )
                           .toList(),
                     );
                   } else {
@@ -85,7 +84,7 @@ class PembayaranWaitingTab extends StatelessWidget {
                 }
 
                 return const Center(
-                  child: Text('Tidak kesalahan'),
+                  child: Text('Terjadi kesalahan'),
                 );
               },
             ),

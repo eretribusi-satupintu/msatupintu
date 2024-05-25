@@ -13,11 +13,12 @@ class TagihanService {
       final token = await AuthService().getToken();
       final roleId = await AuthService().getRoleId();
 
-      final res = await http
-          .get(Uri.parse('$baseUrl/tagihan/wajib_retribusi/$roleId'), headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token
-      });
+      final res = await http.get(
+          Uri.parse('$baseUrl/tagihan/wajib_retribusi/$roleId/newest'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          });
 
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)['message'];

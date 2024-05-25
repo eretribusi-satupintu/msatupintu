@@ -9,7 +9,9 @@ class PembayaranService {
   Future<List<PembayaranModel>> getPembayaran(String status) async {
     try {
       final token = await AuthService().getToken();
-      final res = await http.get(Uri.parse('$baseUrl/pembayaran/$status'),
+      final roleId = await AuthService().getRoleId();
+      final res = await http.get(
+          Uri.parse('$baseUrl/pembayaran/$status/wajib-retribusi/$roleId'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token

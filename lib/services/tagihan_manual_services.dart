@@ -72,6 +72,7 @@ class TagihanManualServices {
         "item_retribusi_id": tagihanManual.itemRetribusiId,
         "detail_tagihan": tagihanManual.detailTagihan,
         "total_harga": tagihanManual.price,
+        "metode_pembayaran": tagihanManual.paymentMethod!.toUpperCase()
       };
 
       final res = await http.post(
@@ -86,6 +87,27 @@ class TagihanManualServices {
       }
 
       return TagihanManualModel.fromJson(jsonDecode(res.body)['data']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> postPaymentImage(int tagihanManualId, String image) async {
+    try {
+      final token = await AuthService().getToken();
+      final body = {"image": image};
+      print({"body": body});
+      final res = await http.put(
+        Uri.parse('$baseUrl/tagihan-manual/$tagihanManualId/upload-image'),
+        headers: {'Content-Type': 'application/json', 'Authorization': token},
+        body: jsonEncode(body),
+      );
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+      print(jsonDecode(res.body)['data']);
+      return jsonDecode(res.body)['data']['bukti_bayar'];
     } catch (e) {
       rethrow;
     }
