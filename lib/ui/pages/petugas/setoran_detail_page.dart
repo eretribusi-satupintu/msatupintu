@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:satupintu_app/model/setoran_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/pages/petugas/setoran_edit_page.dart';
 
 class SetoranDetailPage extends StatelessWidget {
@@ -262,8 +263,7 @@ class SetoranDetailPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(width: 1, color: mainColor),
                     ),
-                    child: Image.network(
-                        'http://localhost:3000/${setoran.buktiSetoran!}'),
+                    child: Image.network('$publicUrl/${setoran.buktiSetoran!}'),
                   )
                 ],
               ),

@@ -9,6 +9,7 @@ import 'package:satupintu_app/shared/theme.dart';
 import 'package:satupintu_app/ui/pages/petugas/petugas_tagihan_list.dart';
 import 'package:satupintu_app/ui/pages/petugas/tagihan_detail_petugas_page.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
+import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
 class PetugasScanQrCodePage extends StatefulWidget {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -99,42 +100,43 @@ class _PetugasScanQrCodePageState extends State<PetugasScanQrCodePage> {
           builder: (context, state) {
             return Column(
               children: [
-                Expanded(
-                  flex: 5,
-                  child: QRView(
-                    key: widget.qrKey,
-                    formatsAllowed: const [BarcodeFormat.qrcode],
-                    onQRViewCreated: (controller) {
-                      this.controller = controller;
-                      controller.scannedDataStream.listen((scanData) {
-                        setState(() {
-                          result = scanData;
-                        });
-                        print(result!.code!);
-                        List<String> qrText = result!.code!.split('-');
-                        if (qrText[0] == 'detail') {
-                          context.read<WajibRetribusiBloc>().add(
-                              WajibRetribusiGetDetailTagihanFromScan(
-                                  int.parse(qrText[1])));
-                        } else if (qrText[0] == 'wajib_retribusi') {
-                          context
-                              .read<WajibRetribusiBloc>()
-                              .add(WajibRetribusiGetDetailFromScan(qrText[1]));
-                        } else {
-                          setState(() {
-                            errorMessage = "Tidak dapat mengenali kode";
-                          });
-                        }
-                      });
-                    },
-                    overlay: QrScannerOverlayShape(
-                      borderColor: mainColor,
-                      borderRadius: 10,
-                      borderLength: 60,
-                      borderWidth: 20,
-                    ),
-                  ),
-                ),
+                state is WajibRetribusiLoading
+                    ? const LoadingInfo()
+                    : Expanded(
+                        flex: 5,
+                        child: QRView(
+                          key: widget.qrKey,
+                          formatsAllowed: const [BarcodeFormat.qrcode],
+                          onQRViewCreated: (controller) {
+                            this.controller = controller;
+                            controller.scannedDataStream.listen((scanData) {
+                              setState(() {
+                                result = scanData;
+                              });
+                              print(result!.code!);
+                              List<String> qrText = result!.code!.split('-');
+                              if (qrText[0] == 'detail') {
+                                context.read<WajibRetribusiBloc>().add(
+                                    WajibRetribusiGetDetailTagihanFromScan(
+                                        int.parse(qrText[1])));
+                              } else if (qrText[0] == 'wajib_retribusi') {
+                                context.read<WajibRetribusiBloc>().add(
+                                    WajibRetribusiGetDetailFromScan(qrText[1]));
+                              } else {
+                                setState(() {
+                                  errorMessage = "Tidak dapat mengenali kode";
+                                });
+                              }
+                            });
+                          },
+                          overlay: QrScannerOverlayShape(
+                            borderColor: mainColor,
+                            borderRadius: 10,
+                            borderLength: 60,
+                            borderWidth: 20,
+                          ),
+                        ),
+                      ),
                 errorMessage != ''
                     ? Container(
                         padding: const EdgeInsets.symmetric(

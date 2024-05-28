@@ -12,33 +12,39 @@ class SplashPage extends StatelessWidget {
     return Scaffold(
         backgroundColor: whiteColor,
         body: BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthSuccess) {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/home', (route) => false);
-            }
+            listener: (context, state) {
+              if (state is AuthSuccess) {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/home', (route) => false);
+              }
 
-            if (state is AuthPetugasFailed) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const TagihanSinkronisasiPage()));
-            }
+              if (state is AuthPetugasFailed) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TagihanSinkronisasiPage()));
+              }
 
-            if (state is AuthFailed) {
-              print(state.e);
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/login', (route) => false);
-            }
-          },
-          child: Center(
-              child: Container(
-            width: 175,
-            height: 70,
-            decoration: const BoxDecoration(
-              image: DecorationImage(image: AssetImage('assets/img_logo.png')),
-            ),
-          )),
-        ));
+              if (state is AuthFailed) {
+                print(state.e);
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/login', (route) => false);
+              }
+            },
+            child: Center(
+              child: Text(
+                "Aplikasi Retribusi",
+                style: mainRdTextStyle.copyWith(fontWeight: bold, fontSize: 24),
+              ),
+            )
+            // Center(
+            //     child: Container(
+            //   width: 175,
+            //   height: 70,
+            //   decoration: const BoxDecoration(
+            //     image: DecorationImage(image: AssetImage('assets/img_logo.png')),
+            //   ),
+            // )),
+            ));
   }
 }

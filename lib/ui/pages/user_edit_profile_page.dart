@@ -9,6 +9,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/user/user_bloc.dart';
 import 'package:satupintu_app/model/user_update_form_model.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/inputs.dart';
@@ -171,7 +172,7 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
                                                                 'assets/img_user_guest.png')
                                                             as ImageProvider
                                                         : NetworkImage(
-                                                            'http://localhost:3000/${state.data.photoProfile}')
+                                                            '$publicUrl/${state.data.photoProfile}')
                                                     : FileImage(
                                                             File(image!.path))
                                                         as ImageProvider,

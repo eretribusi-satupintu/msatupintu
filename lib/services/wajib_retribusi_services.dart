@@ -38,7 +38,7 @@ class WajibRetribusiService {
       final subWilayah =
           await SubWilayahService().getSubwilayahFromLocalStorage();
       final res = await http.get(
-          Uri.parse('$baseUrl//wajib-retribusi/wilayah/${subWilayah.id}'),
+          Uri.parse('$baseUrl/wajib-retribusi/wilayah/${subWilayah.id}'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token

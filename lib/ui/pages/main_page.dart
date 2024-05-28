@@ -8,6 +8,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/auth/auth_bloc.dart';
 import 'package:satupintu_app/blocs/user/user_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/pages/home_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/home_petugas_page.dart';
 import 'package:satupintu_app/ui/pages/pembayaran_page.dart';
@@ -470,7 +471,7 @@ class _MainPageState extends State<MainPage>
                       image: DecorationImage(
                           image: state.data.photoProfile != null
                               ? NetworkImage(
-                                  'http://localhost:3000/${state.data.photoProfile}',
+                                  '$publicUrl/${state.data.photoProfile}',
                                 )
                               : const AssetImage(
                                   'assets/img_user_guest.png',

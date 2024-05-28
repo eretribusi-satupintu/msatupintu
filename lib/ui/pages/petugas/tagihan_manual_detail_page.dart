@@ -14,6 +14,7 @@ import 'package:satupintu_app/blocs/tagihan_manual/tagihan_manual_bloc.dart';
 import 'package:satupintu_app/model/tagihan_manual_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
@@ -896,7 +897,7 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: SizedBox(
             child: Image.network(
-              "http://localhost:3000/$image",
+              "$publicUrl/$image",
             ),
           ),
         );

@@ -12,6 +12,7 @@ import 'package:satupintu_app/model/setoran_form_model.dart';
 import 'package:satupintu_app/model/setoran_model.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/pages/petugas/setoran_list_page.dart';
 import 'package:satupintu_app/ui/pages/petugas/setoran_detail_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
@@ -263,7 +264,7 @@ class _SetoranEditPageState extends State<SetoranEditPage> {
                                           alignment: Alignment.center,
                                           children: [
                                             Image.network(
-                                              'http://localhost:3000/${widget.setoran.buktiSetoran!}',
+                                              '$publicUrl/${widget.setoran.buktiSetoran!}',
                                               height: 450,
                                             ),
                                             Container(

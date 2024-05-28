@@ -9,6 +9,7 @@ import 'package:satupintu_app/blocs/doku_payment/doku_payment_bloc.dart';
 import 'package:satupintu_app/blocs/user/user_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/pages/doku_payment_va_page.dart';
 import 'package:satupintu_app/ui/pages/update_password_page.dart';
 import 'package:satupintu_app/ui/pages/user_edit_profile_page.dart';
@@ -91,7 +92,7 @@ class UserPage extends StatelessWidget {
                                 image: DecorationImage(
                                     image: state.data.photoProfile != null
                                         ? NetworkImage(
-                                            'http://localhost:3000/${state.data.photoProfile}')
+                                            '$publicUrl/${state.data.photoProfile}')
                                         : const AssetImage(
                                                 'assets/img_user_guest.png')
                                             as ImageProvider,

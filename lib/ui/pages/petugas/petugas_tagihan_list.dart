@@ -83,7 +83,10 @@ class WajibRetribusiTagihanListPage extends StatelessWidget {
 
                             if (state is WajibRetribusiFailed) {
                               return Center(
-                                child: Text(state.e),
+                                child: Text(
+                                  state.e,
+                                  style: TextStyle(fontSize: 8),
+                                ),
                               );
                             }
 

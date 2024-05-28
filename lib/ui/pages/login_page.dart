@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 10,
                   ),
                   Text(
-                    'Memasuki SatuPintu',
+                    'Memasuki Aplikasi',
                     style: darkRdBrownTextStyle,
                   )
                 ],
@@ -236,9 +236,14 @@ class _LoginPageState extends State<LoginPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Image.asset(
-                                    'assets/img_logo.png',
-                                    width: 50,
+                                  // Image.asset(
+                                  //   'assets/img_logo.png',
+                                  //   width: 50,
+                                  // ),
+                                  Text(
+                                    "Aplikasi Retribusi ",
+                                    style: mainRdTextStyle.copyWith(
+                                        fontSize: 10, fontWeight: bold),
                                   ),
                                   Text(
                                     'by Institut Teknologi Del',

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:satupintu_app/blocs/user/user_bloc.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/widget/failed_info.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
@@ -48,7 +49,7 @@ class QrCodePage extends StatelessWidget {
                                   ? const AssetImage(
                                       'assets/img_user_guest.png')
                                   : NetworkImage(
-                                          'http://localhost:3000/${state.data.photoProfile}')
+                                          '$publicUrl/${state.data.photoProfile}')
                                       as ImageProvider,
                               fit: BoxFit.cover),
                         ),
