@@ -46,6 +46,18 @@ class TagihanBloc extends Bloc<TagihanEvent, TagihanState> {
         }
       }
 
+      if (event is TagihanGetDetailPetugas) {
+        try {
+          emit(TagihanLoading());
+          final tagihan =
+              await TagihanService().getTagihanDetailPetugas(event.tagihanId);
+          print({"bloc": tagihan});
+          emit(TagihanDetailSuccess(tagihan));
+        } catch (e) {
+          emit(TagihanFailed(e.toString()));
+        }
+      }
+
       if (event is TagihanGetDetailUpdateStatus) {
         final updateTagihan = (state as TagihanDetailSuccess)
             .data

@@ -1,14 +1,19 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:bluetooth_enable_fork/bluetooth_enable_fork.dart';
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:satupintu_app/blocs/petugas/petugas_bloc.dart';
 import 'package:satupintu_app/blocs/tagihan/tagihan_bloc.dart';
 import 'package:satupintu_app/shared/method.dart';
 import 'package:satupintu_app/shared/theme.dart';
+import 'package:satupintu_app/shared/values.dart';
 import 'package:satupintu_app/ui/pages/petugas/transaksi_petugas_success_page.dart';
 import 'package:satupintu_app/ui/widget/buttons.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -33,10 +38,72 @@ class TagihanDetailPetugas extends StatefulWidget {
 class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
   bool isSwitch = false;
   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+  XFile? image;
+  String paymentMethod = "";
+  String errorMessage = "";
 
   bool _connected = false;
   BluetoothDevice? _device;
   String tips = 'no device connect';
+
+  bool validate() {
+    if (paymentMethod != "") {
+      if (paymentMethod == "QRIS") {
+        if (image == null) {
+          showInvalidDialog("Upload bukti bayar terlebih dahulu!");
+          return false;
+        }
+        return true;
+      }
+      return true;
+    }
+    showInvalidDialog("Pilih kategori terlebih dahulu!");
+    return false;
+  }
+
+  void showInvalidDialog(String errorText) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: CustomSnackbar(
+          message: errorText,
+          status: 'failed',
+        ),
+        behavior: SnackBarBehavior.fixed,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+    );
+  }
+
+  Future getImage(String media) async {
+    final ImagePicker picker = ImagePicker();
+
+    switch (media) {
+      case 'galery':
+        final XFile? imagePicker =
+            await picker.pickImage(source: ImageSource.gallery);
+        setImage(imagePicker!);
+
+        break;
+      case 'camera':
+        final XFile? imagePicker = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 50,
+          maxWidth: 300,
+          maxHeight: 500,
+        );
+        setImage(imagePicker!);
+      default:
+        return;
+    }
+  }
+
+  void setImage(XFile file) {
+    setState(() {
+      Navigator.pop(context, 'refresh');
+      image = file;
+    });
+  }
 
   Future<void> enableBT() async {
     var result = await BluetoothEnable.enableBluetooth;
@@ -113,7 +180,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
       body: SingleChildScrollView(
         child: BlocProvider(
           create: (context) =>
-              TagihanBloc()..add(TagihanGetDetail(widget.tagihanId)),
+              TagihanBloc()..add(TagihanGetDetailPetugas(widget.tagihanId)),
           child: BlocBuilder<TagihanBloc, TagihanState>(
             builder: (context, state) {
               if (state is TagihanLoading) {
@@ -152,8 +219,8 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                               ),
                               Text(
                                 'Retribusi ${state.data.retribusiName!}',
-                                style:
-                                    darkRdBrownTextStyle.copyWith(fontSize: 14),
+                                style: darkRdBrownTextStyle.copyWith(
+                                    fontSize: 16, fontWeight: bold),
                               ),
                               const SizedBox(
                                 height: 20,
@@ -334,14 +401,31 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                       color: greenColor,
                                     ),
                                     Text(
-                                      'Tagihan ini telah dibayar secara tunai',
+                                      'Tagihan ini telah dibayar secara ${state.data.paymentMethod}',
                                       style: greyRdTextStyle.copyWith(
                                           fontStyle: FontStyle.italic),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 15,
+                                  height: 8,
+                                ),
+                                state.data.paymentMethod == "QRIS"
+                                    ? GestureDetector(
+                                        onTap: () => paymentImageDialog(
+                                            context, state.data.paymentImage!),
+                                        child: Text(
+                                          "Tampilkan bukti pembayaran",
+                                          style: mainRdTextStyle.copyWith(
+                                              fontWeight: bold,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationThickness: 2,
+                                              decorationColor: mainColor),
+                                        ))
+                                    : const SizedBox(),
+                                const SizedBox(
+                                  height: 10,
                                 ),
                                 widget.isStored != true
                                     ? Container(
@@ -754,6 +838,19 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                                 list.add(LineText(
                                                     type: LineText.TYPE_TEXT,
                                                     content:
+                                                        'Metode pembayaran :',
+                                                    align: LineText.ALIGN_LEFT,
+                                                    linefeed: 1));
+                                                list.add(LineText(
+                                                    type: LineText.TYPE_TEXT,
+                                                    content: state
+                                                        .data.paymentMethod,
+                                                    align: LineText.ALIGN_LEFT,
+                                                    linefeed: 1));
+
+                                                list.add(LineText(
+                                                    type: LineText.TYPE_TEXT,
+                                                    content:
                                                         'Waktu Pembayaran :',
                                                     align: LineText.ALIGN_LEFT,
                                                     linefeed: 1));
@@ -793,7 +890,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 )
                               ],
@@ -867,6 +964,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                   ),
                                 ),
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       crossAxisAlignment:
@@ -907,6 +1005,181 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                     const SizedBox(
                                       height: 10,
                                     ),
+                                    state.data.status == "NEW"
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Pilih kategori',
+                                                style: darkRdBrownTextStyle
+                                                    .copyWith(
+                                                        fontWeight: semiBold),
+                                              ),
+                                              const SizedBox(
+                                                height: 8,
+                                              ),
+                                              Container(
+                                                height: 50,
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        width: 1,
+                                                        color: mainColor),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                child: DropdownMenu(
+                                                  selectedTrailingIcon:
+                                                      const Icon(Icons
+                                                          .cancel_outlined),
+                                                  label: Text(
+                                                    'Kategori tagihan',
+                                                    style: mainRdTextStyle
+                                                        .copyWith(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                  inputDecorationTheme:
+                                                      const InputDecorationTheme(
+                                                          enabledBorder:
+                                                              InputBorder.none,
+                                                          contentPadding:
+                                                              EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      10,
+                                                                  vertical: 0)),
+                                                  expandedInsets:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 0),
+                                                  onSelected: (value) {
+                                                    setState(() {
+                                                      image = null;
+                                                      paymentMethod = value!;
+                                                    });
+                                                  },
+                                                  menuStyle: MenuStyle(
+                                                      backgroundColor:
+                                                          MaterialStatePropertyAll(
+                                                              whiteColor),
+                                                      shadowColor:
+                                                          MaterialStatePropertyAll(
+                                                              whiteColor),
+                                                      surfaceTintColor:
+                                                          MaterialStatePropertyAll(
+                                                              mainColor)),
+                                                  dropdownMenuEntries: const [
+                                                    DropdownMenuEntry(
+                                                      value: "CASH",
+                                                      label: "CASH",
+                                                    ),
+                                                    DropdownMenuEntry(
+                                                      value: "QRIS",
+                                                      label: "QRIS",
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : const SizedBox(),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    paymentMethod == "QRIS"
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              mediaChooseDialog(context);
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Upload bukti bayar',
+                                                  style: darkRdBrownTextStyle
+                                                      .copyWith(
+                                                    fontWeight: bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 8,
+                                                ),
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 30),
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        width: 2,
+                                                        color: mainColor
+                                                            .withAlpha(90),
+                                                      ),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .all(
+                                                              Radius.circular(
+                                                                  10))),
+                                                  child: image == null
+                                                      ? Center(
+                                                          child: Column(
+                                                          children: [
+                                                            Image.asset(
+                                                              'assets/ic_image_upload.png',
+                                                              width: 70,
+                                                            ),
+                                                            Text(
+                                                              'Pilih File',
+                                                              style:
+                                                                  mainRdTextStyle,
+                                                            )
+                                                          ],
+                                                        ))
+                                                      : Stack(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          children: [
+                                                            Image.file(
+                                                              File(image!.path),
+                                                              height: 450,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          14,
+                                                                      vertical:
+                                                                          6),
+                                                              decoration: BoxDecoration(
+                                                                  color: mainColor
+                                                                      .withAlpha(
+                                                                          50),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8)),
+                                                              child: Text(
+                                                                'Ketuk untuk mengganti file',
+                                                                style: mainRdTextStyle
+                                                                    .copyWith(
+                                                                        fontWeight:
+                                                                            bold),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 15,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       children: [
                                         Text(
@@ -938,11 +1211,15 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                                           )
                                         : CustomFilledButton(
                                             title: 'Konfirmasi Pembayaran',
-                                            onPressed: () => _dialogBuilder(
-                                                context,
-                                                state.data.id!,
-                                                state.data.wajibRetribusiName!,
-                                                state.data.price!),
+                                            onPressed: () => validate() == true
+                                                ? _dialogBuilder(
+                                                    context,
+                                                    state.data.id!,
+                                                    state.data
+                                                        .wajibRetribusiName!,
+                                                    state.data.price!,
+                                                  )
+                                                : () {},
                                           )
                                   ],
                                 ),
@@ -1011,9 +1288,10 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
           content: RichText(
               text: TextSpan(
             children: [
-              const TextSpan(
+              TextSpan(
                 text:
-                    'Anda akan melakukan konfirmasi untuk pembayaran tagihan ',
+                    'Anda akan melakukan konfirmasi untuk pembayaran tagihan ' +
+                        image.toString(),
               ),
               TextSpan(text: name, style: TextStyle(fontWeight: bold)),
               const TextSpan(text: ' senilai '),
@@ -1062,6 +1340,7 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                 builder: (context, state) {
                   if (state is PetugasLoading) {
                     return Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -1086,9 +1365,24 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                   return CustomFilledButton(
                       title: 'Lanjutkan',
                       onPressed: () {
-                        context
-                            .read<PetugasBloc>()
-                            .add(PetugasBillPaid(tagihanId));
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(
+                        //     content: CustomSnackbar(
+                        //       status: "failed",
+                        //       message: base64Encode(
+                        //         File(image!.path).readAsBytesSync(),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // );
+                        context.read<PetugasBloc>().add(PetugasBillPaid(
+                            tagihanId,
+                            paymentMethod,
+                            image != null
+                                ? base64Encode(
+                                    File(image!.path).readAsBytesSync(),
+                                  )
+                                : ""));
                       });
                 },
               ),
@@ -1103,6 +1397,97 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                   Navigator.pop(context);
                 })
           ],
+        );
+      },
+    );
+  }
+
+  Future<void> mediaChooseDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: whiteColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          title: Text(
+            'Pilih Media',
+            style: mainRdTextStyle.copyWith(fontSize: 14, fontWeight: bold),
+            textAlign: TextAlign.center,
+          ),
+          content: Row(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  await getImage('camera');
+                },
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      width: 2,
+                      color: mainColor.withAlpha(80),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/ic_camera.png',
+                        width: 45,
+                        height: 45,
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        'Kamera',
+                        style: darkRdBrownTextStyle.copyWith(
+                            fontSize: 12, fontWeight: semiBold),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () async {
+                  await getImage('galery');
+                },
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      width: 2,
+                      color: mainColor.withAlpha(80),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/ic_galery.png',
+                        width: 45,
+                        height: 45,
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        'Galery',
+                        style: darkRdBrownTextStyle.copyWith(
+                            fontSize: 12, fontWeight: semiBold),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -1219,6 +1604,25 @@ class _TagihanDetailPetugasState extends State<TagihanDetailPetugas> {
                   Navigator.pop(context);
                 })
           ],
+        );
+      },
+    );
+  }
+
+  Future<void> paymentImageDialog(BuildContext context, String image) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: whiteColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: SizedBox(
+            child: Image.network(
+              "$publicUrl/$image",
+            ),
+          ),
         );
       },
     );

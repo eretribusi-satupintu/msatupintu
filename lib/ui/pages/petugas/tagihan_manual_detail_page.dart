@@ -297,7 +297,8 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
           ),
           widget.tagihanModel.paymentMethod == "QRIS"
               ? Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 18),
+                  margin:
+                      const EdgeInsets.only(right: 18, left: 18, bottom: 10),
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
@@ -462,7 +463,10 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                           ),
                         ),
                 )
-              : Container(
+              : const SizedBox(),
+          widget.tagihanModel.paymentMethod == 'CASH' ||
+                  widget.tagihanModel.paymentImage != null
+              ? Container(
                   margin: const EdgeInsets.symmetric(horizontal: 18),
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -764,6 +768,18 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                                     content: widget.tagihanModel.subwilayah,
                                     align: LineText.ALIGN_LEFT,
                                     linefeed: 1));
+
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: 'Metode pembayaran :',
+                                    align: LineText.ALIGN_LEFT,
+                                    linefeed: 1));
+                                list.add(LineText(
+                                    type: LineText.TYPE_TEXT,
+                                    content: widget.tagihanModel.paymentMethod,
+                                    align: LineText.ALIGN_LEFT,
+                                    linefeed: 1));
+
                                 list.add(LineText(
                                     type: LineText.TYPE_TEXT,
                                     content: '-----------------------------',
@@ -786,7 +802,8 @@ class _TagihanManualDetailPageState extends State<TagihanManualDetailPage> {
                       ),
                     ],
                   ),
-                ),
+                )
+              : const SizedBox(),
           const SizedBox(
             height: 20,
           )

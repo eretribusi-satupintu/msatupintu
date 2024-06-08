@@ -69,7 +69,8 @@ class PembayaranSuccessTab extends StatelessWidget {
                                 child: pembayaranCard(
                                     tagihan.paymentTime!,
                                     tagihan.wajibRetribusiName!,
-                                    tagihan.price!),
+                                    tagihan.price!,
+                                    tagihan.paymentMethod!),
                               ))
                           .toList(),
                     );
@@ -95,7 +96,8 @@ class PembayaranSuccessTab extends StatelessWidget {
     ));
   }
 
-  Widget pembayaranCard(String date, String name, int price) {
+  Widget pembayaranCard(
+      String date, String name, int price, String paymentMethod) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
@@ -105,12 +107,26 @@ class PembayaranSuccessTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset(
-            'assets/ic_payment_success.png',
-            width: 26,
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+                decoration: BoxDecoration(
+                    color: greenColor, borderRadius: BorderRadius.circular(4)),
+                child: Text(
+                  paymentMethod,
+                  style:
+                      whiteRdTextStyle.copyWith(fontSize: 10, fontWeight: bold),
+                ),
+              ),
+              Image.asset(
+                'assets/ic_payment_success.png',
+                width: 26,
+              ),
+            ],
           ),
           const SizedBox(
-            width: 18,
+            width: 12,
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

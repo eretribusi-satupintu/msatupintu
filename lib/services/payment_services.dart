@@ -69,7 +69,7 @@ class PaymentServices {
           "payment_due_date": data.paymentDueDate,
           "payment_method_types": [
             data.paymentMethodTypes,
-            "EMONEY_OVO",
+            "QRIS",
           ]
         }
       });

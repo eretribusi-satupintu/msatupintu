@@ -8,13 +8,16 @@ import 'package:satupintu_app/services/tagihan_local_services.dart';
 import 'package:satupintu_app/shared/values.dart';
 
 class TransaksiPetugas {
-  Future<TagihanModel> petugasPaidTagihan(int tagihanId) async {
+  Future<TagihanModel> petugasPaidTagihan(
+      int tagihanId, String paymentMethod, String? paymentImage) async {
     try {
       final token = await AuthService().getToken();
       final petugasId = await AuthService().getRoleId();
       final body = {
         "petugas_id": int.parse(petugasId),
-        "tagihan_id": tagihanId
+        "tagihan_id": tagihanId,
+        "metode_pembayaran": paymentMethod,
+        "bukti_bayar": paymentImage ?? ""
       };
 
       final res = await http.post(

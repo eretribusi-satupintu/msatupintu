@@ -233,4 +233,24 @@ class TagihanService {
       rethrow;
     }
   }
+
+  Future<TagihanModel> getTagihanDetailPetugas(int tagihanId) async {
+    try {
+      final token = await AuthService().getToken();
+
+      final res = await http
+          .get(Uri.parse('$baseUrl/tagihan/$tagihanId/petugas'), headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      });
+
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      return TagihanModel.fromJson(jsonDecode(res.body)['data']);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

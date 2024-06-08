@@ -17,8 +17,20 @@ import 'package:satupintu_app/ui/widget/custom_snackbar.dart';
 import 'package:satupintu_app/ui/widget/failed_info.dart';
 import 'package:satupintu_app/ui/widget/laoding_info.dart';
 
-class UserPage extends StatelessWidget {
+class UserPage extends StatefulWidget {
   const UserPage({super.key});
+
+  @override
+  State<UserPage> createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  int? roleId;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +43,14 @@ class UserPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  child: BlocBuilder<UserBloc, UserState>(
+                  child: BlocConsumer<UserBloc, UserState>(
+                    listener: (context, state) {
+                      if (state is UserSuccess) {
+                        setState(() {
+                          roleId = state.data.role;
+                        });
+                      }
+                    },
                     builder: (context, state) {
                       if (state is UserLoading) {
                         return Center(
@@ -114,72 +133,91 @@ class UserPage extends StatelessWidget {
                 const SizedBox(
                   height: 28,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      'Informasi penting',
-                      style: darkRdBrownTextStyle.copyWith(fontWeight: medium),
-                    ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: 16,
-                      color: mainColor,
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                BlocProvider(
-                  create: (context) => DokuPaymentBloc()..add(DokuVaList()),
-                  child: BlocBuilder<DokuPaymentBloc, DokuPaymentState>(
-                    builder: (context, state) {
-                      if (state is DokuPaymentLoading) {
-                        return const LoadingInfo();
-                      }
+                roleId != null
+                    ? roleId == 1
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Informasi penting',
+                                    style: darkRdBrownTextStyle.copyWith(
+                                        fontWeight: medium),
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 16,
+                                    color: mainColor,
+                                  )
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 12,
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    DokuPaymentBloc()..add(DokuVaList()),
+                                child: BlocBuilder<DokuPaymentBloc,
+                                    DokuPaymentState>(
+                                  builder: (context, state) {
+                                    if (state is DokuPaymentLoading) {
+                                      return const LoadingInfo();
+                                    }
 
-                      if (state is DokuPaymentListSuccess) {
-                        if (state.data.isNotEmpty) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: state.data
-                                    .map((va) => GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DokuPaymentVaPage(
-                                                          virtualAccount: va)));
-                                        },
-                                        child: vaPaymentCard(
-                                            va.bank!, va.createdDate!)))
-                                    .toList()),
-                          );
-                        } else {
-                          return const Text('-');
-                        }
-                      }
+                                    if (state is DokuPaymentListSuccess) {
+                                      if (state.data.isNotEmpty) {
+                                        return SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                              children: state.data
+                                                  .map(
+                                                    (va) => GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                DokuPaymentVaPage(
+                                                                    virtualAccount:
+                                                                        va),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: vaPaymentCard(
+                                                          va.bank!,
+                                                          va.createdDate!),
+                                                    ),
+                                                  )
+                                                  .toList()),
+                                        );
+                                      } else {
+                                        return const Text('-');
+                                      }
+                                    }
 
-                      if (state is DokuPaymentFailed) {
-                        return ErrorInfo(
-                          e: 'Terjadi Kesalahan',
-                        );
-                      }
+                                    if (state is DokuPaymentFailed) {
+                                      return const ErrorInfo(
+                                        e: 'Terjadi Kesalahan',
+                                      );
+                                    }
 
-                      return ErrorInfo(
-                        e: 'Terjadi Kesalahan',
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 28,
-                ),
+                                    return const ErrorInfo(
+                                      e: 'Terjadi Kesalahan',
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 28,
+                              ),
+                            ],
+                          )
+                        : const SizedBox()
+                    : const SizedBox(),
                 BlocBuilder<UserBloc, UserState>(
                   builder: (context, state) {
                     if (state is UserLoading) {

@@ -24,6 +24,11 @@ class TagihanGetDetail extends TagihanEvent {
   const TagihanGetDetail(this.tagihanId);
 }
 
+class TagihanGetDetailPetugas extends TagihanEvent {
+  final int tagihanId;
+  const TagihanGetDetailPetugas(this.tagihanId);
+}
+
 class PetugasPaidTagihanGet extends TagihanEvent {
   final String status;
   const PetugasPaidTagihanGet(this.status);

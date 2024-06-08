@@ -66,8 +66,11 @@ class PembayaranWaitingTab extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: pembayaranCard(tagihan.paymentTime!,
-                                  tagihan.wajibRetribusiName!, tagihan.price!),
+                              child: pembayaranCard(
+                                  tagihan.paymentTime!,
+                                  tagihan.wajibRetribusiName!,
+                                  tagihan.price!,
+                                  tagihan.paymentMethod!),
                             ),
                           )
                           .toList(),
@@ -94,7 +97,8 @@ class PembayaranWaitingTab extends StatelessWidget {
     ));
   }
 
-  Widget pembayaranCard(String date, String name, int price) {
+  Widget pembayaranCard(
+      String date, String name, int price, String paymentMethod) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
@@ -104,9 +108,23 @@ class PembayaranWaitingTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset(
-            'assets/ic_payment_waiting.png',
-            width: 26,
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+                decoration: BoxDecoration(
+                    color: orangeColor, borderRadius: BorderRadius.circular(4)),
+                child: Text(
+                  paymentMethod,
+                  style:
+                      whiteRdTextStyle.copyWith(fontSize: 10, fontWeight: bold),
+                ),
+              ),
+              Image.asset(
+                'assets/ic_payment_waiting.png',
+                width: 26,
+              ),
+            ],
           ),
           const SizedBox(
             width: 18,

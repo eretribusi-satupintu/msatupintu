@@ -28,8 +28,8 @@ class PetugasBloc extends Bloc<PetugasEvent, PetugasState> {
       if (event is PetugasBillPaid) {
         try {
           emit(PetugasLoading());
-          final billPay =
-              await TransaksiPetugas().petugasPaidTagihan(event.tagihanId);
+          final billPay = await TransaksiPetugas().petugasPaidTagihan(
+              event.tagihanId, event.paymentMethod, event.paymentImage ?? "");
           emit(PetugasSuccess(billPay));
         } catch (e) {
           emit(PetugasFailed(e.toString()));

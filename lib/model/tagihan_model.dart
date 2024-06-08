@@ -3,6 +3,8 @@ class TagihanModel {
   final String? requestId;
   final String? invoiceNumber;
   final String? tagihanName;
+  final String? paymentMethod;
+  final String? paymentImage;
   final String? dueDate;
   final String? udpatedDate;
   final String? status;
@@ -21,6 +23,8 @@ class TagihanModel {
       this.requestId,
       this.invoiceNumber,
       this.tagihanName,
+      this.paymentMethod,
+      this.paymentImage,
       this.dueDate,
       this.udpatedDate,
       this.status,
@@ -39,6 +43,8 @@ class TagihanModel {
         requestId: json['request_id'],
         invoiceNumber: json['invoice_id'],
         tagihanName: json['nama'],
+        paymentMethod: json['TransaksiPetugas']?['metode_penagihan'] ?? "",
+        paymentImage: json['TransaksiPetugas']?['bukti_bayar'] ?? "",
         dueDate: json['jatuh_tempo'],
         udpatedDate: json['updated_at'],
         status: json['status'],

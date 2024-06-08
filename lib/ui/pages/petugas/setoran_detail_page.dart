@@ -264,6 +264,9 @@ class SetoranDetailPage extends StatelessWidget {
                       border: Border.all(width: 1, color: mainColor),
                     ),
                     child: Image.network('$publicUrl/${setoran.buktiSetoran!}'),
+                  ),
+                  const SizedBox(
+                    height: 45,
                   )
                 ],
               ),
